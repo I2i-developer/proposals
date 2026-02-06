@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal Builder | Ideas2Invest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .input-sidebar { height: calc(100vh - 64px); background: #ffffff; }
+        
+        .preview-area { 
+            height: calc(100vh - 64px); 
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 25mm 20mm;
+            background: white;
+            margin: 40px auto;
+            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .floating-input {
+            transition: all 0.2s ease;
+            border: 1.5px solid #e2e8f0;
+        }
+
+        .floating-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .preview-area { background: white; overflow: visible; height: auto; }
+            .a4-container { margin: 0; box-shadow: none; width: 100%; padding: 15mm; }
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <nav class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-8 z-50 relative no-print">
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-blue-600 transition-colors">
+                <i class="fa fa-home fa-sm mr-1"></i> Dashboard
+            </button>
+            <div class="h-4 w-[1px] bg-slate-300"></div>
+            <h1 class="font-bold text-slate-700 uppercase text-xs tracking-widest">MF Proposal / <span class="text-blue-600">Draft #Ideas2invest</span></h1>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="window.print()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">
+                <i class="fas fa-download mr-2 text-xs"></i> Export PDF
+            </button>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <aside class="w-[400px] input-sidebar no-print p-8 overflow-y-auto shadow-2xl z-40">
+            <section class="mb-10">
+                <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-6">1. Client Profile</h3>
+                <div class="space-y-5">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Client Name</label>
+                        <input type="text" id="cName" oninput="runLogic()" value="Aditya Vikram" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Current Age</label>
+                            <input type="number" id="cAge" min="0" oninput="this.value < 0 ? this.value = 0 : runLogic()" value="30" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Goal Year</label>
+                            <input type="number" id="cDur" min="0" oninput="this.value < 0 ? this.value = 0 : runLogic()" value="15" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10">
+                <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-6">2. Investment Engine</h3>
+                <div class="space-y-5">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Monthly SIP Amount (₹)</label>
+                        <input type="number" id="cSip" oninput="runLogic()" value="25000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Lumpsum Injection (₹)</label>
+                        <input type="number" id="cLum" oninput="runLogic()" value="10000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Growth Expectation (% p.a.)</label>
+                        <input type="range" id="cRet" oninput="runLogic()" min="6" max="22" step="0.5" value="12" class="w-full mt-2">
+                        <div class="flex justify-between text-[12px] font-bold text-slate-400 mt-1">
+                            <span>10% Conservative</span>
+                            <span class="text-blue-600 text-base" id="retVal">12%</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10">
+                <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-3">3. SIP Asset Selection</h3>
+                <div id="fundInputs" class="space-y-3">
+                    <div class="flex gap-2 text-base">
+                        <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="HDFC Top 100 Fund">
+                        <input type="number" placeholder="%" class="fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="50">
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="Parag Parikh Flexi Cap">
+                        <input type="number" placeholder="%" class="fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="30">
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="SBI Small Cap Fund">
+                        <input type="number" placeholder="%" class="fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="20">
+                    </div>
+                </div>
+            </section>
+            <section class="mb-10 border-slate-200">
+                <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4">4. Lumpsum Asset Selection</h3>
+                <div id="lumpsumFundInputs" class="space-y-3">
+                    <div class="flex gap-2 text-base">
+                        <input type="text" placeholder="Lumpsum Fund Name" class="lum-fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none bg-slate-50 border border-slate-200 focus:border-blue-500 transition-all" oninput="runLogic()" value="ICICI Prudential Bluechip">
+                        <input type="number" placeholder="%" class="lum-fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none bg-slate-50 border border-slate-200 focus:border-blue-500 transition-all" oninput="runLogic()" value="100">
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Additional Fund (Optional)" class="lum-fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none bg-slate-50 border border-slate-200 focus:border-blue-500 transition-all" oninput="runLogic()" value="">
+                        <input type="number" placeholder="%" class="lum-fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none bg-slate-50 border border-slate-200 focus:border-blue-500 transition-all" oninput="runLogic()" value="">
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10 border-t border-slate-200 pt-8">
+                <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-2xl mb-6 border border-emerald-100">
+                    <div>
+                        <p class="text-[14px] font-black text-emerald-700 uppercase">Enable Retirement Phase</p>
+                        <p class="text-[13px] text-emerald-600">Include SWP in proposal</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="swpEnabled" class="sr-only peer" onchange="runLogic()">
+                        <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+
+                <div id="swpInputs" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                    <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-2">4. SWP Withdrawal Parameters</h3>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase">Target Retirement Age</label>
+                        <input type="number" id="cRetireAge" value="60" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase">SWP Duration (Years)</label>
+                            <input type="number" id="cSwpDur" value="25" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Initial SWP Rate (%)</label>
+                            <input type="number" id="cSwpRate" value="8" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase">Step-up Rate %</label>
+                            <input type="number" id="cSwpStep" value="5" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase">Step-up Interval</label>
+                            <input type="number" id="cSwpInterval" value="5" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </aside>
+
+        <main class="flex-1 preview-area">
+            <div class="a4-container" id="capture">
+                <div class="flex justify-between items-start mb-12">
+                    <div>
+                        <!-- <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                                <i class="fas fa-chart-pie text-xs"></i>
+                            </div>
+                            <span class="text-xl font-black tracking-tighter text-slate-800">Wealth<span class="text-blue-600">Studio</span></span>
+                        </div> -->
+                        <h2 class="text-3xl font-extrabold text-slate-900 leading-tight mb-5">Investment Growth <br>& Wealth Projection</h2>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Specially Prepared For</p>
+                        <p class="text-lg font-bold text-slate-800" id="pName">Aditya Vikram</p>
+                        <!-- <p class="text-xs text-slate-500">Proposal Date: Jan 20, 2026</p> -->
+                    </div>
+                    <div class="text-right">
+                        <img src="https://www.ideas2invest.com/assets/images/logo/logo.png" alt="Ideas2invest Logo" class="w-40 mb-6">
+                        
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-8 mb-10 pb-10 border-b border-slate-100">
+                    <div class="col-span-7">
+                        <h4 class="text-[13px] font-black text-blue-600 uppercase tracking-[0.2em] mb-3">Executive Summary</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                            Dear <span id="dyn_intro_name" class="font-bold text-slate-800 underline decoration-blue-200">Aditya Vikram</span>, 
+                            this proposal outlines a strategic roadmap designed to accelerate your wealth creation journey. 
+                            By leveraging a disciplined <span id="dyn_intro_method" class="font-bold text-slate-800 uppercase text-[12px]">SIP & Lumpsum</span> 
+                            approach, we aim to harness the power of compounding tailored to your 
+                            <span id="dyn_intro_duration" class="font-bold text-slate-800">15-year</span> horizon.
+                        </p>
+                        <div class="mt-6 p-5 bg-blue-50/30 border-l-4 border-blue-600 rounded-r-2xl">
+                            <p id="dyn_intro_quote" class="text-slate-600 text-[13px] leading-relaxed italic font-medium">
+                                </p>
+                        </div>
+                    </div>
+
+                    <div class="col-span-5 bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
+                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-5">Financial Roadmap Summary</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 font-medium">Risk Profile</span>
+                                <span id="dyn_risk_badge" class="text-[9px] font-black px-2 py-0.5 rounded transition-all duration-500 uppercase">Moderate</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 font-medium">Strategy</span>
+                                <span id="dyn_strategy_label" class="text-xs font-bold text-slate-700 uppercase">Equity Growth</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 font-medium">Planning Horizon</span>
+                                <span id="dyn_param_dur" class="text-xs font-bold text-slate-700">15 Years</span>
+                            </div>
+
+                            <!-- <div class="flex justify-between items-center pt-1">
+                                <span class="text-xs text-slate-500 font-medium">Total Outlay</span>
+                                <span id="dyn_total_outlay" class="text-xs font-bold text-slate-800 tracking-tight">₹ 0</span>
+                            </div> -->
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 font-medium">Wealth Multiplier</span>
+                                <span id="dyn_multiplier" class="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">1.0x</span>
+                            </div>
+
+                            <div class="pt-3 mt-3 border-t border-slate-200 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Target Maturity</p>
+                                    <span class="text-sm font-black text-blue-600" id="dyn_target_year">2041</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Projected ROI</p>
+                                    <span class="text-sm font-black text-slate-700" id="dyn_roi_display">12%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-12">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="h-[2px] w-8 bg-blue-600"></div>
+                        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Recommended Portfolio Funds</h4>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-4 mb-4" id="fundListDisplay">
+                        </div>
+
+                    <div class="grid grid-cols-1 gap-3" id="lumpsumDisplay">
+                        </div>
+<!--                     
+                    <p class="mt-4 text-[11px] text-slate-600 italic">
+                        *Selection is based on historical risk-adjusted returns and current market conditions. Past performance is not indicative of future results.
+                    </p> -->
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-10">
+                    <div class="stat-card p-6 rounded-2xl">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Investment</p>
+                        <p class="text-xl font-black text-slate-800" id="pTotalInv">₹ 0</p>
+                    </div>
+                    <div class="stat-card p-6 rounded-2xl border-blue-100 bg-blue-50/30">
+                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Maturity Corpus</p>
+                        <p class="text-xl font-black text-blue-700" id="pCorpus">₹ 0</p>
+                    </div>
+                    <div class="stat-card p-6 rounded-2xl border-emerald-100 bg-emerald-50/30">
+                        <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Estimated Gain</p>
+                        <p class="text-xl font-black text-emerald-700" id="pGain">₹ 0</p>
+                    </div>
+                </div>
+
+                <div class="space-y-10 mb-12">
+                    <div class="bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm transition-all hover:shadow-md">
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Growth Projection</h4>
+                                <p class="text-xl font-bold text-slate-800">Wealth Accumulation Path</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">Interactive Analysis</span>
+                            </div>
+                        </div>
+                        <div class="w-full relative" style="height: 450px;"> <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm transition-all hover:shadow-md">
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Portfolio Structure</h4>
+                                <p class="text-xl font-bold text-slate-800">Investment vs. Returns Ratio</p>
+                            </div>
+                        </div>
+                        <div class="w-full relative flex justify-center" style="height: 280px;">
+                            <canvas id="mixChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="mb-12">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="h-[2px] w-8 bg-blue-600"></div>
+                        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Recommended Portfolio Funds</h4>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-4" id="fundListDisplay">
+                        </div>
+                    
+                    <p class="mt-4 text-[10px] text-slate-400 italic">
+                        *Selection is based on historical risk-adjusted returns and current market conditions. Past performance is not indicative of future results.
+                    </p>
+                </div> -->
+
+                <!-- <div class="overflow-hidden rounded-2xl border border-slate-100 shadow-sm"> -->
+                <div class="overflow-hidden rounded-2xl border border-slate-100 shadow-sm max-w-none w-full">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-900 text-[10px] text-white uppercase tracking-widest">
+                                <th class="px-6 py-4 font-black">Age</th>
+                                <th class="px-6 py-4 font-black">Monthly Investment</th>
+                                <th class="px-6 py-4 font-black">Lumpsum Investment</th>
+                                <th class="px-6 py-4 font-black">Total Invested</th>
+                                <th class="px-6 py-4 font-black text-right">Year-End Corpus Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pTable" class="text-xs text-slate-600">
+                            </tbody>
+                    </table>
+                </div>
+                <div id="proposal_swp_section" class="hidden">
+                    <div class="mt-8 mb-12 bg-emerald-50/30 border border-emerald-100 rounded-[32px] p-8">
+                        <div class="flex justify-between items-end mb-8">
+                            <div>
+                                <h4 class="text-[11px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-2">Passive Income</h4>
+                                <p class="text-2xl font-bold text-slate-800">Systematic Withdrawal Plan</p>
+                            </div>
+                            <!-- <div class="text-right">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Total Lifecycle Payout</p>
+                                <p class="text-xl font-black text-emerald-600" id="dyn_total_swp">₹ 0</p>
+                            </div> -->
+                            <div class="text-right">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Maturity Corpus</p>
+                                <p class="text-xl font-black text-emerald-600" id="dyn_maturity_corpus">₹ 0</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-6 mb-4">
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-50">
+                                <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">Starting Annual Income</p>
+                                <p class="text-lg font-black text-slate-800" id="dyn_start_swp">₹ 0</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-50">
+                                <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">Total Withdrawal Received</p>
+                                <p class="text-lg font-black text-blue-700" id="dyn_total_withdrawal">₹ 0</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-50">
+                                <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">Final Corpus Remaining (at age <span id="dyn_final_age_label">85</span>)</p>
+                                <p class="text-lg font-black text-emerald-500" id="dyn_legacy_swp">₹ 0</p>
+                            </div>
+                        </div>
+
+                        <p class="text-[11px] text-slate-500 italic mb-8">
+                            *The SWP plan starts at age <span id="dyn_swp_start_age" class="font-bold text-slate-700">60</span>, providing inflation-adjusted monthly credits while keeping your principal capital invested.
+                        </p>
+
+                        <div class="bg-white p-4 rounded-2xl border border-emerald-100" style="height: 300px;">
+                            <canvas id="swpCashflowChart"></canvas>
+                        </div>
+                        
+                    </div>  
+                    <div class="mt-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-[11px] font-black text-emerald-600 uppercase tracking-widest">Yearly Withdrawal Schedule</h4>
+                            <span class="text-[10px] text-slate-400 font-bold italic">*Values adjusted for Step-up intervals</span>
+                        </div>
+                        <div class="overflow-hidden rounded-2xl border border-emerald-100 shadow-sm">
+                            <table class="w-full text-left border-collapse bg-white">
+                                <thead class="bg-emerald-50/50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-[10px] font-black text-emerald-700 uppercase">Age</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-emerald-700 uppercase">Monthly Income</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-emerald-700 uppercase">Annual Withdrawal</th>
+                                        <th class="px-6 py-4 text-right text-[10px] font-black text-emerald-700 uppercase">Remaining Corpus (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pSwpTable">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            <div id="proposal_summary_section" class="mt-12 p-8 rounded-[32px] bg-slate-900 text-white shadow-2xl relative overflow-hidden hidden no-print">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <h3 class="text-[12px] font-black text-blue-400 uppercase tracking-[0.4em] mb-6">Executive Summary</h3>
+                    
+                    <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
+                        <div>
+                            <p class="text-sm font-bold text-slate-400 mb-4 flex items-center gap-2">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span> Phase I: Wealth Creation
+                            </p>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-[10px] uppercase text-slate-500 font-bold">Total Investment</p>
+                                    <p class="text-2xl font-black text-white" id="sum_total_invested">₹ 0</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] uppercase text-slate-500 font-bold">Peak Portfolio Value</p>
+                                    <p class="text-2xl font-black text-blue-400" id="sum_peak_corpus">₹ 0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-sm font-bold text-emerald-400 mb-4 flex items-center gap-2">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Phase II: Financial Freedom
+                            </p>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-[10px] uppercase text-slate-500 font-bold">Overall Withdrawal Received</p>
+                                    <p class="text-2xl font-black text-white" id="sum_total_payout">₹ 0</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] uppercase text-slate-500 font-bold">Final Corpus Value</p>
+                                    <p class="text-2xl font-black text-emerald-400" id="sum_final_legacy">₹ 0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
+                        <div>
+                            <p class="text-base font-bold text-slate-400 mb-4 flex items-center gap-2">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span> Phase I: Wealth Creation
+                            </p>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold">Total Investment (Ages <span id="sum_age_start">30</span> - <span id="sum_age_retire_1">60</span>)</p>
+                                    <p class="text-2xl font-black text-white" id="sum_total_invested">₹ 0</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold">Peak Portfolio Value (At Age <span id="sum_age_retire_2">60</span>)</p>
+                                    <p class="text-2xl font-black text-blue-400" id="sum_peak_corpus">₹ 0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-base font-bold text-emerald-400 mb-4 flex items-center gap-2">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Phase II: Financial Freedom
+                            </p>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold">Overall Withdrawal (Ages <span id="sum_age_retire_3">60</span> - <span id="sum_age_final_1">85</span>)</p>
+                                    <p class="text-2xl font-black text-white" id="sum_total_payout">₹ 0</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold">Final Corpus Value (At Age <span id="sum_age_final_2">85</span>)</p>
+                                    <p class="text-2xl font-black text-emerald-400" id="sum_final_legacy">₹ 0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden mb-10">
+                        <div class="px-4 py-3 bg-white/10 border-b border-white/10">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-blue-400">Consolidated Fund Exposure</p>
+                        </div>
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-500 border-b border-white/5">
+                                    <th class="px-4 py-3 font-bold uppercase">Scheme Name</th>
+                                    <th class="px-4 py-3 font-bold uppercase">Monthly SIP</th>
+                                    <th class="px-4 py-3 font-bold uppercase text-right">Lumpsum Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryFundTable">
+                                </tbody>
+                        </table>
+                    </div> -->
+
+                    <div class="mt-10 pt-8 border-t border-slate-800">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-500 uppercase mb-3">
+                            <span>Accumulation Phase</span>
+                            <span>Distribution Phase</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden flex">
+                            <div id="bar_accumulation" class="h-full bg-blue-600" style="width: 50%"></div>
+                            <div id="bar_distribution" class="h-full bg-emerald-500" style="width: 50%"></div>
+                        </div>
+                        <p class="mt-4 text-center text-[13px] text-slate-400 italic">
+                            This strategy ensures that <span class="text-white font-bold" id="sum_multiplier">0x</span> of your principal is returned as income while maintaining capital growth.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+                <div class="mt-12 pt-8 border-t border-slate-100 text-center">
+                    <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold">Copyright © Ideas2invest 2026 • Confidential Financial Proposal</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    let growthChart, mixChart, swpChart;
+
+    function formatIndianCurrency(num) {
+        // Round to nearest integer for clean financial reports
+        const rounded = Math.round(num);
+        return rounded.toLocaleString('en-IN');
+    }
+
+    // --- Place this at the bottom of your <script> ---
+    function updateSummaryTable() {
+        const portfolioMap = new Map();
+
+        // 1. Collect SIP Funds
+        const sipNames = document.getElementsByClassName('fund-name');
+        const sipPercs = document.getElementsByClassName('fund-perc');
+        const monthlySipAmt = parseFloat(document.getElementById('cSip').value) || 0;
+
+        for (let i = 0; i < sipNames.length; i++) {
+            const name = sipNames[i].value.trim();
+            const perc = parseFloat(sipPercs[i].value) || 0;
+            if (name && perc > 0) {
+                portfolioMap.set(name, { sip: (monthlySipAmt * perc) / 100, lum: 0 });
+            }
+        }
+
+        // 2. Collect Lumpsum Funds
+        const lumNames = document.getElementsByClassName('lum-fund-name');
+        const lumPercs = document.getElementsByClassName('lum-fund-perc');
+        const totalLumAmt = parseFloat(document.getElementById('cLum').value) || 0;
+
+        for (let i = 0; i < lumNames.length; i++) {
+            const name = lumNames[i].value.trim();
+            const perc = parseFloat(lumPercs[i].value) || 0;
+            if (name && perc > 0) {
+                const existing = portfolioMap.get(name) || { sip: 0, lum: 0 };
+                portfolioMap.set(name, { 
+                    sip: existing.sip, 
+                    lum: existing.lum + ((totalLumAmt * perc) / 100) 
+                });
+            }
+        }
+
+        // 3. Render Table Rows
+        let tableHtml = '';
+        portfolioMap.forEach((values, fundName) => {
+            tableHtml += `
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td class="px-4 py-4 font-medium text-white">${fundName}</td>
+                    <td class="px-4 py-4 text-blue-400 font-bold">₹${formatIndianCurrency(values.sip)}</td>
+                    <td class="px-4 py-4 text-right text-slate-300">₹${formatIndianCurrency(values.lum)}</td>
+                </tr>`;
+        });
+
+        const tableBody = document.getElementById('summaryFundTable');
+        if (tableBody) {
+            tableBody.innerHTML = tableHtml || '<tr><td colspan="3" class="p-4 text-center text-slate-500">No funds selected</td></tr>';
+        }
+    }
+
+    function runLogic() {
+        try {
+            // 1. Fetch values from inputs with fallback defaults
+            const name = document.getElementById('cName').value || "Aditya Vikram";
+            const age = parseInt(document.getElementById('cAge').value) || 30;
+            const duration = parseInt(document.getElementById('cDur').value) || 0;
+            const monthlySip = parseFloat(document.getElementById('cSip').value) || 0;
+            const lumpsum = parseFloat(document.getElementById('cLum').value) || 0;
+            const rate = parseFloat(document.getElementById('cRet').value) || 12;
+
+            const fundNames = document.getElementsByClassName('fund-name');
+            const fundPercs = document.getElementsByClassName('fund-perc');
+
+            // 2. Sync Basic Header Info
+            if(document.getElementById('retVal')) document.getElementById('retVal').innerText = rate + '%';
+            if(document.getElementById('pName')) document.getElementById('pName').innerText = name;
+            if(document.getElementById('dyn_intro_name')) document.getElementById('dyn_intro_name').innerText = name;
+            if(document.getElementById('dyn_intro_name_short')) document.getElementById('dyn_intro_name_short').innerText = name.split(' ')[0];
+            if(document.getElementById('dyn_intro_duration')) document.getElementById('dyn_intro_duration').innerText = `${duration}-year`;
+            if(document.getElementById('dyn_param_dur')) document.getElementById('dyn_param_dur').innerText = `${duration} Years`;
+
+            // 3. Dynamic Investment Method Phrase
+            let method = "Strategic Allocation";
+            if (monthlySip > 0 && lumpsum > 0) method = "SIP & Lumpsum Injection";
+            else if (monthlySip > 0) method = "Systematic Investment (SIP)";
+            else if (lumpsum > 0) method = "Lumpsum Allocation";
+            
+            const methodElem = document.getElementById('dyn_intro_method');
+            if(methodElem) methodElem.innerText = method;
+
+            // 4. Enhanced Dynamic Narrative & Fund Count
+            let activeFundsCount = 0;
+            for(let f of fundNames) if(f.value.trim() !== "") activeFundsCount++;
+
+            const nameShort = name.split(' ').slice(0, 2).join(' ');
+            const assetText = activeFundsCount <= 1 ? "a specialized asset" : `${activeFundsCount} handpicked assets`;
+
+            const objectiveText = `
+                "We have engineered a bespoke growth strategy for 
+                <span class="text-blue-600 font-bold">${nameShort}</span> 
+                featuring <span class="text-slate-800 font-bold">${assetText}</span>, 
+                balancing aggressive capital appreciation with systematic market exposure."`;
+
+            const quoteElem = document.getElementById('dyn_intro_quote');
+            if (quoteElem) quoteElem.innerHTML = objectiveText;
+
+            // 5. Dynamic Risk Profiler
+            const riskBadge = document.getElementById('dyn_risk_badge');
+            if (riskBadge) {
+                if (rate > 14) {
+                    riskBadge.innerText = "HIGH RISK";
+                    riskBadge.className = "text-[10px] font-black px-2 py-1 rounded bg-red-50 text-red-600";
+                } else if (rate > 10) {
+                    riskBadge.innerText = "MODERATE-HIGH";
+                    riskBadge.className = "text-[10px] font-black px-2 py-1 rounded bg-orange-50 text-orange-600";
+                } else {
+                    riskBadge.innerText = "CONSERVATIVE";
+                    riskBadge.className = "text-[10px] font-black px-2 py-1 rounded bg-emerald-50 text-emerald-600";
+                }
+            }
+
+            // 6. Target Year
+            const currentYear = new Date().getFullYear();
+            const targetYearElem = document.getElementById('dyn_target_year');
+            if(targetYearElem) targetYearElem.innerText = currentYear + duration;
+
+            // 7. Core Financial Math
+            // const annualSip = monthlySip * 12;
+            // const r = rate / 100;
+            // let tableHtml = '';
+            // let currentCorpus = lumpsum;
+            // let totalInvested = lumpsum;
+            // let chartLabels = [];
+            // let corpusData = [];
+
+            // for (let i = 1; i <= duration; i++) {
+            //     currentCorpus = (currentCorpus + annualSip) * (1 + r);
+            //     totalInvested += annualSip;
+
+            //     chartLabels.push(`Age ${age + i}`);
+            //     corpusData.push(Math.round(currentCorpus));
+            const r = rate / 100;
+            const monthlyRate = r / 12; // Monthly periodic rate
+            let currentCorpus = lumpsum;
+            let totalInvested = lumpsum;
+            let tableHtml = '';
+            let chartLabels = [];
+            let corpusData = [];
+
+            for (let i = 1; i <= duration; i++) {
+                // 1. Calculate growth on the existing lumpsum/corpus for the year
+                // 2. Calculate the Future Value of 12 monthly SIPs for this specific year
+                // Formula for FV of SIP (Due): MonthlySIP * [((1+r)^n - 1) / r] * (1+r)
+                
+                let sipGrowthThisYear = monthlySip * ((Math.pow(1 + monthlyRate, 12) - 1) / monthlyRate) * (1 + monthlyRate);
+                
+                // Total corpus at end of year i
+                currentCorpus = (currentCorpus * Math.pow(1 + monthlyRate, 12)) + sipGrowthThisYear;
+                
+                totalInvested += (monthlySip * 12);
+
+                chartLabels.push(`Age ${age + i}`);
+                corpusData.push(Math.round(currentCorpus));
+
+                tableHtml += `
+                    <tr class="border-b border-slate-50 hover:bg-blue-50/50 transition-colors text-sm">
+                        <td class="px-2 py-4 font-bold text-slate-900">${age + i} yrs</td>
+                        <td class="px-2 py-4 font-bold text-slate-500">₹ ${formatIndianCurrency(monthlySip)}</td>
+                        <td class="px-2 py-4 font-bold text-slate-500">₹ ${formatIndianCurrency(lumpsum)}</td>
+                        <td class="px-2 py-4 font-bold text-slate-700">₹ ${formatIndianCurrency(totalInvested)}</td>
+                        <td class="px-2 py-4 text-right font-black text-blue-600">₹ ${formatIndianCurrency(currentCorpus)}</td>
+                    </tr>`;
+            }
+
+            // 8. Update UI Stat Cards
+            document.getElementById('pTable').innerHTML = tableHtml;
+            document.getElementById('pTotalInv').innerText = "₹" + formatIndianCurrency(totalInvested);
+            document.getElementById('pCorpus').innerText = "₹" + formatIndianCurrency(currentCorpus);
+            document.getElementById('pGain').innerText = "₹" + formatIndianCurrency(currentCorpus - totalInvested);
+
+            if (totalInvested > 0) {
+                const wealthMultiplier = (currentCorpus / totalInvested).toFixed(2);
+                
+                // Update the dynamic span
+                const multiplierElement = document.getElementById('dyn_multiplier');
+                if (multiplierElement) {
+                    multiplierElement.innerText = wealthMultiplier + "x";
+                    
+                    // Optional: Change color intensity based on performance
+                    if (wealthMultiplier >= 3) {
+                        multiplierElement.className = "text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded";
+                    } else if (wealthMultiplier >= 2) {
+                        multiplierElement.className = "text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded";
+                    } else {
+                        multiplierElement.className = "text-[11px] font-black text-slate-600 bg-slate-50 px-2 py-0.5 rounded";
+                    }
+                }
+            }
+
+            // 9. Fund List Display
+            // let fundHtml = '';
+            // for (let i = 0; i < fundNames.length; i++) {
+            //     if(fundNames[i].value) {
+            //         const fName = fundNames[i].value;
+            //         const fPerc = parseFloat(fundPercs[i].value) || 0;
+                    
+            //         fundHtml += `
+            //             <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+            //                 <div class="flex items-center gap-4">
+            //                     <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600 font-bold text-xs">
+            //                         ${fPerc}%
+            //                     </div>
+            //                     <div>
+            //                         <p class="text-sm font-bold text-slate-800">${fName}</p>
+            //                         <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Equity Mutual Fund • Growth Option</p>
+            //                     </div>
+            //                 </div>
+            //                 <div class="text-right">
+            //                     <p class="text-xs font-bold text-slate-400">Monthly Allocation</p>
+            //                     <p class="text-sm font-black text-slate-700">₹${formatIndianCurrency((monthlySip * fPerc) / 100)}</p>
+            //                 </div>
+            //             </div>`;
+            //     }
+            // }
+            // document.getElementById('fundListDisplay').innerHTML = fundHtml;
+
+            // let lumFundHtml = '';
+            // if (lumpsum > 0) {
+            //     for (let i = 0; i < lumFundNames.length; i++) {
+            //         if(lumFundNames[i].value.trim() !== "") {
+            //             const fName = lumFundNames[i].value;
+            //             const fPerc = parseFloat(lumFundPercs[i].value) || 0;
+            //             const allocatedAmt = (lumpsum * fPerc) / 100;
+
+            //             lumFundHtml += `
+            //                 <div class="flex items-center justify-between p-4 bg-blue-50/30 border border-blue-100 rounded-2xl mb-2">
+            //                     <div class="flex items-center gap-4">
+            //                         <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600 font-bold text-xs border border-blue-50">
+            //                             ${fPerc}%
+            //                         </div>
+            //                         <div>
+            //                             <p class="text-sm font-bold text-slate-800">${fName}</p>
+            //                             <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Lumpsum Injection Allocation</p>
+            //                         </div>
+            //                     </div>
+            //                     <div class="text-right">
+            //                         <p class="text-xs font-bold text-slate-400">One-time Investment</p>
+            //                         <p class="text-sm font-black text-blue-600">₹${formatIndianCurrency(allocatedAmt)}</p>
+            //                     </div>
+            //                 </div>`;
+            //         }
+            //     }
+            // }
+
+            // // Make sure you have a div with id="lumpsumDisplay" in your proposal HTML
+            // const lumDisplay = document.getElementById('lumpsumDisplay');
+            // if(lumDisplay) lumDisplay.innerHTML = lumFundHtml;
+            
+            // --- 1. HANDLE SIP FUNDS ---
+            let fundHtml = '';
+            for (let i = 0; i < fundNames.length; i++) {
+                if(fundNames[i].value.trim() !== "") {
+                    const fName = fundNames[i].value;
+                    const fPerc = parseFloat(fundPercs[i].value) || 0;
+                    
+                    fundHtml += `
+                        <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600 font-bold text-xs">
+                                    ${fPerc}%
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">${fName}</p>
+                                    <div class="flex items-center gap-2">
+                                            <span class="text-[9px] bg-emerald-500 text-white px-1.5 py-0.5 rounded-sm font-black uppercase tracking-widest">SIP</span>
+                                            <p class="text-[10px] text-slate-700 font-medium uppercase tracking-normal">Systematic Investment</p>
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Monthly</p>
+                                <p class="text-sm font-black text-emerald-600">₹ ${formatIndianCurrency((monthlySip * fPerc) / 100)}</p>
+                            </div>
+                        </div>`;
+                }
+            }
+            document.getElementById('fundListDisplay').innerHTML = fundHtml;
+
+            // --- 2. HANDLE LUMPSUM FUNDS ---
+            // 1. Capture the main Lumpsum amount from your input field
+            const lumpsumAmount = parseFloat(document.getElementById('cLum').value) || 0;
+
+            // 2. Capture the Lumpsum Fund Inputs from the sidebar
+            const lumNames = document.querySelectorAll('.lum-fund-name');
+            const lumPercs = document.querySelectorAll('.lum-fund-perc');
+
+            let lumFundHtml = '';
+
+            console.log("Checking Lumpsum logic... Amount:", lumpsumAmount);
+
+            if (lumpsumAmount > 0) {
+                for (let i = 0; i < lumNames.length; i++) {
+                    const fName = lumNames[i].value.trim();
+                    const fPerc = parseFloat(lumPercs[i].value) || 0;
+
+                    if (fName !== "" && fPerc > 0) {
+                        const allocatedAmt = (lumpsumAmount * fPerc) / 100;
+                        console.log(`Found Fund: ${fName}, Allocating: ${allocatedAmt}`);
+
+                        lumFundHtml += `
+                            <div class="flex items-center justify-between p-4 bg-blue-50/50 border border-blue-100 rounded-2xl mb-3">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600 font-bold text-xs border border-blue-100">
+                                        ${fPerc}%
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-800">${fName}</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded-sm font-black uppercase tracking-widest">Lumpsum</span>
+                                            <p class="text-[10px] text-slate-700 font-medium uppercase tracking-normal">One-time Investment</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Amount</p>
+                                    <p class="text-sm font-black text-blue-600">₹ ${formatIndianCurrency(allocatedAmt)}</p>
+                                </div>
+                            </div>`;
+                    }
+                }
+            }
+
+            // 3. Injecting the HTML
+            const lumContainer = document.getElementById('lumpsumDisplay');
+            if (lumContainer) {
+                lumContainer.innerHTML = lumFundHtml;
+                // Show/Hide container based on content
+                lumContainer.style.display = lumFundHtml === '' ? 'none' : 'block';
+            } else {
+                console.error("Critical: Could not find 'lumpsumDisplay' ID in HTML");
+            }
+
+            // 10. Update Charts
+            updateInteractiveCharts(chartLabels, corpusData, totalInvested, Math.round(currentCorpus - totalInvested));
+
+            // --- PHASE 2: SWP (The critical link) ---
+        //     calculateSWP(currentCorpus);
+
+        //     const swpEnabled = document.getElementById('swpEnabled').checked;
+        //     const swpInputContainer = document.getElementById('swpInputs');
+        //     const swpProposalSection = document.getElementById('proposal_swp_section'); // The ID of your Phase II div in the proposal
+        //     const summarySection = document.getElementById('proposal_summary_section');
+
+        //     if (swpEnabled) {
+        //         // Show Sidebar Inputs & Proposal Section
+        //         swpInputContainer.classList.remove('hidden');
+        //         if(swpProposalSection) swpProposalSection.classList.remove('hidden');
+        //         // summarySection.classList.remove('hidden');
+            
+        //         // Populate the specific Phase 1 & 2 numbers in the summary
+        //         document.getElementById('sum_total_invested').innerText = document.getElementById('pTotalInv').innerText;
+        //         document.getElementById('sum_peak_corpus').innerText = document.getElementById('pCorpus').innerText;
+        //         document.getElementById('sum_total_payout').innerText = document.getElementById('dyn_total_withdrawal').innerText;
+                
+        //         // REFRESH THE AGGREGATED TABLE HERE
+        //         // updateSummaryTable();
+                
+        //         // ... (The rest of your existing logic) ...
+        //         // After SIP math is done, call calculateSWP(currentCorpus);
+        //     } else {
+        //         // Hide Sidebar Inputs & Proposal Section
+        //         swpInputContainer.classList.add('hidden');
+        //         if(swpProposalSection) swpProposalSection.classList.add('hidden');
+        //         // summarySection.classList.add('hidden');
+                
+        //         // ... (The rest of your SIP only logic) ...
+        //     }
+        //     // 2. ALWAYS SHOW & UPDATE THE SUMMARY SECTION
+        //     if (summarySection) {
+        //         summarySection.classList.remove('hidden');
+                
+        //         // Sync Phase 1 Totals
+        //         document.getElementById('sum_total_invested').innerText = document.getElementById('pTotalInv').innerText;
+        //         document.getElementById('sum_peak_corpus').innerText = document.getElementById('pCorpus').innerText;
+                
+        //         // Update the Consolidated Fund Table (SIP + Lumpsum)
+        //         updateSummaryTable();
+        //     }
+            
+        // } catch (e) {
+        //     console.error("Calculation Error: ", e);
+        // }
+
+        // 1. Handle SWP Detail Visibility & Calculation
+        const swpEnabled = document.getElementById('swpEnabled').checked;
+        const swpInputContainer = document.getElementById('swpInputs');
+        const swpProposalSection = document.getElementById('proposal_swp_section');
+        const summarySection = document.getElementById('proposal_summary_section');
+
+        // Get accumulation values needed for summary resets or multipliers
+        const peakCorpusText = document.getElementById('pCorpus').innerText;
+        const totalInvText = document.getElementById('pTotalInv').innerText;
+
+        if (swpEnabled) {
+            // Show Sidebar Inputs & Detailed Phase II Section
+            swpInputContainer.classList.remove('hidden');
+            if(swpProposalSection) swpProposalSection.classList.remove('hidden');
+            
+            // IMPORTANT: This function must internally update sum_total_payout and sum_final_legacy
+            calculateSWP(currentCorpus); 
+
+            // Update Progress Bar based on real ages
+            const duration = parseInt(document.getElementById('cDur').value) || 0;
+            const swpDur = parseInt(document.getElementById('cSwpDur').value) || 0;
+            const totalCycle = duration + swpDur;
+            if (totalCycle > 0) {
+                document.getElementById('bar_accumulation').style.width = ((duration / totalCycle) * 100) + '%';
+                document.getElementById('bar_distribution').style.width = ((swpDur / totalCycle) * 100) + '%';
+            }
+        } else {
+            // Hide Sidebar Inputs & Detailed Phase II Section
+            swpInputContainer.classList.add('hidden');
+            if(swpProposalSection) swpProposalSection.classList.add('hidden');
+            
+            // RESET SUMMARY VALUES: Since SWP is off, payout is 0 and legacy is just the starting corpus
+            document.getElementById('sum_total_payout').innerText = "₹ 0";
+            document.getElementById('sum_final_legacy').innerText = "₹ 0";
+            document.getElementById('sum_multiplier').innerText = "0.0x";
+            
+            // Reset Progress Bar to 100% Accumulation
+            document.getElementById('bar_accumulation').style.width = '100%';
+            document.getElementById('bar_distribution').style.width = '0%';
+        }
+
+        // Calculate the age milestones
+        const startAge = parseInt(document.getElementById('cAge').value) || 30;
+        const sipDuration = parseInt(document.getElementById('cDur').value) || 0;
+        const mfCorpusAge = startAge + sipDuration;
+        const retireAge = parseInt(document.getElementById('cRetireAge').value) || 60;
+        const swpDuration = parseInt(document.getElementById('cSwpDur').value) || 25;
+        const finalAge = retireAge + swpDuration;
+
+        // Update Phase I Age Labels
+        document.getElementById('sum_age_start').innerText = startAge;
+        document.getElementById('sum_age_retire_1').innerText = mfCorpusAge;
+        document.getElementById('sum_age_retire_2').innerText = mfCorpusAge;
+
+        // Update Phase II Age Labels
+        document.getElementById('sum_age_retire_3').innerText = retireAge;
+        document.getElementById('sum_age_final_1').innerText = finalAge;
+        document.getElementById('sum_age_final_2').innerText = finalAge;
+
+        // 2. ALWAYS SHOW & UPDATE THE SUMMARY SECTION
+        if (summarySection) {
+            summarySection.classList.remove('hidden');
+            
+            // Sync Phase 1 Totals to Summary
+            document.getElementById('sum_total_invested').innerText = totalInvText;
+            document.getElementById('sum_peak_corpus').innerText = peakCorpusText;
+            
+            // Update the Consolidated Fund Table (SIP + Lumpsum)
+            updateSummaryTable();
+        }
+
+        } catch (e) {
+            console.error("Logic Error:", e);
+        }
+
+    }
+    
+
+    function calculateSWP(corpusAtRetirement) {
+        try {
+            // Fetch SWP Inputs
+            const retireAge = parseInt(document.getElementById('cRetireAge').value) || 60;
+            const swpDur = parseInt(document.getElementById('cSwpDur').value) || 25;
+            const initRate = parseFloat(document.getElementById('cSwpRate').value) / 100 || 0.08;
+            const stepUp = parseFloat(document.getElementById('cSwpStep').value) / 100 || 0.05;
+            const interval = parseInt(document.getElementById('cSwpInterval').value) || 5;
+            const returnRate = 0.12; // Assumed 12% returns during retirement
+            const finalAge = retireAge + swpDur;
+
+            let annualWithdrawal = corpusAtRetirement * initRate;
+            let runningCorpus = corpusAtRetirement;
+            let totalPaidOut = 0;
+            
+            let swpTableHtml = '';
+            let swpLabels = [];
+            let swpCorpusData = [];
+            let swpPayoutData = [];
+
+            for (let y = 1; y <= swpDur; y++) {
+                // Step-up logic: Increase withdrawal every X years
+                // if (y > 1 && (y - 1) % interval === 0) {
+                //     annualWithdrawal *= (1 + stepUp);
+                // }
+                if (stepUp > 0 && interval > 0) {
+                    if (y > 1 && (y - 1) % interval === 0) {
+                        annualWithdrawal *= (1 + stepUp);
+                    }
+                }
+
+                totalPaidOut += annualWithdrawal;
+                // Math: Remaining Money = (Old Money - Payout) + 9% Returns
+                runningCorpus = (runningCorpus - annualWithdrawal) * (1 + returnRate);
+
+                if (runningCorpus < 0) runningCorpus = 0;
+
+                swpLabels.push(`Age ${retireAge + y}`);
+                swpCorpusData.push(Math.round(runningCorpus));
+                swpPayoutData.push(Math.round(annualWithdrawal));
+
+                swpTableHtml += `
+                    <tr class="border-b border-emerald-50 text-sm hover:bg-emerald-50/50">
+                        <td class="px-6 py-3 font-bold text-slate-900">${retireAge + y} yrs</td>
+                        <td class="px-6 py-3 text-emerald-700 font-bold">₹${formatIndianCurrency(annualWithdrawal / 12)}</td>
+                        <td class="px-6 py-3 font-bold text-slate-500">₹${formatIndianCurrency(annualWithdrawal)}</td>
+                        <td class="px-6 py-3 text-right font-black text-slate-700">₹${formatIndianCurrency(runningCorpus)}</td>
+                    </tr>`;
+            }
+
+            // Update the label in the summary/detail section
+            const ageLabel = document.getElementById('dyn_final_age_label');
+            if (ageLabel) {
+                ageLabel.innerText = finalAge;
+            }
+
+            // 1. Maturity Corpus (The starting amount from Phase 1)
+            if(document.getElementById('dyn_maturity_corpus')) {
+                document.getElementById('dyn_maturity_corpus').innerText = "₹ " + formatIndianCurrency(corpusAtRetirement);
+            }
+
+            // 2. Starting Monthly Income
+            if(document.getElementById('dyn_start_swp')) {
+                document.getElementById('dyn_start_swp').innerText = "₹ " + formatIndianCurrency((corpusAtRetirement * initRate));
+            }
+
+            // 3. Total Withdrawal Received (Cumulative sum of all payouts)
+            if(document.getElementById('dyn_total_withdrawal')) {
+                document.getElementById('dyn_total_withdrawal').innerText = "₹ " + formatIndianCurrency(totalPaidOut);
+            }
+
+            // 4. Corpus Value at End (Legacy)
+            if(document.getElementById('dyn_legacy_swp')) {
+                document.getElementById('dyn_legacy_swp').innerText = "₹ " + formatIndianCurrency(Math.max(0, runningCorpus));
+            }
+
+            // 5. Age and Table
+            if(document.getElementById('dyn_swp_start_age')) document.getElementById('dyn_swp_start_age').innerText = retireAge;
+            if(document.getElementById('pSwpTable')) document.getElementById('pSwpTable').innerHTML = swpTableHtml;
+
+            // --- UPDATE THE EXECUTIVE SUMMARY SECTION (THE FIX) ---
+            // Ensure these IDs match your Dark Summary Box exactly
+            // Inside calculateSWP function, after the loop:
+            document.getElementById('sum_total_payout').innerText = "₹ " + formatIndianCurrency(totalPaidOut);
+            document.getElementById('sum_final_legacy').innerText = "₹ " + formatIndianCurrency(Math.max(0, runningCorpus));
+
+            // Calculate Multiplier
+            const investedValue = parseFloat(document.getElementById('pTotalInv').innerText.replace(/[₹,]/g, '')) || 1;
+            const multiplier = (totalPaidOut / investedValue).toFixed(1);
+            document.getElementById('sum_multiplier').innerText = multiplier + "x";
+
+            // Draw Chart
+            renderSwpChart(swpLabels, swpCorpusData, swpPayoutData);
+
+        } catch (e) {
+            console.error("Error in calculateSWP:", e);
+        }
+    }
+
+    function updateInteractiveCharts(labels, corpus, principal, profit) {
+        const ctx1 = document.getElementById('growthChart').getContext('2d');
+        const ctx2 = document.getElementById('mixChart').getContext('2d');
+
+        if (growthChart) growthChart.destroy();
+        if (mixChart) mixChart.destroy();
+
+        // 1. Large Growth Chart
+        growthChart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Wealth Corpus',
+                    data: corpus,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#2563eb',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 9,
+                    pointHoverBackgroundColor: '#2563eb',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#1e293b',
+                        padding: 16,
+                        displayColors: false,
+                        callbacks: {
+                            // FIXED: Added 'en-IN' for Indian comma system
+                            label: (context) => `Value: ₹ ${context.parsed.y.toLocaleString('en-IN')}`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        position: 'right',
+                        grid: { color: '#f1f5f9', borderDash: [5, 5] },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            // FIXED: Better logic for Lakhs/Crores on Axis
+                            callback: function(value) {
+                                if (value >= 10000000) return '₹' + (value / 10000000).toFixed(1) + ' Cr';
+                                if (value >= 100000) return '₹' + (value / 100000).toFixed(1) + ' L';
+                                return '₹' + value.toLocaleString('en-IN');
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 13, weight: '600' }, maxTicksLimit: 10 }
+                    }
+                }
+            }
+        });
+
+        // 2. Large Donut Chart
+
+        mixChart = new Chart(ctx2, {
+            type: 'doughnut',
+            // 1. Register the plugin
+            plugins: [ChartDataLabels], 
+            data: {
+                labels: ['Total Investment', 'Capital Appreciation'],
+                datasets: [{
+                    data: [principal, profit],
+                    backgroundColor: ['#25a944', '#2563eb'],
+                    borderWidth: 0,
+                    hoverOffset: 30
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    // 2. Configure the labels
+                    datalabels: {
+                        anchor: 'end',    // Position label at the outer edge
+                        align: 'end',     // Pull label outside the chart
+                        offset: 5,       // Distance from the chart edge
+                        color: '#616569',
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        formatter: (value, context) => {
+                            const label = context.chart.data.labels[context.dataIndex];
+                            return `${label}\n₹${value.toLocaleString('en-IN')}`;
+                        },
+                    },
+                    legend: { 
+                        position: 'bottom', 
+                        labels: { padding: 40, font: { size: 15, weight: 'bold' } } 
+                    },
+                    tooltip: {
+                        // Your existing tooltip logic remains untouched
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.parsed || 0;
+                                return ` ₹ ${value.toLocaleString('en-IN')}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // mixChart = new Chart(ctx2, {
+        //     type: 'doughnut',
+        //     data: {
+        //         labels: ['Total Investment', 'Capital Appreciation'],
+        //         datasets: [{
+        //             data: [principal, profit],
+        //             backgroundColor: ['#25a944', '#2563eb'],
+        //             borderWidth: 0,
+        //             hoverOffset: 30
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         maintainAspectRatio: false,
+        //         cutout: '70%',
+        //         plugins: {
+        //             legend: { 
+        //                 position: 'bottom', 
+        //                 labels: { padding: 40, font: { size: 15, weight: 'bold' } } 
+        //             },
+        //             tooltip: {
+        //                 callbacks: {
+        //                     // FIXED: Added 'en-IN' for Indian comma system
+        //                     label: function (context) {
+        //                         const value = context.parsed || 0;
+        //                         return ` ₹ ${value.toLocaleString('en-IN')}`;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
+    }
+
+    // let swpChart;
+    function renderSwpChart(labels, corpus, payouts) {
+    const ctx = document.getElementById('swpCashflowChart').getContext('2d');
+    if (swpChart) swpChart.destroy();
+
+    swpChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Remaining Wealth (Corpus)',
+                    data: corpus,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Annual Withdrawal',
+                    data: payouts,
+                    type: 'bar',
+                    backgroundColor: '#3b82f6',
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { position: 'left', ticks: { callback: v => '₹' + (v/100000).toFixed(0) + 'L' } },
+                y1: { position: 'right', grid: { drawOnChartArea: false } }
+            }
+        }
+    });
+}
+    window.onload = runLogic;
+</script>
+
+</body>
+</html>

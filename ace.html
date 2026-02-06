@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bajaj ACE Strategy | Ideas2Invest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .input-sidebar { height: calc(100vh - 64px); background: #ffffff; }
+        .preview-area { height: calc(100vh - 64px); background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); overflow-y: auto; scroll-behavior: smooth; }
+        .a4-container { width: 210mm; min-height: 297mm; padding: 20mm; background: white; margin: 40px auto; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.6); position: relative; }
+        .floating-input { transition: all 0.2s ease; border: 1.5px solid #e2e8f0; }
+        .floating-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .stat-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .preview-area { background: white; overflow: visible; height: auto; }
+            .a4-container { margin: 0; box-shadow: none; border: 1px solid #e2e8f0; print-color-adjust: exact; -webkit-print-color-adjust: exact; width: 100%; padding: 15mm; }
+            canvas { max-height: 300px !important; width: 100% !important; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="overflow-hidden">
+
+    <nav class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-8 z-50 relative no-print">
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-blue-600 transition-colors">
+                <i class="fa fa-home fa-sm mr-1"></i> Dashboard
+            </button>
+            <div class="h-4 w-[1px] bg-slate-300"></div>
+            <h1 class="font-bold text-slate-700 uppercase text-xs tracking-widest">Bajaj ACE Plan / <span class="text-blue-600">Strategy Draft</span></h1>
+        </div>
+        <button onclick="window.print()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-blue-600 transition-all shadow-lg">
+            <i class="fas fa-download mr-2 text-xs"></i> Export Proposal
+        </button>
+    </nav>
+
+    <div class="flex">
+        <aside class="w-[400px] input-sidebar no-print p-8 overflow-y-auto shadow-2xl z-40">
+            <section class="mb-10">
+                <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-6">1. Client & Policy Detail</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Client Name</label>
+                        <input type="text" id="cName" oninput="runAceLogic()" value="Aditya Vikram" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Current Age</label>
+                            <input type="number" id="cAge" oninput="runAceLogic()" value="35" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Annual Premium</label>
+                            <input type="number" id="cPremium" oninput="runAceLogic()" value="200000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10">
+                <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-6">2. Term Parameters</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">PPT (Pay Years)</label>
+                        <input type="number" id="cPpt" oninput="runAceLogic()" value="10" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Policy Term</label>
+                        <input type="number" id="cTerm" oninput="runAceLogic()" value="20" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10">
+                <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-6">3. Guaranteed Benefits</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Annual Income (Immediate)</label>
+                        <input type="number" id="cIncome" oninput="runAceLogic()" value="150000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Maturity Benefit</label>
+                        <input type="number" id="cMaturity" oninput="runAceLogic()" value="2800000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Initial Life Cover</label>
+                        <input type="number" id="cLifeCover" oninput="runAceLogic()" value="2500000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                </div>
+            </section>
+        </aside>
+
+        <main class="flex-1 preview-area">
+            <div class="a4-container">
+                <div class="flex justify-between items-start mb-12">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 leading-tight mb-4">Bajaj ACE Strategy <br>Cashflow & Security Plan</h2>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Prepared For</p>
+                        <p class="text-lg font-bold text-slate-800" id="pName">Aditya Vikram</p>
+                    </div>
+                    <img src="https://www.ideas2invest.com/assets/images/logo/logo.png" alt="Logo" class="w-40">
+                </div>
+
+                <div class="mb-5 pb-5 border-b border-slate-100">
+                    <h4 class="text-[13px] font-black text-blue-600 uppercase tracking-[0.2em] mb-3">Strategy Overview</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        This plan is engineered to provide <strong>Immediate Tax-Free Liquidity</strong> while securing your family's future. 
+                        Unlike traditional plans, your income starts from Year 1, ensuring your capital starts working for you instantly.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mt-5 mb-10">
+                    <div class="stat-card p-6 rounded-2xl">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">Total Guaranteed Income (Tax-free)</p>
+                        <p class="text-xl font-black text-slate-800" id="pTotalIncome">₹ 0</p>
+                    </div>
+                    <div class="stat-card p-6 rounded-2xl border-blue-100 bg-blue-50/30">
+                        <p class="text-[12px] font-bold text-blue-400 uppercase mb-1">Maturity Benefit (Tax-free)</p>
+                        <p class="text-xl font-black text-blue-700" id="pMaturity">₹ 0</p>
+                    </div>
+                    <div class="stat-card p-6 rounded-2xl border-emerald-100 bg-emerald-50/30">
+                        <p class="text-[12px] font-bold text-emerald-400 uppercase mb-1">Life Security (Tax-free)</p>
+                        <p class="text-xl font-black text-emerald-700" id="pLifeCover">₹ 0</p>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl border border-slate-100 shadow-sm mb-12">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-900 text-[10px] text-white uppercase tracking-widest">
+                                <th class="px-6 py-4 font-black">Age</th>
+                                <th class="px-6 py-4 font-black">Annual Premium</th>
+                                <th class="px-6 py-4 font-black">Annual Income (Tax Free)</th>
+                                <th class="px-6 py-4 font-black text-right">Net Cashflow</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pTable" class="text-sm text-slate-600">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm mb-10">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h4 class="text-[13px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Benefit Visualization</h4>
+                            <p class="text-xl font-bold text-slate-800">Cashflow & Security Timeline</p>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-red-400 rounded-full"></span>
+                                <span class="text-[11px] font-bold text-slate-500 uppercase">Premium</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-emerald-500 rounded-full"></span>
+                                <span class="text-[11px] font-bold text-slate-500 uppercase">Income</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full relative" style="height: 350px;">
+                        <canvas id="aceChart"></canvas>
+                    </div>
+                    <p class="mt-2 text-[10px] text-slate-400 italic text-center">
+                        *Visualization represents the dynamic shift from investment phase to tax-free harvest phase.
+                    </p>
+                </div>
+
+                <div class="mt-12 p-8 rounded-[32px] bg-slate-900 text-white shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+                    <div class="relative z-10">
+                        <h3 class="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6">Financial Freedom Summary</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div>
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-base font-bold text-blue-400">Phase I: Premium Payment</p>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total Investment (Ages <span id="sum_age_start">35</span> - <span id="sum_age_ppt">45</span>)</p>
+                                        <p class="text-2xl font-black text-white" id="sum_total_invested">₹ 0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total Annual Income Received</p>
+                                        <p class="text-2xl font-black text-blue-400" id="sum_total_income">₹ 0</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-currency-rupee text-emerald-500" viewBox="0 0 16 16">
+                                            <path d="M4 3.06h2.726c1.22 0 2.12.575 2.325 1.724H4v1.051h5.051C8.855 7.001 8 7.558 6.788 7.558H4v1.317L8.437 14h2.11L6.095 8.884h.855c2.316-.018 3.465-1.476 3.688-3.049H12V4.784h-1.345c-.08-.778-.357-1.335-.793-1.732H12V2H4z"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="text-base font-bold text-emerald-400">Phase II: Maturity</p>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Guaranteed Maturity (Age <span id="sum_age_term">55</span>)</p>
+                                        <p class="text-2xl font-black text-white" id="sum_maturity_val">₹ 0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total Guaranteed Benefits</p>
+                                        <p class="text-2xl font-black text-emerald-400" id="sum_overall_benefits">₹ 0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div>
+                                <p class="text-base font-bold text-slate-400 mb-4 flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-blue-500 rounded-full"></span> Phase I: Premium Payment
+                                </p>
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold">Total Investment (Ages <span id="sum_age_start">35</span> - <span id="sum_age_ppt">45</span>)</p>
+                                        <p class="text-2xl font-black text-white" id="sum_total_invested">₹ 0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold">Total Annual Income Received</p>
+                                        <p class="text-2xl font-black text-blue-400" id="sum_total_income">₹ 0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-base font-bold text-emerald-400 mb-4 flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Phase II: Maturity
+                                </p>
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold">Guaranteed Maturity (Age <span id="sum_age_term">55</span>)</p>
+                                        <p class="text-2xl font-black text-white" id="sum_maturity_val">₹ 0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold">Total Guaranteed Benefits</p>
+                                        <p class="text-2xl font-black text-emerald-400" id="sum_overall_benefits">₹ 0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="mt-6 pt-8 border-t border-slate-800 flex flex-col items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-[12px] font-black text-rose-400 uppercase tracking-[0.3em]">Life Cover Protection</h4>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-black text-white mb-2" id="sum_life_cover">₹ 0</p>
+                                <p class="text-[11px] text-slate-500 font-medium uppercase tracking-wider">Financial security for your family throughout the policy term</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12 pt-8 border-t border-slate-100 text-center">
+                    <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold">Copyright © Ideas2invest 2026 • Confidential Financial Proposal</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let aceChart;
+        function fmt(num) {
+            return "₹" + Math.round(num).toLocaleString('en-IN');
+        }
+
+        function runAceLogic() {
+            const name = document.getElementById('cName').value;
+            const age = parseInt(document.getElementById('cAge').value) || 0;
+            const premium = parseFloat(document.getElementById('cPremium').value) || 0;
+            const ppt = parseInt(document.getElementById('cPpt').value) || 0;
+            const term = parseInt(document.getElementById('cTerm').value) || 0;
+            const income = parseFloat(document.getElementById('cIncome').value) || 0;
+            const maturity = parseFloat(document.getElementById('cMaturity').value) || 0;
+            const lifeCover = parseFloat(document.getElementById('cLifeCover').value) || 0;
+
+            // Updates
+            document.getElementById('pName').innerText = name;
+            document.getElementById('pTotalIncome').innerText = fmt(income * term);
+            document.getElementById('pMaturity').innerText = fmt(maturity);
+            document.getElementById('pLifeCover').innerText = fmt(lifeCover);
+
+            // Dark Summary Updates
+            document.getElementById('sum_age_start').innerText = age;
+            document.getElementById('sum_age_ppt').innerText = age + ppt;
+            document.getElementById('sum_age_term').innerText = age + term;
+            document.getElementById('sum_total_invested').innerText = fmt(premium * ppt);
+            document.getElementById('sum_total_income').innerText = fmt(income * term);
+            document.getElementById('sum_maturity_val').innerText = fmt(maturity);
+            document.getElementById('sum_overall_benefits').innerText = fmt((income * term) + maturity);
+            document.getElementById('sum_life_cover').innerText = fmt(lifeCover);
+
+            // Table Generation
+            let tableHtml = '';
+            for (let i = 1; i <= term; i++) {
+                const yearPremium = i <= ppt ? premium : 0;
+                const netFlow = income - yearPremium + (i === term ? maturity : 0);
+                tableHtml += `
+                    <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 font-bold text-slate-500">${age + i} <span class="text-[12px] font-semibold ml-1">(Yr ${i})</span></td>
+                        <td class="px-6 py-4 text-center font-semibold text-slate-700">${fmt(yearPremium)}</td>
+                        <td class="px-6 py-4 text-center text-emerald-600 font-bold">${fmt(income)} ${i===term ? '<span class="block text-[10px] text-blue-500">+ MATURITY</span>' : ''}</td>
+                        <td class="px-6 py-4 text-right font-black ${netFlow >= 0 ? 'text-slate-800' : 'text-red-500'}">${fmt(netFlow)}</td>
+                    </tr>
+                `;
+            }
+            document.getElementById('pTable').innerHTML = tableHtml;
+            // Logic for Chart Data
+            const labels = [];
+            const premiumData = [];
+            const incomeData = [];
+            const maturityData = [];
+
+            for (let i = 1; i <= term; i++) {
+                labels.push("Age " + (age + i));
+                premiumData.push(i <= ppt ? -premium : 0);
+                incomeData.push(income);
+                maturityData.push(i === term ? maturity : 0);
+            }
+
+            updateChart(labels, premiumData, incomeData, maturityData);
+        }
+
+        // function updateChart(labels, premiums, incomes, maturity) {
+        //     const ctx = document.getElementById('aceChart').getContext('2d');
+            
+        //     // Check if we are printing to adjust colors (High Contrast for PDF)
+        //     const isPrinting = window.matchMedia('print').matches;
+            
+        //     const colors = {
+        //         premium: isPrinting ? '#64748b' : '#fb7185',  // Slate vs Soft Red
+        //         income: isPrinting ? '#059669' : '#10b981',   // Deep Green vs Emerald
+        //         maturity: isPrinting ? '#1e3a8a' : '#3b82f6'  // Navy vs Blue
+        //     };
+
+        //     if (aceChart) aceChart.destroy();
+
+        //     aceChart = new Chart(ctx, {
+        //         type: 'bar',
+        //         data: {
+        //             labels: labels,
+        //             datasets: [
+        //                 {
+        //                     label: 'Premium Outflow',
+        //                     data: premiums,
+        //                     backgroundColor: colors.premium,
+        //                     borderRadius: 2, // Squarer for professional look
+        //                     stack: 'Stack 0',
+        //                 },
+        //                 {
+        //                     label: 'Annual Income',
+        //                     data: incomes,
+        //                     backgroundColor: colors.income,
+        //                     borderRadius: 2,
+        //                     stack: 'Stack 0',
+        //                 },
+        //                 {
+        //                     label: 'Maturity Benefit',
+        //                     data: maturity,
+        //                     backgroundColor: colors.maturity,
+        //                     borderRadius: 2,
+        //                     stack: 'Stack 0',
+        //                 }
+        //             ]
+        //         },
+        //         options: {
+        //             responsive: true,
+        //             maintainAspectRatio: false,
+        //             animation: isPrinting ? false : { duration: 1000 }, // Disable animation for instant PDF capture
+        //             plugins: {
+        //                 legend: { 
+        //                     display: true, 
+        //                     position: 'bottom',
+        //                     labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 10, weight: '700' } }
+        //                 }
+        //             },
+        //             scales: {
+        //                 x: { 
+        //                     grid: { display: false },
+        //                     ticks: { color: '#1e293b', font: { size: 11, weight: '600' } }
+        //                 },
+        //                 y: {
+        //                     beginAtZero: false,
+        //                     ticks: {
+        //                         color: '#64748b',
+        //                         callback: value => '₹' + Math.abs(value/1000).toLocaleString() + 'k',
+        //                         font: { size: 12 }
+        //                     },
+        //                     grid: { color: '#f1f5f9' }
+        //                 }
+        //             }
+        //         }
+        //     });
+        // }
+
+        // // Special Listener to Redraw Chart when Print Dialog Opens
+        // window.onbeforeprint = () => { runAceLogic(); };
+        // window.onafterprint = () => { runAceLogic(); };
+
+        function updateChart(labels, premiums, incomes, maturity) {
+            const ctx = document.getElementById('aceChart').getContext('2d');
+
+            // Check if we are printing to adjust colors (High Contrast for PDF)
+            const isPrinting = window.matchMedia('print').matches;
+            
+            const colors = {
+                premium: isPrinting ? '#64748b' : '#fb7185',  // Slate vs Soft Red
+                income: isPrinting ? '#059669' : '#10b981',   // Deep Green vs Emerald
+                maturity: isPrinting ? '#1e3a8a' : '#3b82f6'  // Navy vs Blue
+            };
+            
+            if (aceChart) aceChart.destroy();
+
+            aceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Premium Outflow',
+                            data: premiums,
+                            backgroundColor: '#fb7185',
+                            borderRadius: 5,
+                            stack: 'Stack 0',
+                        },
+                        {
+                            label: 'Annual Income',
+                            data: incomes,
+                            backgroundColor: '#10b981',
+                            borderRadius: 5,
+                            stack: 'Stack 0',
+                        },
+                        {
+                            label: 'Maturity Benefit',
+                            data: maturity,
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 5,
+                            stack: 'Stack 0',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            display: true, 
+                            position: 'bottom',
+                            labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + Math.abs(context.raw).toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            grid: { display: false },
+                            ticks: { font: { size: 11, weight: '600' } }
+                        },
+                        y: {
+                            ticks: {
+                                callback: value => '₹' + Math.abs(value/1000).toLocaleString() + 'k',
+                                font: { size: 12 }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        }
+                    }
+                }
+            });
+        }
+        runAceLogic();
+    </script>
+</body>
+</html>
