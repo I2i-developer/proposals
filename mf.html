@@ -717,6 +717,7 @@
             document.getElementById('pTotalInv').innerText = "₹" + formatIndianCurrency(totalInvested);
             document.getElementById('pCorpus').innerText = "₹" + formatIndianCurrency(currentCorpus);
             document.getElementById('pGain').innerText = "₹" + formatIndianCurrency(currentCorpus - totalInvested);
+            document.getElementById('dyn_roi_display').innerText = rate + '%';
 
             if (totalInvested > 0) {
                 const wealthMultiplier = (currentCorpus / totalInvested).toFixed(2);
