@@ -655,7 +655,12 @@
                 let harvestPoints = [];
                 const yearsToRetire = startAge - age;
 
-                for (let yr = 1; yr <= yearsToRetire; yr++) {
+                // for (let yr = 1; yr <= yearsToRetire; yr++) {
+                //     let currentAge = age + yr;
+
+                const totalYears = aceTerm;
+
+                for (let yr = 1; yr <= totalYears; yr++) {
                     let currentAge = age + yr;
                     
                     // Ace Outflow (Premium)
@@ -680,7 +685,7 @@
                     currentCorpus = (currentCorpus + yrAceIn + totalYearlyMfInflow) * (1 + (mfRate / 100));
 
                     // Table Construction
-                    if (yr <= 20 || currentAge === startAge) {
+                    if (yr <= 35 || currentAge === startAge) {
                         accumulationTableHtml += `
                             <tr class="border-b border-slate-50 transition-colors hover:bg-slate-50 ${yr === 1 ? 'bg-blue-50/40' : ''}">
                                 <td class="px-6 py-4 text-sm font-black text-slate-900">${currentAge}</td>
