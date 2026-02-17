@@ -425,45 +425,11 @@
                     </div>
                 </div>
 
-            <div id="proposal_summary_section" class="mt-12 p-8 rounded-[32px] bg-slate-900 text-white shadow-2xl relative overflow-hidden hidden no-print">
+            <!-- <div id="proposal_summary_section" class="mt-12 p-8 rounded-[32px] bg-slate-900 text-white shadow-2xl relative overflow-hidden hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
                 
                 <div class="relative z-10">
                     <h3 class="text-[12px] font-black text-blue-400 uppercase tracking-[0.4em] mb-6">Executive Summary</h3>
-                    
-                    <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
-                        <div>
-                            <p class="text-sm font-bold text-slate-400 mb-4 flex items-center gap-2">
-                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span> Phase I: Wealth Creation
-                            </p>
-                            <div class="space-y-4">
-                                <div>
-                                    <p class="text-[10px] uppercase text-slate-500 font-bold">Total Investment</p>
-                                    <p class="text-2xl font-black text-white" id="sum_total_invested">₹ 0</p>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] uppercase text-slate-500 font-bold">Peak Portfolio Value</p>
-                                    <p class="text-2xl font-black text-blue-400" id="sum_peak_corpus">₹ 0</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <p class="text-sm font-bold text-emerald-400 mb-4 flex items-center gap-2">
-                                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Phase II: Financial Freedom
-                            </p>
-                            <div class="space-y-4">
-                                <div>
-                                    <p class="text-[10px] uppercase text-slate-500 font-bold">Overall Withdrawal Received</p>
-                                    <p class="text-2xl font-black text-white" id="sum_total_payout">₹ 0</p>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] uppercase text-slate-500 font-bold">Final Corpus Value</p>
-                                    <p class="text-2xl font-black text-emerald-400" id="sum_final_legacy">₹ 0</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
                         <div>
                             <p class="text-base font-bold text-slate-400 mb-4 flex items-center gap-2">
@@ -498,23 +464,6 @@
                         </div>
                     </div>
 
-                    <!-- <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden mb-10">
-                        <div class="px-4 py-3 bg-white/10 border-b border-white/10">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-blue-400">Consolidated Fund Exposure</p>
-                        </div>
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="text-slate-500 border-b border-white/5">
-                                    <th class="px-4 py-3 font-bold uppercase">Scheme Name</th>
-                                    <th class="px-4 py-3 font-bold uppercase">Monthly SIP</th>
-                                    <th class="px-4 py-3 font-bold uppercase text-right">Lumpsum Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody id="summaryFundTable">
-                                </tbody>
-                        </table>
-                    </div> -->
-
                     <div class="mt-10 pt-8 border-t border-slate-800">
                         <div class="flex justify-between text-[11px] font-bold text-slate-500 uppercase mb-3">
                             <span>Accumulation Phase</span>
@@ -529,8 +478,85 @@
                         </p>
                     </div>
                 </div>
-            </div>
+            </div> -->
+        <!--<div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden mb-10">
+                <div class="px-4 py-3 bg-white/10 border-b border-white/10">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-blue-400">Consolidated Fund Exposure</p>
+                </div>
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-slate-500 border-b border-white/5">
+                            <th class="px-4 py-3 font-bold uppercase">Scheme Name</th>
+                            <th class="px-4 py-3 font-bold uppercase">Monthly SIP</th>
+                            <th class="px-4 py-3 font-bold uppercase text-right">Lumpsum Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryFundTable">
+                        </tbody>
+                </table>
+            </div> -->
 
+                <div id="proposal_summary_section" class="mt-12 p-8 rounded-[40px] bg-white border-2 border-slate-600 text-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-60"></div>
+                    
+                    <div class="relative z-10">
+                        <!-- <h3 class="text-center text-[14px] font-black text-pink-600 uppercase tracking-[0.3em] mb-6 px-1 underline underline-offset-4 decoration-pink-200 decoration-4">Executive Summary</h3> -->
+                        <h3 class="mx-auto w-fit bg-pink-100 px-6 py-1 rounded-full text-center text-[13px] font-black text-pink-600 uppercase tracking-[0.3em] mb-6">Executive Summary</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="p-6 rounded-3xl bg-slate-50/50 border border-indigo-200 shadow-md">
+                                <p class="text-base font-bold text-blue-600 mb-6 flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-sm shadow-blue-200"></span> 
+                                    Phase I: Wealth Creation
+                                </p>
+                                <div class="space-y-6">
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total Investment (Ages <span id="sum_age_start">30</span> - <span id="sum_age_retire_1">60</span>)</p>
+                                        <p class="text-2xl font-black text-slate-900" id="sum_total_invested">₹ 0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Peak Portfolio Value (At Age <span id="sum_age_retire_2">60</span>)</p>
+                                        <p class="text-2xl font-black text-blue-600" id="sum_peak_corpus">₹ 0</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-6 rounded-3xl bg-emerald-50/30 border border-emerald-300/50 shadow-md">
+                                <p class="text-base font-bold text-emerald-700 mb-6 flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-sm shadow-emerald-200"></span> 
+                                    Phase II: Financial Freedom
+                                </p>
+                                <div class="space-y-6">
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Overall Withdrawal (Ages <span id="sum_age_retire_3">60</span>-<span id="sum_age_final_1">85</span>)</p>
+                                        <p class="text-2xl font-black text-slate-900" id="sum_total_payout">₹ 0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Final Corpus Value (At Age <span id="sum_age_final_2">85</span>)</p>
+                                        <p class="text-2xl font-black text-emerald-600" id="sum_final_legacy">₹ 0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-t border-slate-300">
+                            <div class="flex justify-between text-[11px] font-bold uppercase mb-2 tracking-widest">
+                                <span class="flex items-center gap-2 text-blue-500"><span class="w-2 h-2 bg-indigo-500 rounded-full"></span> Accumulation Phase</span>
+                                <span class="flex items-center gap-2 text-emerald-600"><span class="w-2 h-2 bg-emerald-700 rounded-full"></span> Distribution Phase</span>
+                            </div>
+                            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex shadow-inner ring-4 ring-slate-50">
+                                <div id="bar_accumulation" class="h-full bg-blue-500 transition-all duration-500" style="width: 50%"></div>
+                                <div id="bar_distribution" class="h-full bg-emerald-500 transition-all duration-500" style="width: 50%"></div>
+                            </div>
+                            
+                            <div class="mt-6 px-6 py-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                                <p class="text-center text-[14px] text-slate-600 leading-relaxed">
+                                    This strategy ensures that <span class="text-slate-900 font-black italic underline decoration-indigo-200 decoration-4 underline-offset-4" id="sum_multiplier">0x</span> of your principal is returned as income while maintaining capital growth.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="mt-12 pt-8 border-t border-slate-100 text-center">
                     <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold">Copyright © Ideas2invest 2026 • Confidential Financial Proposal</p>
                 </div>

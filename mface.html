@@ -127,11 +127,11 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">PPT (Years)</label>
-                            <input type="number" id="acePpt" oninput="runLogic()" value="10" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <input type="number" id="acePpt" oninput="runLogic()" value="10" min="5" max="12" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                         </div>
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Policy Term</label>
-                            <input type="number" id="aceTerm" oninput="runLogic()" value="20" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <input type="number" id="aceTerm" oninput="runLogic()" value="20" min="10" max="85" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                         </div>
                     </div>
 
@@ -164,6 +164,17 @@
                         <input type="number" id="mfSip" oninput="runLogic()" value="5000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                     </div>
                     <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">SIP Duration (Years)</label>
+                        <div class="flex items-center gap-4">
+                            <input type="range" id="mfSipDuration" min="5" max="40" value="15" 
+                                oninput="this.nextElementSibling.value = this.value; runLogic()" 
+                                class="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <input type="number" id="mfSipDurationNum" value="15" oninput="this.previousElementSibling.value = this.value; runLogic()"
+                                class="w-12 text-sm font-bold text-slate-700 bg-slate-100 rounded-md px-1 py-1 text-md text-center">
+                        </div>
+                        <p class="text-[12px] text-slate-400 mt-1 font-medium">Choose a Period between 5 and Policy Term-(<span id="polTerm" class="text-slate-500">20</span>)</p>
+                    </div>
+                    <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Additional Lumpsum (₹)</label>
                         <input type="number" id="mfLumpsum" oninput="runLogic()" value="5000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                     </div>
@@ -175,10 +186,6 @@
                             <span class="text-emerald-600 text-base" id="rateVal">12%</span>
                         </div>
                     </div>
-                    <!-- <div>
-                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Target Mutual Fund</label>
-                        <input type="text" id="mfName" oninput="runLogic()" value="HDFC Balanced Advantage Fund" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
-                    </div> -->
                     <div class="space-y-3">
                         <div class="flex justify-between items-center mb-1">
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Growth Engines (MF)</label>
@@ -563,37 +570,37 @@
                                     <p class="text-slate-700 font-medium text-[12px] mb-1">ACE Assured Benefit</p>
                                     <p class="text-2xl font-extrabold text-purple-700" id="sum_ace_benefit">₹0</p>
                                 </div>
-                                <div class="pt-4 border-t border-slate-400">
+                                <div class="pt-4 border-t-2 border-slate-400">
                                     <p class="text-slate-800 font-medium text-[11px] mb-1">Projected Corpus @ Age <span id="sum_retire_age">60</span></p>
                                     <p class="text-3xl font-black text-blue-700 tracking-tight" id="sum_peak_corpus">₹0</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-span-4 bg-slate-900 px-6 py-4 rounded-[40px] shadow-xl relative overflow-hidden text-white">
+                        <div class="col-span-4 bg-yellow-50 px-6 py-4 rounded-[40px] shadow-xl relative overflow-hidden text-white">
                             <div class="absolute top-0 right-0 p-4">
-                                <span class="bg-orange-500/20 text-orange-400 text-[11px] font-black px-3 py-1 rounded-full uppercase">Phase 02</span>
+                                <span class="bg-orange-500/20 text-orange-500 text-[11px] font-black px-3 py-1 rounded-full uppercase">Phase 02</span>
                             </div>
-                            <h5 class="text-slate-400 text-[11px] font-black uppercase tracking-widest mb-2 mt-8">Retirement Harvest</h5>
+                            <h5 class="text-slate-600 text-[12px] font-black uppercase tracking-widest mb-2 mt-8">Retirement Harvest</h5>
                             
-                            <div class="space-y-6">
+                            <div class="space-y-4">
                                 <div>
-                                    <p class="text-slate-400 font-medium text-[12px] mb-1">Starting Monthly Income</p>
+                                    <p class="text-slate-700 font-medium text-[12px] mb-1">Starting Monthly Income</p>
                                     <p class="text-xl font-black text-orange-400" id="sum_start_income">₹0</p>
                                 </div>
                                 <div>
-                                    <p class="text-slate-400 font-medium text-[12px]">Total Lifetime Payout</p>
-                                    <p class="text-xl font-bold text-white" id="sum_total_payout">₹0</p>
+                                    <p class="text-slate-700 font-medium text-[12px]">Total Lifetime Payout</p>
+                                    <p class="text-2xl font-extrabold text-[#A0522D]" id="sum_total_payout">₹0</p>
                                 </div>
-                                <div class="pt-2 border-t border-slate-800">
-                                    <p class="text-slate-400 font-bold text-[11px] mb-1">Wealth Efficiency</p>
+                                <div class="pt-2 border-t-2 border-slate-400">
+                                    <p class="text-slate-600 font-bold text-[11px] mb-1">Wealth Efficiency</p>
                                     <div class="flex items-center gap-2">
                                         <div class="bg-emerald-500/10 p-1.5 rounded-lg">
-                                            <i class="fas fa-coins text-emerald-400 text-xs"></i>
+                                            <i class="fas fa-coins text-emerald-600 text-xs"></i>
                                         </div>
                                         <div>
-                                            <p class="text-[15px] font-black text-emerald-400 leading-none" id="sum_multiplier">0.0x Multiplier</p>
-                                            <p class="text-[10px] text-slate-300 font-medium mt-1"></p>
+                                            <p class="text-[15px] font-black text-emerald-600 leading-none" id="sum_multiplier">0.0x Multiplier</p>
+                                            <p class="text-[10px] text-slate-600 font-medium mt-1"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -734,6 +741,7 @@
                 const totalAcePayout = (aceInc * aceTerm) + aceMat;
 
                 const mfSip = parseFloat(document.getElementById('mfSip')?.value) || 0;
+                const mfSipDuration = parseInt(document.getElementById('mfSipDuration')?.value) || 0;
                 const mfLump = parseFloat(document.getElementById('mfLumpsum')?.value) || 0;
                 const mfRate = parseFloat(document.getElementById('mfRate')?.value) || 12;
                 const mfName = document.getElementById('mfName')?.value || "Mutual Fund Name";
@@ -772,15 +780,30 @@
                     
                     // Ace Inflow (Income/Maturity)
                     let yrAceIn = (yr <= aceTerm) ? aceInc : 0;
+                    let finAceIn = aceInc;
                     if (currentAge === (age + aceTerm)) yrAceIn += aceMat;
+                    let displayAceCell = `₹${yrAceIn.toLocaleString('en-IN')}`;
+
+                    // Check if it's the final year and there's a maturity amount
+                    if (yr === totalYears && aceMat > 0) {
+                        displayAceCell = `₹${finAceIn.toLocaleString('en-IN')} <span class="text-blue-500 text-base font-bolder">+</span> ₹${aceMat.toLocaleString('en-IN')}`;
+                    }
                     
                     // MF Inflow: Annual SIP
-                    let annualSip = mfSip * 12;
+
+                    // let annualSip = mfSip * 12;
+                    let annualSip = (yr <= mfSipDuration) ? (mfSip * 12) : 0;
                     let totalYearlyMfInflow = annualSip;
                     let displaySipCell = `₹${annualSip.toLocaleString('en-IN')}`;
                     
+                    if (yr <= mfSipDuration) {
+                        displaySipCell = `₹${annualSip.toLocaleString('en-IN')}`;
+                    } else {
+                        displaySipCell = `<span class="text-slate-500 text-[13px]">₹-</span>`;
+                    }
+
                     // Handle Year 1 Lumpsum specifically
-                    if (yr === 1) {
+                    if (yr === 1 && mfLump > 0) {
                         totalYearlyMfInflow = annualSip + mfLump; 
                         displaySipCell = `₹${annualSip.toLocaleString('en-IN')} <span class="text-blue-500 font-bold">+</span> ₹${mfLump.toLocaleString('en-IN')}`;
                     }
@@ -790,14 +813,18 @@
 
                     // Table Construction
                     if (yr <= 35 || currentAge === startAge) {
+                        const sipStatusClass = yr <= mfSipDuration ? "font-bold text-slate-600" : "text-slate-300";
                         accumulationTableHtml += `
                             <tr class="border-b border-slate-50 transition-colors hover:bg-slate-50 ${yr === 1 ? 'bg-blue-50/40' : ''}">
                                 <td class="px-6 py-4 text-sm font-black text-slate-900">${currentAge}</td>
                                 <td class="px-6 py-4 text-sm text-red-500 font-bold">₹${yrPremium > 0 ? yrPremium.toLocaleString('en-IN') : '-'}</td>
-                                <td class="px-6 py-4 text-sm text-emerald-600 font-bold">₹${yrAceIn > 0 ? yrAceIn.toLocaleString('en-IN') : '-'}</td>
-                                <td class="px-4 py-4 text-sm font-bold font-base text-slate-600">
+                                <td class="px-6 py-4 text-sm text-emerald-600 font-bold">
+                                    ${yrAceIn > 0 || (yr === totalYears && aceMat > 0) ? displayAceCell : '-'}
+                                    ${(yr === totalYears && aceMat > 0) ? '<div class="text-[9px] text-blue-600 font-black uppercase mt-1 tracking-tightest">Policy Maturity Added</div>' : ''}
+                                </td>
+                                <td class="px-4 py-4 text-sm font-bold font-base text-slate-600 ${sipStatusClass}">
                                     ${displaySipCell}
-                                    ${yr === 1 ? '<div class="text-[9px] text-blue-600 font-black uppercase mt-1 tracking-tightest">Initial Lumpsum Added</div>' : ''}
+                                    ${(yr === 1 && mfLump > 0) ? '<div class="text-[9px] text-blue-600 font-black uppercase mt-1 tracking-tightest">Initial Lumpsum Added</div>' : ''}
                                 </td>
                                 <td class="px-6 py-4 text-[15px] text-center font-black text-blue-600">₹${Math.round(currentCorpus).toLocaleString('en-IN')}</td>
                             </tr>`;
@@ -815,6 +842,7 @@
                 document.getElementById('dyn_roi').innerText  = mfRate.toFixed(1) + "%";
                 document.getElementById('dyn_pol_term').innerText  = (age + aceTerm) + " Years";
                 document.getElementById('tblRate').innerText  = mfRate.toFixed(1);
+                document.getElementById('polTerm').innerText  = aceTerm + " Yrs";
                 
                 // Show total initial capital in a badge if you have the element
                 if(document.getElementById('pInitialCap')) {
@@ -823,7 +851,7 @@
                 
                 // --- 4. EXECUTIVE SUMMARY CALCULATIONS (NEW) ---
                 // A. Phase 1 Values
-                const totalInvested = (acePrem * acePpt) + (mfSip * 12 * aceTerm) + mfLump;
+                const totalInvested = (acePrem * acePpt) + (mfSip * 12 * mfSipDuration) + mfLump;
 
                 // --- CALCULATE TOTAL INVESTMENT (THE COST) ---
                 const yearsOfSip = startAge - age;
