@@ -107,7 +107,7 @@
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">1. ACE Foundation</h3>
                 </div>
                 
-                <div class="space-y-5">
+                <div class="space-y-4">
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Client Name</label>
                         <input type="text" id="cName" oninput="runLogic()" value="Aditya Vikram" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
@@ -120,7 +120,8 @@
                         </div>
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Annual Premium</label>
-                            <input type="number" id="acePrem" oninput="runLogic()" value="100000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <input type="number" id="acePrem" oninput="updateWordDisplay(this); runLogic()" value="100000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <p id="acePremWords" class="text-[11px] font-medium italic text-sky-600 mt-1 ml-1 h-3"></p>
                         </div>
                     </div>
 
@@ -138,16 +139,19 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Annual Income (ACE)</label>
-                            <input type="number" id="aceInc" oninput="runLogic()" value="8000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <input type="number" id="aceInc" oninput="updateWordDisplay(this); runLogic()" value="8000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <p id="aceIncWords" class="text-[11px] font-medium italic text-sky-600 mt-1 ml-1 h-3"></p>
                         </div>
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Maturity (Lumpsum)</label>
-                            <input type="number" id="aceMat" oninput="runLogic()" value="1500000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <input type="number" id="aceMat" oninput="updateWordDisplay(this); runLogic()" value="1500000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <p id="aceMatWords" class="text-[11px] font-medium italic text-sky-600 mt-1 ml-1 h-3"></p>
                         </div>
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Life Cover (At Inception)</label>
-                        <input type="number" id="lifeCover" oninput="runLogic()" value="5500000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <input type="number" id="lifeCover" oninput="updateWordDisplay(this); runLogic()" value="5500000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <p id="lifeCoverWords" class="text-[12px] font-medium italic text-sky-600 mt-1 ml-1 h-3"></p>
                     </div>
                 </div>
             </section>
@@ -161,7 +165,8 @@
                 <div class="space-y-7">
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Additional Monthly SIP (₹)</label>
-                        <input type="number" id="mfSip" oninput="runLogic()" value="5000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <input type="number" id="mfSip" oninput="updateWordDisplay(this); runLogic()" value="5000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <p id="mfSipWords" class="text-[11px] font-medium italic text-sky-600 mt-1 ml-1 h-3"></p>
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">SIP Duration (Years)</label>
@@ -672,6 +677,43 @@
             return "₹ " + Math.round(amount).toLocaleString('en-IN');
         }
 
+        function numberToIndianWords(num) {
+            if (num === 0) return 'Zero';
+            if (isNaN(num)) return '';
+
+            const single = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const double = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+            function formatAmount(n) {
+                if (n < 10) return single[n];
+                if (n < 20) return double[n - 10];
+                if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + single[n % 10] : "");
+                if (n < 1000) return formatAmount(Math.floor(n / 100)) + " Hundred" + (n % 100 !== 0 ? " and " + formatAmount(n % 100) : "");
+                if (n < 100000) return formatAmount(Math.floor(n / 1000)) + " Thousand" + (n % 1000 !== 0 ? " " + formatAmount(n % 1000) : "");
+                if (n < 10000000) return formatAmount(Math.floor(n / 100000)) + " Lakh" + (n % 100000 !== 0 ? " " + formatAmount(n % 100000) : "");
+                return formatAmount(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 !== 0 ? " " + formatAmount(n % 10000000) : "");
+            }
+
+            return "₹ " + formatAmount(num) + " Only";
+        }
+
+        function updateWordDisplay(element) {
+            const wordId = element.id + "Words";
+            const displayElement = document.getElementById(wordId);
+            
+            if (displayElement) {
+                const value = parseFloat(element.value);
+                if (value > 0) {
+                    displayElement.innerText = numberToIndianWords(Math.round(value));
+                    displayElement.classList.add('opacity-100');
+                } else {
+                    displayElement.innerText = "";
+                    displayElement.classList.remove('opacity-100');
+                }
+            }
+        }
+
         function addLumpsumRow() {
             const container = document.getElementById('lumpsumInputsContainer');
             const newRow = document.createElement('div');
@@ -684,8 +726,9 @@
                 </div>
                 <div class="flex-[2]">
                     <p class="text-[11px] font-bold text-slate-500 uppercase ml-1">Amount</p>
-                    <input type="number" placeholder="Amount" value="500000" min="0" oninput="runLogic()" 
+                    <input type="number" placeholder="Amount" value="500000" min="0" oninput="updateWordDisplay(this); runLogic()" id="ls_amt_${Date.now()}" 
                         class="ls-amount w-full bg-white rounded-lg px-2 py-1 text-sm outline-none border border-slate-300">
+                    <p id="ls_amt_${Date.now()}Words" class="text-[11px] text-sky-700 text-extrabold italic mt-1 opacity-0 transition-opacity"></p>
                 </div>
                 <button onclick="this.parentElement.remove(); runLogic();" class="mt-3 text-red-400 hover:text-red-600 px-1">
                     <i class="fas fa-times-circle"></i>
