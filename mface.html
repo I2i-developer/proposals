@@ -211,7 +211,7 @@
                         </div>
                         
                         <div id="fundInputsContainer" class="space-y-3">
-                            <div class="fund-row bg-slate-50 p-3 rounded-2xl border border-slate-100 relative group">
+                            <!-- <div class="fund-row bg-slate-50 p-3 rounded-2xl border border-slate-100 relative group">
                                 <div class="flex gap-2 mb-2">
                                     <select onchange="runLogic()" class="type-input bg-white text-[12px] font-medium rounded-lg px-2 py-1 outline-none border border-slate-200">
                                         <option value="SIP">SIP</option>
@@ -220,7 +220,28 @@
                                     <input type="text" placeholder="Fund Name" oninput="runLogic()" value="Motilal Oswal Small Cap Fund" 
                                         class="name-input w-full bg-white rounded-lg px-3 py-1.5 text-sm outline-none border border-slate-200">
                                 </div>
-                            </div>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 border-t border-slate-200 pt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="text-[12px] font-black text-slate-500 uppercase">Retirement Milestone</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="milestoneToggle" class="sr-only peer" onchange="runLogic()">
+                            <div class="w-12 h-6 bg-slate-200 rounded-full peer 
+                                after:content-[''] after:absolute after:top-[4px] after:left-[3px] 
+                                after:bg-white after:border after:rounded-full after:h-4 after:w-4 
+                                after:transition-all peer-checked:after:translate-x-6 peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+
+                    <div id="milestoneInputs" class="hidden space-y-3 animate-fade-in">
+                        <div>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">One-Time Withdrawal at Age <span id="milestoneAgeLabel">60</span></p>
+                            <input type="number" id="milestoneAmount" value="2000000" oninput="updateWordDisplay(this); runLogic()" 
+                                class="w-full bg-slate-50 rounded-xl px-4 py-2 text-sm outline-none border border-slate-200 focus:border-blue-400">
+                            <p id="milestoneAmountWords" class="text-[8px] font-bold text-blue-500 mt-1 h-3"></p>
                         </div>
                     </div>
                 </div>
@@ -586,6 +607,10 @@
                                     <p class="text-slate-700 font-medium text-[12px] mb-1">ACE Assured Benefit</p>
                                     <p class="text-2xl font-extrabold text-purple-700" id="sum_ace_benefit">₹0</p>
                                 </div>
+                                <div id="sum_milestone_display" class="hidden mt-2 flex items-center justify-between bg-orange-50 px-2 py-1 rounded-xl border border-orange-100">
+                                    <span class="text-[11px] font-black text-orange-700 uppercase">Lumpsum Withdrawal @ age 60</span>
+                                    <span class="text-sm font-bold text-orange-600" id="sum_milestone_val">₹0</span>
+                                </div>
                                 <div class="pt-4 border-t-2 border-slate-400">
                                     <p class="text-slate-800 font-medium text-[11px] mb-1">Projected Corpus @ Age <span id="sum_retire_age">60</span></p>
                                     <p class="text-3xl font-black text-blue-700 tracking-tight" id="sum_peak_corpus">₹0</p>
@@ -799,12 +824,294 @@
 
             container.innerHTML = pillsHtml;
         }
+
+        function updateOverallMultiplier(totalInvested, milestoneVal) {
+            if (totalInvested <= 0 || !document.getElementById('sum_multiplier')) return;
+
+            let totalBenefits = currentCorpus; // Default: Final Peak Corpus
+
+            if (swpToggle) {
+                const rawTotalPayout = parseFloat(document.getElementById('sum_total_payout').innerText.replace(/[₹,]/g, '')) || 0;
+                const rawLegacy = parseFloat(document.getElementById('sum_legacy_val').innerText.replace(/[₹,]/g, '')) || 0;
+                
+                // Total Benefit = (Monthly Payouts) + (The Remaining Legacy) + (The Milestone Withdrawal)
+                totalBenefits = rawTotalPayout + rawLegacy + milestoneVal;
+            }
+
+            const finalMultiplier = (totalBenefits / totalInvested).toFixed(1);
+            document.getElementById('sum_multiplier').innerText = `${finalMultiplier}x Wealth Multiplier`;
+        }
+
         /**
          * MAIN CALCULATION ENGINE
          */
+        
+        // function runLogic() {
+        //     try {
+        //         // 1. COLLECT ALL INPUT VALUES
+        //         const name = document.getElementById('cName')?.value || "Client";
+        //         const age = parseInt(document.getElementById('cAge')?.value) || 30;
+        //         const acePrem = parseFloat(document.getElementById('acePrem')?.value) || 0;
+        //         const aceInc = parseFloat(document.getElementById('aceInc')?.value) || 0;
+        //         const aceMat = parseFloat(document.getElementById('aceMat')?.value) || 0;
+        //         const aceTerm = parseInt(document.getElementById('aceTerm')?.value) || 0;
+        //         const acePpt = parseInt(document.getElementById('acePpt')?.value) || 0;
+        //         const lifeCov = parseInt(document.getElementById('lifeCover')?.value) || 0;
+
+        //         // ACE Logic
+        //         const totalAcePayout = (aceInc * aceTerm) + aceMat;
+
+        //         const mfSip = parseFloat(document.getElementById('mfSip')?.value) || 0;
+        //         const mfSipDuration = parseInt(document.getElementById('mfSipDuration')?.value) || 0;
+        //         const mfLump = parseFloat(document.getElementById('mfLumpsum')?.value) || 0;
+        //         const mfRate = parseFloat(document.getElementById('mfRate')?.value) || 12;
+        //         const mfName = document.getElementById('mfName')?.value || "Mutual Fund Name";
+
+        //         const swpToggle = document.getElementById('swpToggle')?.checked;
+        //         const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
+        //         const summarySection = document.getElementById('summary-section');
+
+        //         // UI Updates
+        //         // document.getElementById('pAceTotal').innerText = "₹" + (totalAcePayout / 100000).toFixed(2) + " L";
+        //         if(document.getElementById('pName')) document.getElementById('pName').innerText = name;
+        //         if(document.getElementById('footerClientName')) document.getElementById('footerClientName').innerText = name;
+        //         if(document.getElementById('dyn_mf_name')) document.getElementById('dyn_mf_name').innerText = mfName;
+        //         if(document.getElementById('dyn_intro_name')) document.getElementById('dyn_intro_name').innerText = name;
+        //         if(document.getElementById('rateVal')) document.getElementById('rateVal').innerText = mfRate + "%";
+
+        //         // 1. Capture all planned lumpsums into a Map { year: totalAmount }
+        //         const plannedLumpsums = {};
+        //         document.querySelectorAll('.lumpsum-row').forEach(row => {
+        //             const yr = parseInt(row.querySelector('.ls-year').value);
+        //             const amt = parseFloat(row.querySelector('.ls-amount').value) || 0;
+        //             if(yr > 0) plannedLumpsums[yr] = (plannedLumpsums[yr] || 0) + amt;
+        //         });
+
+        //         // 2. ACCUMULATION CALCULATIONS
+        //         let currentCorpus = 0; 
+        //         let accumulationTableHtml = "";
+        //         let labels = [];
+        //         let growthPoints = [];
+        //         let accumulationPoints = [];
+        //         let harvestPoints = [];
+        //         const yearsToRetire = startAge - age;
+
+        //         // for (let yr = 1; yr <= yearsToRetire; yr++) {
+        //         //     let currentAge = age + yr;
+
+        //         const totalYears = aceTerm;
+
+        //         for (let yr = 1; yr <= totalYears; yr++) {
+        //             let currentAge = age + yr;
+
+        //             // Check for Lumpsum Injection in THIS year
+        //             let yrLumpsum = plannedLumpsums[yr] || 0;
+                    
+        //             // Ace Outflow (Premium)
+        //             let yrPremium = (yr <= acePpt) ? acePrem : 0;
+                    
+        //             // Ace Inflow (Income/Maturity)
+        //             let yrAceIn = (yr <= aceTerm) ? aceInc : 0;
+        //             let finAceIn = aceInc;
+        //             if (currentAge === (age + aceTerm)) yrAceIn += aceMat;
+        //             let displayAceCell = `₹${yrAceIn.toLocaleString('en-IN')}`;
+
+        //             // Check if it's the final year and there's a maturity amount
+        //             if (yr === totalYears && aceMat > 0) {
+        //                 displayAceCell = `₹${finAceIn.toLocaleString('en-IN')} <span class="text-blue-500 text-base font-bolder">+</span> ₹${aceMat.toLocaleString('en-IN')}`;
+        //             }
+                    
+        //             // MF Inflow: Annual SIP
+
+        //             // let annualSip = mfSip * 12;
+        //             let annualSip = (yr <= mfSipDuration) ? (mfSip * 12) : 0;
+        //             let totalYearlyMfInflow = annualSip;
+        //             // let displaySipCell = `₹${annualSip.toLocaleString('en-IN')}`;
+                    
+        //             // if (yr <= mfSipDuration) {
+        //             //     displaySipCell = `₹${annualSip.toLocaleString('en-IN')}`;
+        //             // } else {
+        //             //     displaySipCell = `<span class="text-slate-500 text-[13px]">₹-</span>`;
+        //             // }
+
+        //             // // Handle Year 1 Lumpsum specifically
+        //             // if (yr === 1 && mfLump > 0) {
+        //             //     totalYearlyMfInflow = annualSip + mfLump; 
+        //             //     displaySipCell = `₹${annualSip.toLocaleString('en-IN')} <span class="text-blue-500 font-bold">+</span> ₹${mfLump.toLocaleString('en-IN')}`;
+        //             // }
+                    
+        //             // Compounding Math
+        //             // currentCorpus = (currentCorpus + yrAceIn + totalYearlyMfInflow) * (1 + (mfRate / 100));
+        //             currentCorpus = (currentCorpus + yrAceIn + annualSip + yrLumpsum) * (1 + (mfRate / 100));
+
+        //             let sipDisplay = "";
+        //             if (yrLumpsum > 0) {
+        //                 // Show the Lumpsum clearly in the table with a badge
+        //                 sipDisplay = `₹${annualSip.toLocaleString('en-IN')}<span class="text-emerald-600 text-[13px] py-0.5 rounded-full ml-1"> <span class="text-lg">+</span> ₹${yrLumpsum.toLocaleString('en-IN')} Lumpsum</span>`;
+        //             } else {
+        //                 sipDisplay = (yr <= mfSipDuration) ? `₹${annualSip.toLocaleString('en-IN')}` : `<span class="text-slate-500 italic">₹-</span>`;
+        //             }
+
+        //             // Table Construction
+        //             if (yr <= 35 || currentAge === startAge) {
+        //                 const sipStatusClass = yr <= mfSipDuration ? "font-bold text-slate-600" : "text-slate-300";
+        //                 accumulationTableHtml += `
+        //                     <tr class="border-b border-slate-50 transition-colors hover:bg-slate-50 ${yr === 1 ? 'bg-blue-50/40' : ''}">
+        //                         <td class="px-6 py-4 text-sm font-black text-slate-900">${currentAge}</td>
+        //                         <td class="px-6 py-4 text-sm text-pink-600 font-bold">₹${yrPremium > 0 ? yrPremium.toLocaleString('en-IN') : '-'}</td>
+        //                         <td class="px-6 py-4 text-sm text-emerald-600 font-bold">
+        //                             ${yrAceIn > 0 || (yr === totalYears && aceMat > 0) ? displayAceCell : '-'}
+        //                             ${(yr === totalYears && aceMat > 0) ? '<div class="text-[9px] text-blue-600 font-black uppercase mt-1 tracking-tightest">Policy Maturity Added</div>' : ''}
+        //                         </td>
+        //                         <td class="px-4 py-4 text-sm font-bold font-base text-slate-600 ${sipStatusClass}">
+        //                             ${sipDisplay}
+        //                         </td>
+        //                         <td class="px-6 py-4 text-[15px] text-center font-black text-blue-600">₹${Math.round(currentCorpus).toLocaleString('en-IN')}</td>
+        //                     </tr>`;
+        //             }
+        //             labels.push("Age " + currentAge);
+        //             growthPoints.push(Math.round(currentCorpus));
+        //         }
+
+        //         // 3. UI SYNC
+        //         // document.getElementById('pAceTotal').innerText = "₹" + (totalAcePayout / 100000).toFixed(2) + " L";
+        //         document.getElementById('pTable').innerHTML = accumulationTableHtml;
+        //         document.getElementById('pAceTotal').innerText = formatINR(totalAcePayout);
+        //         document.getElementById('pMfTotal').innerText  = formatINR(currentCorpus);
+        //         document.getElementById('pLifeCover').innerText  = formatINR(lifeCov);
+        //         document.getElementById('dyn_roi').innerText  = mfRate.toFixed(1) + "%";
+        //         document.getElementById('dyn_pol_term').innerText  = (age + aceTerm) + " Years";
+        //         document.getElementById('tblRate').innerText  = mfRate.toFixed(1);
+        //         document.getElementById('polTerm').innerText  = aceTerm + " Yrs";
+                
+        //         let totalLumpsums = Object.values(plannedLumpsums).reduce((a, b) => a + b, 0);
+
+        //         // Show total initial capital in a badge if you have the element
+        //         if(document.getElementById('pInitialCap')) {
+        //             document.getElementById('pInitialCap').innerText = "₹" + (totalLumpsums + (mfSip*12)).toLocaleString('en-IN');
+        //         }
+
+        //         let finalPhase1Corpus = currentCorpus; 
+        //         const milestoneActive = document.getElementById('milestoneToggle').checked;
+        //         let milestoneVal = 0;
+
+        //         if (milestoneActive) {
+        //             document.getElementById('milestoneInputs').classList.remove('hidden');
+        //             milestoneVal = parseFloat(document.getElementById('milestoneAmount').value) || 0;
+                    
+        //             // Deduct from the corpus used for SWP
+        //             finalPhase1Corpus = Math.max(0, finalPhase1Corpus - milestoneVal);
+                    
+        //             // UI Label Update
+        //             document.getElementById('milestoneAgeLabel').innerText = startAge;
+        //         } else {
+        //             document.getElementById('milestoneInputs').classList.add('hidden');
+        //         }
+
+        //         // 1. TRIGGER SWP LOGIC (Based on the Net Amount)
+        //         if (swpToggle) {
+        //             // IMPORTANT: runSwpLogic must use finalPhase1Corpus to calculate the monthly payout
+        //             runSwpLogic(finalPhase1Corpus, mfRate);
+        //         }
+
+        //         // 2. UI UPDATES: SUMMARY SECTION
+        //         if (document.getElementById('sum_peak_corpus')) {
+        //             // Show Peak Achievement (Before Withdrawal)
+        //             document.getElementById('sum_peak_corpus').innerText = formatINR(currentCorpus);
+        //         }
+
+        //         // 3. SHOW MILESTONE BADGE
+        //         const milestoneDisplay = document.getElementById('sum_milestone_display');
+        //         if (milestoneActive && milestoneVal > 0) {
+        //             milestoneDisplay.classList.remove('hidden');
+        //             document.getElementById('sum_milestone_val').innerText = formatINR(milestoneVal);
+        //         } else {
+        //             milestoneDisplay.classList.add('hidden');
+        //         }
+
+        //         // 4. UPDATE WEALTH MULTIPLIER (Crucial Step)
+        //         updateOverallMultiplier(totalInvested, milestoneVal);
+                
+        //         // --- 4. EXECUTIVE SUMMARY CALCULATIONS (NEW) ---
+        //         // A. Phase 1 Values
+        //         const totalInvested = (acePrem * acePpt) + (mfSip * 12 * mfSipDuration) + totalLumpsums;
+
+        //         // --- CALCULATE TOTAL INVESTMENT (THE COST) ---
+        //         const yearsOfSip = startAge - age;
+
+        //         // --- CALCULATE TOTAL BENEFITS (THE RETURN) ---
+        //         let totalBenefits = 0;
+
+        //         if (swpToggle) {
+        //             // If Harvesting: Benefits = Total Payouts + Remaining Legacy
+        //             const rawTotalPayout = parseFloat(document.getElementById('dyn_total_withdrawal').innerText.replace(/[₹,]/g, '')) || 0;
+        //             const rawLegacy = parseFloat(document.getElementById('dyn_legacy_swp').innerText.replace(/[₹,]/g, '')) || 0;
+        //             totalBenefits = rawTotalPayout + rawLegacy;
+        //         } else {
+        //             // If just Accumulating: Benefits = The Peak Corpus at Retirement
+        //             totalBenefits = currentCorpus; 
+        //         }
+
+        //         // --- UPDATE THE UI ---
+        //         if (totalInvested > 0 && document.getElementById('sum_multiplier')) {
+        //             const multiplier = (totalBenefits / totalInvested).toFixed(1);
+        //             document.getElementById('sum_multiplier').innerText = `${multiplier}x Wealth Multiplier`;
+                    
+        //             // Optional: Add a subtle label update if SWP is off
+        //             const multiplierSubtext = swpToggle ? "Growth on Harvest" : "Growth on Accumulation";
+        //             const subLabel = document.querySelector('#sum_multiplier + p');
+        //             if(subLabel) subLabel.innerText = multiplierSubtext;
+        //         }         
+        //         if(document.getElementById('sum_total_invested')) document.getElementById('sum_total_invested').innerText = formatINR(totalInvested);
+        //         if(document.getElementById('sum_ace_benefit')) document.getElementById('sum_ace_benefit').innerText = formatINR(totalAcePayout);
+        //         if(document.getElementById('sum_peak_corpus')) document.getElementById('sum_peak_corpus').innerText = formatINR(currentCorpus);
+        //         if(document.getElementById('sum_retire_age')) document.getElementById('sum_retire_age').innerText = startAge;
+
+        //         // if (swpToggle) runSwpLogic(currentCorpus, mfRate);
+        //         if (swpToggle) {
+        //             runSwpLogic(currentCorpus, mfRate); // This fills the harvest summary
+        //             const swpRate = parseFloat(document.getElementById('swpRateInput')?.value) || 8;
+        //             const startMonthly = (currentCorpus * (swpRate/100)) / 12;
+                    
+        //             if(document.getElementById('sum_start_income')) document.getElementById('sum_start_income').innerText = formatINR(startMonthly);
+        //             // if(document.getElementById('sum_legacy_val')) document.getElementById('sum_legacy_val').innerText = document.getElementById('dyn_legacy_swp').innerText;
+        //             if(document.getElementById('sum_total_payout')) {
+        //                 // We strip the formatting from the existing ID or use the raw variable if available
+        //                 const rawTotalPayout = document.getElementById('dyn_total_withdrawal').innerText.replace(/[₹,]/g, '');
+        //                 document.getElementById('sum_total_payout').innerText = formatINR(parseFloat(rawTotalPayout));
+        //             }
+        //             // Inside runLogic() where you update the summary...
+        //             if(document.getElementById('sum_legacy_val')) {
+        //                 const rawLegacy = document.getElementById('dyn_legacy_swp').innerText.replace(/[₹,]/g, '');
+        //                 document.getElementById('sum_legacy_val').innerText = formatINR(parseFloat(rawLegacy));
+        //             }
+        //             if(document.getElementById('sum_final_age')) {
+        //                 const dur = parseInt(document.getElementById('swpDuration').value);
+        //                 document.getElementById('sum_final_age').innerText = startAge + dur;
+        //             }
+        //             // Enable conditional page break for PDF export
+        //             summarySection.style.breakBefore = 'page'; // Modern CSS
+        //             summarySection.style.pageBreakBefore = 'always'; // Legacy support for PDF engines
+        //         } else {
+        //             // Default text if SWP is off
+        //             if(document.getElementById('sum_life_cover')) document.getElementById('sum_life_cover').innerText = formatINR(lifeCov);
+        //             if(document.getElementById('sum_start_income')) document.getElementById('sum_start_income').innerText = "N/A";
+        //             if(document.getElementById('sum_legacy_val')) document.getElementById('sum_legacy_val').innerText = formatINR(currentCorpus);
+        //             // Remove page break if SWP is off (keep it on the same page)
+        //             summarySection.style.breakBefore = 'auto';
+        //             summarySection.style.pageBreakBefore = 'auto';
+        //         }
+        //         updateFundPills();
+        //         updateMainChart(labels, growthPoints);
+
+        //         updateMixChart(acePrem, mfSip, totalLumpsums);
+
+        //     } catch (e) { console.error("Logic Error:", e); }
+        // }
+
         function runLogic() {
             try {
-                // 1. COLLECT ALL INPUT VALUES
+                // 1. BASIC INPUTS
                 const name = document.getElementById('cName')?.value || "Client";
                 const age = parseInt(document.getElementById('cAge')?.value) || 30;
                 const acePrem = parseFloat(document.getElementById('acePrem')?.value) || 0;
@@ -814,101 +1121,60 @@
                 const acePpt = parseInt(document.getElementById('acePpt')?.value) || 0;
                 const lifeCov = parseInt(document.getElementById('lifeCover')?.value) || 0;
 
-                // ACE Logic
-                const totalAcePayout = (aceInc * aceTerm) + aceMat;
-
                 const mfSip = parseFloat(document.getElementById('mfSip')?.value) || 0;
                 const mfSipDuration = parseInt(document.getElementById('mfSipDuration')?.value) || 0;
-                const mfLump = parseFloat(document.getElementById('mfLumpsum')?.value) || 0;
                 const mfRate = parseFloat(document.getElementById('mfRate')?.value) || 12;
-                const mfName = document.getElementById('mfName')?.value || "Mutual Fund Name";
+                const mfName = document.getElementById('mfName')?.value || "Mutual Fund";
 
                 const swpToggle = document.getElementById('swpToggle')?.checked;
                 const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
-                const summarySection = document.getElementById('summary-section');
+                
+                // Milestone Inputs
+                const milestoneActive = document.getElementById('milestoneToggle')?.checked || false;
+                const milestoneVal = milestoneActive ? (parseFloat(document.getElementById('milestoneAmount')?.value) || 0) : 0;
 
-                // UI Updates
-                // document.getElementById('pAceTotal').innerText = "₹" + (totalAcePayout / 100000).toFixed(2) + " L";
-                if(document.getElementById('pName')) document.getElementById('pName').innerText = name;
-                if(document.getElementById('footerClientName')) document.getElementById('footerClientName').innerText = name;
-                if(document.getElementById('dyn_mf_name')) document.getElementById('dyn_mf_name').innerText = mfName;
-                if(document.getElementById('dyn_intro_name')) document.getElementById('dyn_intro_name').innerText = name;
-                if(document.getElementById('rateVal')) document.getElementById('rateVal').innerText = mfRate + "%";
-
-                // 1. Capture all planned lumpsums into a Map { year: totalAmount }
+                // 2. DYNAMIC LUMPSUMS CAPTURE
                 const plannedLumpsums = {};
                 document.querySelectorAll('.lumpsum-row').forEach(row => {
                     const yr = parseInt(row.querySelector('.ls-year').value);
                     const amt = parseFloat(row.querySelector('.ls-amount').value) || 0;
                     if(yr > 0) plannedLumpsums[yr] = (plannedLumpsums[yr] || 0) + amt;
                 });
+                const totalLumpsums = Object.values(plannedLumpsums).reduce((a, b) => a + b, 0);
 
-                // 2. ACCUMULATION CALCULATIONS
+                // 3. PHASE 1: ACCUMULATION ENGINE
                 let currentCorpus = 0; 
                 let accumulationTableHtml = "";
                 let labels = [];
                 let growthPoints = [];
-                let accumulationPoints = [];
-                let harvestPoints = [];
-                const yearsToRetire = startAge - age;
-
-                // for (let yr = 1; yr <= yearsToRetire; yr++) {
-                //     let currentAge = age + yr;
-
                 const totalYears = aceTerm;
 
                 for (let yr = 1; yr <= totalYears; yr++) {
                     let currentAge = age + yr;
-
-                    // Check for Lumpsum Injection in THIS year
                     let yrLumpsum = plannedLumpsums[yr] || 0;
-                    
-                    // Ace Outflow (Premium)
                     let yrPremium = (yr <= acePpt) ? acePrem : 0;
                     
-                    // Ace Inflow (Income/Maturity)
                     let yrAceIn = (yr <= aceTerm) ? aceInc : 0;
-                    let finAceIn = aceInc;
                     if (currentAge === (age + aceTerm)) yrAceIn += aceMat;
-                    let displayAceCell = `₹${yrAceIn.toLocaleString('en-IN')}`;
 
-                    // Check if it's the final year and there's a maturity amount
-                    if (yr === totalYears && aceMat > 0) {
-                        displayAceCell = `₹${finAceIn.toLocaleString('en-IN')} <span class="text-blue-500 text-base font-bolder">+</span> ₹${aceMat.toLocaleString('en-IN')}`;
-                    }
-                    
-                    // MF Inflow: Annual SIP
-
-                    // let annualSip = mfSip * 12;
                     let annualSip = (yr <= mfSipDuration) ? (mfSip * 12) : 0;
-                    let totalYearlyMfInflow = annualSip;
-                    // let displaySipCell = `₹${annualSip.toLocaleString('en-IN')}`;
                     
-                    // if (yr <= mfSipDuration) {
-                    //     displaySipCell = `₹${annualSip.toLocaleString('en-IN')}`;
-                    // } else {
-                    //     displaySipCell = `<span class="text-slate-500 text-[13px]">₹-</span>`;
-                    // }
-
-                    // // Handle Year 1 Lumpsum specifically
-                    // if (yr === 1 && mfLump > 0) {
-                    //     totalYearlyMfInflow = annualSip + mfLump; 
-                    //     displaySipCell = `₹${annualSip.toLocaleString('en-IN')} <span class="text-blue-500 font-bold">+</span> ₹${mfLump.toLocaleString('en-IN')}`;
-                    // }
-                    
-                    // Compounding Math
-                    // currentCorpus = (currentCorpus + yrAceIn + totalYearlyMfInflow) * (1 + (mfRate / 100));
+                    // Compounding: Previous Balance + Income + SIP + New Lumpsum
                     currentCorpus = (currentCorpus + yrAceIn + annualSip + yrLumpsum) * (1 + (mfRate / 100));
 
-                    let sipDisplay = "";
-                    if (yrLumpsum > 0) {
-                        // Show the Lumpsum clearly in the table with a badge
-                        sipDisplay = `₹${annualSip.toLocaleString('en-IN')}<span class="text-emerald-600 text-[13px] py-0.5 rounded-full ml-1"> <span class="text-lg">+</span> ₹${yrLumpsum.toLocaleString('en-IN')} Lumpsum</span>`;
-                    } else {
-                        sipDisplay = (yr <= mfSipDuration) ? `₹${annualSip.toLocaleString('en-IN')}` : `<span class="text-slate-500 italic">₹-</span>`;
+                    // Store Chart Data
+                    labels.push("Age " + currentAge);
+                    growthPoints.push(Math.round(currentCorpus));
+
+                    // Table Row Logic
+                    let displayAceCell = `₹${yrAceIn.toLocaleString('en-IN')}`;
+                    if (yr === totalYears && aceMat > 0) {
+                        displayAceCell = `₹${aceInc.toLocaleString('en-IN')} <span class="text-blue-500 font-bold">+</span> ₹${aceMat.toLocaleString('en-IN')}`;
                     }
 
-                    // Table Construction
+                    let sipDisplay = (yrLumpsum > 0) 
+                        ? `₹${annualSip.toLocaleString('en-IN')}<span class="text-emerald-600 text-[11px] ml-1"> + ₹${yrLumpsum.toLocaleString('en-IN')} LS</span>`
+                        : (yr <= mfSipDuration ? `₹${annualSip.toLocaleString('en-IN')}` : `<span class="text-slate-400 italic">₹-</span>`);
                     if (yr <= 35 || currentAge === startAge) {
                         const sipStatusClass = yr <= mfSipDuration ? "font-bold text-slate-600" : "text-slate-300";
                         accumulationTableHtml += `
@@ -925,105 +1191,93 @@
                                 <td class="px-6 py-4 text-[15px] text-center font-black text-blue-600">₹${Math.round(currentCorpus).toLocaleString('en-IN')}</td>
                             </tr>`;
                     }
-                    labels.push("Age " + currentAge);
-                    growthPoints.push(Math.round(currentCorpus));
                 }
 
-                // 3. UI SYNC
-                // document.getElementById('pAceTotal').innerText = "₹" + (totalAcePayout / 100000).toFixed(2) + " L";
-                document.getElementById('pTable').innerHTML = accumulationTableHtml;
-                document.getElementById('pAceTotal').innerText = formatINR(totalAcePayout);
-                document.getElementById('pMfTotal').innerText  = formatINR(currentCorpus);
-                document.getElementById('pLifeCover').innerText  = formatINR(lifeCov);
-                document.getElementById('dyn_roi').innerText  = mfRate.toFixed(1) + "%";
-                document.getElementById('dyn_pol_term').innerText  = (age + aceTerm) + " Years";
-                document.getElementById('tblRate').innerText  = mfRate.toFixed(1);
-                document.getElementById('polTerm').innerText  = aceTerm + " Yrs";
-                
-                let totalLumpsums = Object.values(plannedLumpsums).reduce((a, b) => a + b, 0);
-
-                // Show total initial capital in a badge if you have the element
-                if(document.getElementById('pInitialCap')) {
-                    document.getElementById('pInitialCap').innerText = "₹" + (totalLumpsums + (mfSip*12)).toLocaleString('en-IN');
+                // 4. TRANSITION LOGIC (Milestone Drop)
+                let finalPhase1Corpus = currentCorpus;
+                if (milestoneActive) {
+                    document.getElementById('milestoneInputs')?.classList.remove('hidden');
+                    finalPhase1Corpus = Math.max(0, currentCorpus - milestoneVal);
+                    document.getElementById('milestoneAgeLabel').innerText = startAge;
+                    
+                    // Graph: Add a vertical drop point
+                    labels.push("Age " + startAge + " (Payout)");
+                    growthPoints.push(Math.round(finalPhase1Corpus));
+                } else {
+                    document.getElementById('milestoneInputs')?.classList.add('hidden');
                 }
-                
-                // --- 4. EXECUTIVE SUMMARY CALCULATIONS (NEW) ---
-                // A. Phase 1 Values
+
+                // 5. PHASE 2: HARVESTING (SWP)
+                if (swpToggle) {
+                    runSwpLogic(finalPhase1Corpus, mfRate);
+                }
+
+                // 6. CALCULATE TOTALS FOR SUMMARY
                 const totalInvested = (acePrem * acePpt) + (mfSip * 12 * mfSipDuration) + totalLumpsums;
+                const totalAceBenefit = (aceInc * aceTerm) + aceMat;
 
-                // --- CALCULATE TOTAL INVESTMENT (THE COST) ---
-                const yearsOfSip = startAge - age;
+                // 7. UPDATE ALL UI ELEMENTS (Safely)
+                const safeSet = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
 
-                // --- CALCULATE TOTAL BENEFITS (THE RETURN) ---
-                let totalBenefits = 0;
+                safeSet('pName', name);
+                safeSet('dyn_intro_name', name);
+                safeSet('footerClientName', name);
+                safeSet('pTable', ''); // Clear and then append is safer
+                document.getElementById('pTable').innerHTML = accumulationTableHtml;
+                
+                safeSet('pAceTotal', formatINR(totalAceBenefit));
+                safeSet('pMfTotal', formatINR(currentCorpus));
+                safeSet('pLifeCover', formatINR(lifeCov));
+                safeSet('dyn_roi', mfRate.toFixed(1) + "%");
+                safeSet('dyn_pol_term', (age + aceTerm) + " Years");
+                safeSet('sum_total_invested', formatINR(totalInvested));
+                safeSet('sum_peak_corpus', formatINR(currentCorpus));
+                safeSet('sum_ace_benefit', formatINR(totalAceBenefit));
+                safeSet('sum_retire_age', startAge);
 
-                if (swpToggle) {
-                    // If Harvesting: Benefits = Total Payouts + Remaining Legacy
-                    const rawTotalPayout = parseFloat(document.getElementById('dyn_total_withdrawal').innerText.replace(/[₹,]/g, '')) || 0;
-                    const rawLegacy = parseFloat(document.getElementById('dyn_legacy_swp').innerText.replace(/[₹,]/g, '')) || 0;
-                    totalBenefits = rawTotalPayout + rawLegacy;
-                } else {
-                    // If just Accumulating: Benefits = The Peak Corpus at Retirement
-                    totalBenefits = currentCorpus; 
+                // Milestone Summary Badge
+                const msDisplay = document.getElementById('sum_milestone_display');
+                if (msDisplay) {
+                    if (milestoneActive && milestoneVal > 0) {
+                        msDisplay.classList.remove('hidden');
+                        safeSet('sum_milestone_val', formatINR(milestoneVal));
+                    } else {
+                        msDisplay.classList.add('hidden');
+                    }
                 }
 
-                // --- UPDATE THE UI ---
-                if (totalInvested > 0 && document.getElementById('sum_multiplier')) {
-                    const multiplier = (totalBenefits / totalInvested).toFixed(1);
-                    document.getElementById('sum_multiplier').innerText = `${multiplier}x Wealth Multiplier`;
-                    
-                    // Optional: Add a subtle label update if SWP is off
-                    const multiplierSubtext = swpToggle ? "Growth on Harvest" : "Growth on Accumulation";
-                    const subLabel = document.querySelector('#sum_multiplier + p');
-                    if(subLabel) subLabel.innerText = multiplierSubtext;
-                }         
-                if(document.getElementById('sum_total_invested')) document.getElementById('sum_total_invested').innerText = formatINR(totalInvested);
-                if(document.getElementById('sum_ace_benefit')) document.getElementById('sum_ace_benefit').innerText = formatINR(totalAcePayout);
-                if(document.getElementById('sum_peak_corpus')) document.getElementById('sum_peak_corpus').innerText = formatINR(currentCorpus);
-                if(document.getElementById('sum_retire_age')) document.getElementById('sum_retire_age').innerText = startAge;
-
-                // if (swpToggle) runSwpLogic(currentCorpus, mfRate);
+                // 8. FINAL WEALTH MULTIPLIER MATH
+                let totalBenefits = currentCorpus;
                 if (swpToggle) {
-                    runSwpLogic(currentCorpus, mfRate); // This fills the harvest summary
+                    const rawPayout = parseFloat(document.getElementById('dyn_total_withdrawal')?.innerText.replace(/[₹,]/g, '') || 0);
+                    const rawLegacy = parseFloat(document.getElementById('dyn_legacy_swp')?.innerText.replace(/[₹,]/g, '') || 0);
+                    totalBenefits = rawPayout + rawLegacy + milestoneVal;
+                    
+                    // Update SWP Summary Fields
                     const swpRate = parseFloat(document.getElementById('swpRateInput')?.value) || 8;
-                    const startMonthly = (currentCorpus * (swpRate/100)) / 12;
-                    
-                    if(document.getElementById('sum_start_income')) document.getElementById('sum_start_income').innerText = formatINR(startMonthly);
-                    // if(document.getElementById('sum_legacy_val')) document.getElementById('sum_legacy_val').innerText = document.getElementById('dyn_legacy_swp').innerText;
-                    if(document.getElementById('sum_total_payout')) {
-                        // We strip the formatting from the existing ID or use the raw variable if available
-                        const rawTotalPayout = document.getElementById('dyn_total_withdrawal').innerText.replace(/[₹,]/g, '');
-                        document.getElementById('sum_total_payout').innerText = formatINR(parseFloat(rawTotalPayout));
-                    }
-                    // Inside runLogic() where you update the summary...
-                    if(document.getElementById('sum_legacy_val')) {
-                        const rawLegacy = document.getElementById('dyn_legacy_swp').innerText.replace(/[₹,]/g, '');
-                        document.getElementById('sum_legacy_val').innerText = formatINR(parseFloat(rawLegacy));
-                    }
-                    if(document.getElementById('sum_final_age')) {
-                        const dur = parseInt(document.getElementById('swpDuration').value);
-                        document.getElementById('sum_final_age').innerText = startAge + dur;
-                    }
-                    // Enable conditional page break for PDF export
-                    summarySection.style.breakBefore = 'page'; // Modern CSS
-                    summarySection.style.pageBreakBefore = 'always'; // Legacy support for PDF engines
-                } else {
-                    // Default text if SWP is off
-                    if(document.getElementById('sum_life_cover')) document.getElementById('sum_life_cover').innerText = formatINR(lifeCov);
-                    if(document.getElementById('sum_start_income')) document.getElementById('sum_start_income').innerText = "N/A";
-                    if(document.getElementById('sum_legacy_val')) document.getElementById('sum_legacy_val').innerText = formatINR(currentCorpus);
-                    // Remove page break if SWP is off (keep it on the same page)
-                    summarySection.style.breakBefore = 'auto';
-                    summarySection.style.pageBreakBefore = 'auto';
+                    const startMonthly = (finalPhase1Corpus * (swpRate/100)) / 12;
+                    safeSet('sum_start_income', formatINR(startMonthly));
+                    safeSet('sum_total_payout', formatINR(rawPayout));
+                    safeSet('sum_legacy_val', formatINR(rawLegacy));
                 }
+
+                if(document.getElementById('sum_life_cover')) document.getElementById('sum_life_cover').innerText = formatINR(lifeCov);
+
+                if (totalInvested > 0 && document.getElementById('sum_multiplier')) {
+                    const mult = (totalBenefits / totalInvested).toFixed(1);
+                    document.getElementById('sum_multiplier').innerText = `${mult}x Wealth Multiplier`;
+                }
+
+                // 9. REFRESH GRAPHS
                 updateFundPills();
                 updateMainChart(labels, growthPoints);
-
                 updateMixChart(acePrem, mfSip, totalLumpsums);
 
-            } catch (e) { console.error("Logic Error:", e); }
+            } catch (e) { 
+                console.error("Logic Error:", e); 
+            }
         }
-
+        
         /**
          * SWP LOGIC
          */
@@ -1184,7 +1438,14 @@
 
             // Update Center Value
             if(document.getElementById('donut_total_val')) {
-                document.getElementById('donut_total_val').innerText = "₹" + Math.round(totalYear1/100000).toFixed(1) + "L";
+                let displayValue = "";
+                if (totalYear1 >= 10000000) { // 1 Crore
+                    displayValue = "₹" + (totalYear1 / 10000000).toFixed(2) + " Cr";
+                } else {
+                    displayValue = "₹" + (totalYear1 / 100000).toFixed(1) + " L";
+                }
+
+                document.getElementById('donut_total_val').innerText = displayValue;
             }
 
             if (mixChartInstance) mixChartInstance.destroy();

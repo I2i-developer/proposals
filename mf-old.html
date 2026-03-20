@@ -151,37 +151,6 @@
                 </div>
             </section>
 
-            <section class="mb-10 border-slate-200">
-                <div class="flex items-center justify-between p-4 bg-amber-50 rounded-2xl mb-4 border border-amber-100">
-                    <div>
-                        <p class="text-[14px] font-black text-amber-700 uppercase">Enable Step-Up SIP</p>
-                        <p class="text-[13px] text-amber-600">Increase SIP amount periodically</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="stepUpEnabled" class="sr-only peer" onchange="toggleStepUp()">
-                        <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                    </label>
-                </div>
-
-                <div id="stepUpInputs" class="hidden space-y-4 mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up (%)</label>
-                            <input type="number" id="stepUpPerc" value="10" oninput="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200">
-                        </div>
-                        <div>
-                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Frequency</label>
-                            <select id="stepUpFreq" onchange="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200 bg-white">
-                                <option value="12">Annually</option>
-                                <option value="6">Semi-Annually</option>
-                                <option value="3">Quarterly</option>
-                                <option value="1">Monthly</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <section class="mb-10 border-t border-slate-200 pt-8">
                 <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-2xl mb-6 border border-emerald-100">
                     <div>
@@ -527,7 +496,7 @@
                 </table>
             </div> -->
 
-                <div id="proposal_summary_section" class="mt-12 p-8 rounded-[40px] bg-white border-2 border-slate-600 text-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative overflow-hidden" style="break-before: page;">
+                <div id="proposal_summary_section" class="mt-12 p-8 rounded-[40px] bg-white border-2 border-slate-600 text-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-60"></div>
                     
                     <div class="relative z-10">
@@ -655,18 +624,6 @@
         }
     }
 
-    function toggleStepUp() {
-        const container = document.getElementById('stepUpInputs');
-        const isEnabled = document.getElementById('stepUpEnabled').checked;
-        
-        if (isEnabled) {
-            container.classList.remove('hidden');
-        } else {
-            container.classList.add('hidden');
-        }
-        runLogic();
-    }
-
     function runLogic() {
         try {
             // 1. Fetch values from inputs with fallback defaults
@@ -676,12 +633,6 @@
             const monthlySip = parseFloat(document.getElementById('cSip').value) || 0;
             const lumpsum = parseFloat(document.getElementById('cLum').value) || 0;
             const rate = parseFloat(document.getElementById('cRet').value) || 12;
-
-            // --- NEW: Step-Up Inputs ---
-            const stepUpEnabled = document.getElementById('stepUpEnabled').checked;
-            // const stepUpPerc = parseFloat(document.getElementById('stepUpPerc').value) / 100 || 0;
-            const stepUpPerc = parseFloat(document.getElementById('stepUpPerc').value) || 0;
-            const stepUpFreq = parseInt(document.getElementById('stepUpFreq').value) || 12;
 
             const fundNames = document.getElementsByClassName('fund-name');
             const fundPercs = document.getElementsByClassName('fund-perc');
@@ -694,10 +645,9 @@
             if(document.getElementById('dyn_intro_duration')) document.getElementById('dyn_intro_duration').innerText = `${duration}-year`;
             if(document.getElementById('dyn_param_dur')) document.getElementById('dyn_param_dur').innerText = `${duration} Years`;
 
-            // 3. Dynamic Investment Method Phrase (Updated for Step-Up)
+            // 3. Dynamic Investment Method Phrase
             let method = "Strategic Allocation";
-            if (stepUpEnabled) method = "Step-Up Systematic Strategy";
-            else if (monthlySip > 0 && lumpsum > 0) method = "SIP & Lumpsum Injection";
+            if (monthlySip > 0 && lumpsum > 0) method = "SIP & Lumpsum Injection";
             else if (monthlySip > 0) method = "Systematic Investment (SIP)";
             else if (lumpsum > 0) method = "Lumpsum Allocation";
             
@@ -740,6 +690,21 @@
             const targetYearElem = document.getElementById('dyn_target_year');
             if(targetYearElem) targetYearElem.innerText = currentYear + duration;
 
+            // 7. Core Financial Math
+            // const annualSip = monthlySip * 12;
+            // const r = rate / 100;
+            // let tableHtml = '';
+            // let currentCorpus = lumpsum;
+            // let totalInvested = lumpsum;
+            // let chartLabels = [];
+            // let corpusData = [];
+
+            // for (let i = 1; i <= duration; i++) {
+            //     currentCorpus = (currentCorpus + annualSip) * (1 + r);
+            //     totalInvested += annualSip;
+
+            //     chartLabels.push(`Age ${age + i}`);
+            //     corpusData.push(Math.round(currentCorpus));
             const r = rate / 100;
             const monthlyRate = r / 12; // Monthly periodic rate
             let currentCorpus = lumpsum;
@@ -748,39 +713,28 @@
             let chartLabels = [];
             let corpusData = [];
 
-            // Reset variables before the loop
-            let runningSip = monthlySip; // Use a separate variable that can increase
-
             for (let i = 1; i <= duration; i++) {
-                // We process 12 months for every 1 year row
-                for (let m = 1; m <= 12; m++) {
+                // 1. Calculate growth on the existing lumpsum/corpus for the year
+                // 2. Calculate the Future Value of 12 monthly SIPs for this specific year
+                // Formula for FV of SIP (Due): MonthlySIP * [((1+r)^n - 1) / r] * (1+r)
+                
+                let sipGrowthThisYear = monthlySip * ((Math.pow(1 + monthlyRate, 12) - 1) / monthlyRate) * (1 + monthlyRate);
+                
+                // Total corpus at end of year i
+                currentCorpus = (currentCorpus * Math.pow(1 + monthlyRate, 12)) + sipGrowthThisYear;
+                
+                totalInvested += (monthlySip * 12);
 
-                    const totalMonthsPassed = ((i - 1) * 12) + m;
-
-                    // ✅ Apply step-up correctly
-                    if (
-                        stepUpEnabled &&
-                        totalMonthsPassed > 1 &&
-                        (totalMonthsPassed - 1) % stepUpFreq === 0
-                    ) {
-                        runningSip = runningSip * (1 + stepUpPerc / 100);
-                    }
-
-                    totalInvested += runningSip;
-                    currentCorpus = (currentCorpus + runningSip) * (1 + monthlyRate);
-                }
-
-                // --- AFTER 12 MONTHS: PUSH TO UI ---
                 chartLabels.push(`Age ${age + i}`);
                 corpusData.push(Math.round(currentCorpus));
 
                 tableHtml += `
                     <tr class="border-b border-slate-50 hover:bg-blue-50/50 transition-colors text-sm">
                         <td class="px-2 py-4 font-bold text-slate-900">${age + i} yrs</td>
-                        <td class="px-2 py-4 font-bold text-slate-500">₹ ${formatIndianCurrency(Math.round(runningSip))}</td>
+                        <td class="px-2 py-4 font-bold text-slate-500">₹ ${formatIndianCurrency(monthlySip)}</td>
                         <td class="px-2 py-4 font-bold text-slate-500">₹ ${formatIndianCurrency(lumpsum)}</td>
-                        <td class="px-2 py-4 font-bold text-slate-700">₹ ${formatIndianCurrency(Math.round(totalInvested))}</td>
-                        <td class="px-2 py-4 text-right font-black text-blue-600">₹ ${formatIndianCurrency(Math.round(currentCorpus))}</td>
+                        <td class="px-2 py-4 font-bold text-slate-700">₹ ${formatIndianCurrency(totalInvested)}</td>
+                        <td class="px-2 py-4 text-right font-black text-blue-600">₹ ${formatIndianCurrency(currentCorpus)}</td>
                     </tr>`;
             }
 
@@ -809,6 +763,65 @@
                     }
                 }
             }
+
+            // 9. Fund List Display
+            // let fundHtml = '';
+            // for (let i = 0; i < fundNames.length; i++) {
+            //     if(fundNames[i].value) {
+            //         const fName = fundNames[i].value;
+            //         const fPerc = parseFloat(fundPercs[i].value) || 0;
+                    
+            //         fundHtml += `
+            //             <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+            //                 <div class="flex items-center gap-4">
+            //                     <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600 font-bold text-xs">
+            //                         ${fPerc}%
+            //                     </div>
+            //                     <div>
+            //                         <p class="text-sm font-bold text-slate-800">${fName}</p>
+            //                         <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Equity Mutual Fund • Growth Option</p>
+            //                     </div>
+            //                 </div>
+            //                 <div class="text-right">
+            //                     <p class="text-xs font-bold text-slate-400">Monthly Allocation</p>
+            //                     <p class="text-sm font-black text-slate-700">₹${formatIndianCurrency((monthlySip * fPerc) / 100)}</p>
+            //                 </div>
+            //             </div>`;
+            //     }
+            // }
+            // document.getElementById('fundListDisplay').innerHTML = fundHtml;
+
+            // let lumFundHtml = '';
+            // if (lumpsum > 0) {
+            //     for (let i = 0; i < lumFundNames.length; i++) {
+            //         if(lumFundNames[i].value.trim() !== "") {
+            //             const fName = lumFundNames[i].value;
+            //             const fPerc = parseFloat(lumFundPercs[i].value) || 0;
+            //             const allocatedAmt = (lumpsum * fPerc) / 100;
+
+            //             lumFundHtml += `
+            //                 <div class="flex items-center justify-between p-4 bg-blue-50/30 border border-blue-100 rounded-2xl mb-2">
+            //                     <div class="flex items-center gap-4">
+            //                         <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600 font-bold text-xs border border-blue-50">
+            //                             ${fPerc}%
+            //                         </div>
+            //                         <div>
+            //                             <p class="text-sm font-bold text-slate-800">${fName}</p>
+            //                             <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Lumpsum Injection Allocation</p>
+            //                         </div>
+            //                     </div>
+            //                     <div class="text-right">
+            //                         <p class="text-xs font-bold text-slate-400">One-time Investment</p>
+            //                         <p class="text-sm font-black text-blue-600">₹${formatIndianCurrency(allocatedAmt)}</p>
+            //                     </div>
+            //                 </div>`;
+            //         }
+            //     }
+            // }
+
+            // // Make sure you have a div with id="lumpsumDisplay" in your proposal HTML
+            // const lumDisplay = document.getElementById('lumpsumDisplay');
+            // if(lumDisplay) lumDisplay.innerHTML = lumFundHtml;
             
             // --- 1. HANDLE SIP FUNDS ---
             let fundHtml = '';
@@ -896,6 +909,54 @@
 
             // 10. Update Charts
             updateInteractiveCharts(chartLabels, corpusData, totalInvested, Math.round(currentCorpus - totalInvested));
+
+            // --- PHASE 2: SWP (The critical link) ---
+        //     calculateSWP(currentCorpus);
+
+        //     const swpEnabled = document.getElementById('swpEnabled').checked;
+        //     const swpInputContainer = document.getElementById('swpInputs');
+        //     const swpProposalSection = document.getElementById('proposal_swp_section'); // The ID of your Phase II div in the proposal
+        //     const summarySection = document.getElementById('proposal_summary_section');
+
+        //     if (swpEnabled) {
+        //         // Show Sidebar Inputs & Proposal Section
+        //         swpInputContainer.classList.remove('hidden');
+        //         if(swpProposalSection) swpProposalSection.classList.remove('hidden');
+        //         // summarySection.classList.remove('hidden');
+            
+        //         // Populate the specific Phase 1 & 2 numbers in the summary
+        //         document.getElementById('sum_total_invested').innerText = document.getElementById('pTotalInv').innerText;
+        //         document.getElementById('sum_peak_corpus').innerText = document.getElementById('pCorpus').innerText;
+        //         document.getElementById('sum_total_payout').innerText = document.getElementById('dyn_total_withdrawal').innerText;
+                
+        //         // REFRESH THE AGGREGATED TABLE HERE
+        //         // updateSummaryTable();
+                
+        //         // ... (The rest of your existing logic) ...
+        //         // After SIP math is done, call calculateSWP(currentCorpus);
+        //     } else {
+        //         // Hide Sidebar Inputs & Proposal Section
+        //         swpInputContainer.classList.add('hidden');
+        //         if(swpProposalSection) swpProposalSection.classList.add('hidden');
+        //         // summarySection.classList.add('hidden');
+                
+        //         // ... (The rest of your SIP only logic) ...
+        //     }
+        //     // 2. ALWAYS SHOW & UPDATE THE SUMMARY SECTION
+        //     if (summarySection) {
+        //         summarySection.classList.remove('hidden');
+                
+        //         // Sync Phase 1 Totals
+        //         document.getElementById('sum_total_invested').innerText = document.getElementById('pTotalInv').innerText;
+        //         document.getElementById('sum_peak_corpus').innerText = document.getElementById('pCorpus').innerText;
+                
+        //         // Update the Consolidated Fund Table (SIP + Lumpsum)
+        //         updateSummaryTable();
+        //     }
+            
+        // } catch (e) {
+        //     console.error("Calculation Error: ", e);
+        // }
 
         // 1. Handle SWP Detail Visibility & Calculation
         const swpEnabled = document.getElementById('swpEnabled').checked;
