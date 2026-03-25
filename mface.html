@@ -165,7 +165,7 @@
                 <div class="space-y-7">
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Additional Monthly SIP (₹)</label>
-                        <input type="number" id="mfSip" oninput="updateWordDisplay(this); runLogic()" value="5000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <input type="number" id="mfSip" oninput="updateWordDisplay(this); runLogic()" value="5000" min="0" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                         <p id="mfSipWords" class="text-[11px] font-medium italic text-sky-600 mt-1 ml-1 h-3"></p>
                     </div>
                     <div>
@@ -241,7 +241,7 @@
                             <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">One-Time Withdrawal at Age <span id="milestoneAgeLabel">60</span></p>
                             <input type="number" id="milestoneAmount" value="2000000" oninput="updateWordDisplay(this); runLogic()" 
                                 class="w-full bg-slate-50 rounded-xl px-4 py-2 text-sm outline-none border border-slate-200 focus:border-blue-400">
-                            <p id="milestoneAmountWords" class="text-[8px] font-bold text-blue-500 mt-1 h-3"></p>
+                            <p id="milestoneAmountWords" class="text-[11px] italic font-bold text-blue-500 mt-1 h-3"></p>
                         </div>
                     </div>
                 </div>
