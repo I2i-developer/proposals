@@ -156,7 +156,7 @@
                 </div>
             </section>
 
-            <section class="mb-6">
+            <section class="mb-10">
                 <div class="flex items-center gap-2 mb-6">
                     <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">2. MF Growth Engine</h3>
@@ -245,19 +245,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="space-y-3 mt-8 border-t border-slate-200 pt-4">
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">
-                            Planned Withdrawals (₹)
-                        </label>
-                        <button onclick="addWithdrawalRow()" 
-                            class="bg-red-100 text-red-600 p-2 rounded-xl text-[11px] font-black uppercase">
-                            <i class="fas fa-plus-circle"></i> Add Withdrawal
-                        </button>
-                    </div>
-
-                    <div id="withdrawalInputsContainer" class="space-y-2"></div>
-                </div>
             </section>
 
             <section class="mb-10 border-t border-slate-200 pt-8">
@@ -309,7 +296,7 @@
             <div class="a4-container" id="capture">
                 <div class="flex justify-between items-start mb-12">
                     <div>
-                        <h1 class="text-4xl font-extrabold text-slate-900 leading-[1.1] mb-6">Wealth Creation & <br><span class="text-blue-600"><span class="tax-label">Tax-Free</span> Retirement</span></h1>
+                        <h1 class="text-4xl font-extrabold text-slate-900 leading-[1.1] mb-6">Wealth Creation & <br><span class="text-blue-600">Tax-Free Retirement</span></h1>
                         
                         <div class="space-y-1">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Exclusively Prepared For</p>
@@ -336,7 +323,7 @@
                             </p>
                                 
                             <p class="text-slate-600 leading-relaxed relative z-10">
-                                By utilizing the <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-[12px] font-bold italic shadow-sm">Bajaj ACE Plan</span> as your foundation, we secure a guaranteed, <span class="tax-label">tax-free</span> income stream. Instead of traditional consumption, this income is 
+                                By utilizing the <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-[12px] font-bold italic shadow-sm">Bajaj ACE Plan</span> as your foundation, we secure a guaranteed, tax-free income stream. Instead of traditional consumption, this income is 
                                 <span class="text-blue-600 font-bold uppercase tracking-tight mx-1">"Multiplexed"</span> 
                                 into your selected growth engines:
                             </p>
@@ -374,11 +361,11 @@
                             </div>
 
                             <div class="flex justify-between items-center border-b border-white/30 pb-3">
-                                <span class="text-[11px] text-slate-400 font-medium uppercase">ACE Income</span>
-                                <span class="label-tax text-[10px] font-black bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">100% TAX FREE*</span>
+                                <span class="text-[11px] text-slate-400 font-medium uppercase">Tax Status</span>
+                                <span class="text-[10px] font-black bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">100% TAX FREE*</span>
                             </div>
                             
-                            <div id="retirementAgeBox" class="flex justify-between items-center border-b border-white/30 pb-3">
+                            <div class="flex justify-between items-center border-b border-white/30 pb-3">
                                 <span class="text-[11px] text-slate-400 font-medium uppercase">Retirement Age</span>
                                 <span id="dyn_ret_age" class="text-xs font-bold text-blue-400">60 Years</span>
                             </div>
@@ -479,7 +466,7 @@
                                 <div>
                                     <p class="text-[13px] text-emerald-600 uppercase font-black mb-1 tracking-wider">Tax Status</p>
                                     <p class="text-[13px] font-bold text-slate-700">Optimized Tax Status</p>
-                                    <p class="text-[12px] font-medium text-slate-600 leading-tight mt-1"><span class="tax-label">Tax-free</span> ACE Maturity*</p>
+                                    <p class="text-[12px] font-medium text-slate-600 leading-tight mt-1">Tax-free ACE Maturity*</p>
                                 </div>
 
                                 <div>
@@ -528,7 +515,7 @@
                     <div class="mt-6 flex flex-wrap gap-6 items-center justify-center p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                         <div class="flex items-center gap-2">
                             <i class="fas fa-check-circle text-emerald-500 text-xs"></i>
-                            <span class="text-[12px] font-bold text-slate-600 uppercase"><span class="tax-label">Tax-Free</span> ACE Income</span>
+                            <span class="text-[12px] font-bold text-slate-600 uppercase">Tax-Free ACE Income</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <i class="fas fa-check-circle text-emerald-500 text-xs"></i>
@@ -598,7 +585,7 @@
                         </div>
                     </div>
                 </div>
-                <section id="summary-section" class="mt-8" style="break-before: page;">
+                <section id="summary-section" class="mt-8">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="h-8 w-1 bg-blue-600 rounded-full"></div>
                         <h3 class="text-xl font-black text-slate-800 tracking-tight">Executive Strategy Summary</h3>
@@ -631,7 +618,7 @@
                             </div>
                         </div>
 
-                        <div id="retirementHarvestBox" class="col-span-4 bg-yellow-50 px-6 py-4 rounded-[40px] shadow-xl border border-slate-200 relative overflow-hidden">
+                        <div class="col-span-4 bg-yellow-50 px-6 py-4 rounded-[40px] shadow-xl border border-slate-200 relative overflow-hidden">
                             <div class="absolute top-0 right-0 p-4">
                                 <span class="bg-orange-500/20 text-orange-500 text-[11px] font-black px-3 py-1 rounded-full uppercase">Phase 02</span>
                             </div>
@@ -678,7 +665,7 @@
                             </div>
                             
                             <div class="mt-4">
-                                <p class="text-[10px] font-bold text-emerald-700 uppercase">Net Generational Wealth (CORPUS + WITHDRAWALS)</p>
+                                <p class="text-[10px] font-bold text-emerald-700 uppercase">Net Generational Wealth</p>
                                 <p class="text-3xl font-black text-emerald-600 tracking-tight" id="sum_legacy_val">₹0</p>
                             </div>
                         </div>
@@ -776,52 +763,6 @@
             runLogic();
         }
 
-        function addWithdrawalRow() {
-            const container = document.getElementById("withdrawalInputsContainer");
-            const uniqueId = Date.now();
-            const div = document.createElement("div");
-            div.className = "withdrawal-row flex gap-2 items-center";
-
-            div.innerHTML = `
-                <div class="flex-1">
-                    <p class="text-[11px] font-bold text-slate-500 uppercase ml-1">Age</p>
-                    <input type="number" placeholder="Age" min="0" oninput="runLogic()" 
-                        class="wd-year w-full bg-white rounded-lg px-2 py-1 text-sm outline-none border border-slate-300">
-                </div>
-
-                <div class="flex-[2]">
-                    <p class="text-[11px] font-bold text-slate-500 uppercase ml-1">Amount</p>
-                    <input type="number" placeholder="Amount" min="0" 
-                        oninput="updateWordDisplay(this); runLogic()" 
-                        id="wd_amt_${uniqueId}"
-                        class="wd-amount w-full bg-white rounded-lg px-2 py-1 text-sm outline-none border border-slate-300">
-
-                    <p id="wd_amt_${uniqueId}Words" 
-                        class="text-[11px] text-sky-700 font-bold italic mt-1 opacity-0 transition-opacity">
-                    </p>
-                </div>
-
-                <div class="flex-1">
-                    <p class="text-[11px] font-bold text-slate-500 uppercase ml-1">Goal</p>
-                    <select onchange="runLogic()" 
-                        class="wd-tag w-full bg-white rounded-lg px-2 py-1 text-sm outline-none border border-slate-300">
-                        <option value="Withdrawn">Goal</option>
-                        <option value="Education">🎓 Edu</option>
-                        <option value="Marriage">💍 Marriage</option>
-                        <option value="House">🏠 House</option>
-                        <option value="Other">📌 Other</option>
-                    </select>
-                </div>
-
-                <button onclick="this.parentElement.remove(); runLogic();" 
-                    class="mt-5 text-red-400 hover:text-red-600 px-1">
-                    <i class="fas fa-times-circle"></i>
-                </button>
-            `;
-
-            container.appendChild(div);
-        }
-
         /**
          * TOGGLE VISIBILITY LOGIC
          */
@@ -882,19 +823,6 @@
             });
 
             container.innerHTML = pillsHtml;
-        }
-
-        function updateTaxLabels(amount) {
-            const taxLabels = document.querySelectorAll(".tax-label");
-            const text = amount < 500000 ? "Tax-Free" : "Assured";
-
-            taxLabels.forEach(el => el.textContent = text);
-        }
-        function updateLabelTax(amount) {
-            const taxLabels = document.querySelectorAll(".label-tax");
-            const text = amount < 500000 ? "100% TAX FREE*" : "ASSURED*";
-
-            taxLabels.forEach(el => el.textContent = text);
         }
 
         function updateOverallMultiplier(totalInvested, milestoneVal) {
@@ -1184,7 +1112,7 @@
         function runLogic() {
             try {
                 // 1. BASIC INPUTS
-                const name = document.getElementById('cName')?.value || "Valuable Client";
+                const name = document.getElementById('cName')?.value || "Client";
                 const age = parseInt(document.getElementById('cAge')?.value) || 30;
                 const acePrem = parseFloat(document.getElementById('acePrem')?.value) || 0;
                 const aceInc = parseFloat(document.getElementById('aceInc')?.value) || 0;
@@ -1196,111 +1124,61 @@
                 const mfSip = parseFloat(document.getElementById('mfSip')?.value) || 0;
                 const mfSipDuration = parseInt(document.getElementById('mfSipDuration')?.value) || 0;
                 const mfRate = parseFloat(document.getElementById('mfRate')?.value) || 12;
-                const mfName = document.getElementById('mfName')?.value || "Mutual Fund";
 
                 const swpToggle = document.getElementById('swpToggle')?.checked;
                 const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
-                
+
                 // Milestone Inputs
                 const milestoneActive = document.getElementById('milestoneToggle')?.checked || false;
                 const milestoneVal = milestoneActive ? (parseFloat(document.getElementById('milestoneAmount')?.value) || 0) : 0;
-                if(document.getElementById('rateVal')) document.getElementById('rateVal').innerText = mfRate + "%";
 
                 // 2. DYNAMIC LUMPSUMS CAPTURE
                 const plannedLumpsums = {};
                 document.querySelectorAll('.lumpsum-row').forEach(row => {
                     const yr = parseInt(row.querySelector('.ls-year').value);
                     const amt = parseFloat(row.querySelector('.ls-amount').value) || 0;
-                    if(yr > 0) plannedLumpsums[yr] = (plannedLumpsums[yr] || 0) + amt;
+                    if (yr > 0) plannedLumpsums[yr] = (plannedLumpsums[yr] || 0) + amt;
                 });
                 const totalLumpsums = Object.values(plannedLumpsums).reduce((a, b) => a + b, 0);
 
-                // WITHDRAWALS
-                const plannedWithdrawals = {};
-
-                document.querySelectorAll('.withdrawal-row').forEach(row => {
-                    const ageInput = parseInt(row.querySelector('.wd-year').value);
-                    const amt = parseFloat(row.querySelector('.wd-amount').value) || 0;
-                    const tag = row.querySelector('.wd-tag').value || "Goal";
-
-                    const yr = ageInput - age;
-
-                    if (yr > 0 && amt > 0) {
-                        if (!plannedWithdrawals[yr]) plannedWithdrawals[yr] = [];
-                        
-                        plannedWithdrawals[yr].push({ amount: amt, tag: tag });
-                    }
-                });
-
                 // 3. PHASE 1: ACCUMULATION ENGINE
-                let currentCorpus = 0; 
+                let currentCorpus = 0;
+                let investedSoFar = 0; // Track invested principal
                 let accumulationTableHtml = "";
                 let labels = [];
                 let growthPoints = [];
                 const totalYears = aceTerm;
 
                 for (let yr = 1; yr <= totalYears; yr++) {
-                    let currentAge = age + yr;
-                    let yrLumpsum = plannedLumpsums[yr] || 0;
-                    // let yrWithdrawal = plannedWithdrawals[yr] || 0;
-                    let yrWithdrawal = 0;
-                    let withdrawalTags = [];
+                    const currentAge = age + yr;
+                    const yrLumpsum = plannedLumpsums[yr] || 0;
+                    const yrPremium = (yr <= acePpt) ? acePrem : 0;
 
-                    if (plannedWithdrawals[yr]) {
-                        plannedWithdrawals[yr].forEach(w => {
-                            yrWithdrawal += w.amount || 0;
-                            withdrawalTags.push(w.tag || "");
-                        });
-                    }
-                    let yrPremium = (yr <= acePpt) ? acePrem : 0;
-                    
                     let yrAceIn = (yr <= aceTerm) ? aceInc : 0;
                     if (currentAge === (age + aceTerm)) yrAceIn += aceMat;
 
-                    let annualSip = (yr <= mfSipDuration) ? (mfSip * 12) : 0;
-                    
+                    const annualSip = (yr <= mfSipDuration) ? (mfSip * 12) : 0;
+
+                    // Update invested principal
+                    investedSoFar += yrLumpsum + annualSip;
+
                     // Compounding: Previous Balance + Income + SIP + New Lumpsum
-                    // currentCorpus = (currentCorpus + yrAceIn + annualSip + yrLumpsum) * (1 + (mfRate / 100));
                     currentCorpus = (currentCorpus + yrAceIn + annualSip + yrLumpsum) * (1 + (mfRate / 100));
-                    currentCorpus -= yrWithdrawal;
 
-                    if (currentCorpus < 0) currentCorpus = 0;
-
-                    // Store Chart Data
+                    // Chart Data
                     labels.push("Age " + currentAge);
                     growthPoints.push(Math.round(currentCorpus));
 
-                    // Table Row Logic
+                    // Table Row
                     let displayAceCell = `₹${yrAceIn.toLocaleString('en-IN')}`;
                     if (yr === totalYears && aceMat > 0) {
                         displayAceCell = `₹${aceInc.toLocaleString('en-IN')} <span class="text-blue-500 font-bold">+</span> ₹${aceMat.toLocaleString('en-IN')}`;
                     }
 
-                    // let sipDisplay = (yrLumpsum > 0) 
-                    //     ? `₹${annualSip.toLocaleString('en-IN')}<span class="text-emerald-600 text-[11px] ml-1"> + ₹${yrLumpsum.toLocaleString('en-IN')} LS</span>`
-                    //     : (yr <= mfSipDuration ? `₹${annualSip.toLocaleString('en-IN')}` : `<span class="text-slate-400 italic">₹-</span>`);
-                    let sipDisplay = "";
+                    const sipDisplay = (yrLumpsum > 0) 
+                        ? `₹${annualSip.toLocaleString('en-IN')}<span class="text-emerald-600 text-[11px] ml-1"> + ₹${yrLumpsum.toLocaleString('en-IN')} LS</span>`
+                        : (yr <= mfSipDuration ? `₹${annualSip.toLocaleString('en-IN')}` : `<span class="text-slate-400 italic">₹-</span>`);
 
-                    if (yr <= mfSipDuration) {
-                        sipDisplay += `₹${annualSip.toLocaleString('en-IN')}`;
-                    } else {
-                        sipDisplay += `<span class="text-slate-400 italic">₹-</span>`;
-                    }
-
-                    // Lumpsum
-                    if (yrLumpsum > 0) {
-                        sipDisplay += `<span class="text-emerald-600 text-[12px] ml-1">
-                            + ₹${yrLumpsum.toLocaleString('en-IN')} Lumpsum Added
-                        </span>`;
-                    }
-
-                    // 🔴 Withdrawal (THIS WAS MISSING)
-                    if (yrWithdrawal > 0) {
-                        sipDisplay += `<div class="text-red-500 text-[12px] mt-1 font-bold">
-                            - ₹${yrWithdrawal.toLocaleString('en-IN')}
-                            <span class="ml-1 text-[11px]">${withdrawalTags.join(", ")}</span>
-                        </div>`;
-                    }
                     if (yr <= 35 || currentAge === startAge) {
                         const sipStatusClass = yr <= mfSipDuration ? "font-bold text-slate-600" : "text-slate-300";
                         accumulationTableHtml += `
@@ -1311,7 +1189,7 @@
                                     ${yrAceIn > 0 || (yr === totalYears && aceMat > 0) ? displayAceCell : '-'}
                                     ${(yr === totalYears && aceMat > 0) ? '<div class="text-[9px] text-blue-600 font-black uppercase mt-1 tracking-tightest">Policy Maturity Added</div>' : ''}
                                 </td>
-                                <td class="px-4 py-4 text-sm font-bold font-base text-slate-600 ${sipStatusClass}">
+                                <td class="px-4 py-4 text-sm font-bold text-slate-600 ${sipStatusClass}">
                                     ${sipDisplay}
                                 </td>
                                 <td class="px-6 py-4 text-[15px] text-center font-black text-blue-600">₹${Math.round(currentCorpus).toLocaleString('en-IN')}</td>
@@ -1319,38 +1197,35 @@
                     }
                 }
 
-                // 4. TRANSITION LOGIC (Milestone Drop)
+                // 4. MILESTONE ADJUSTMENT
                 let finalPhase1Corpus = currentCorpus;
                 if (milestoneActive) {
                     document.getElementById('milestoneInputs')?.classList.remove('hidden');
                     finalPhase1Corpus = Math.max(0, currentCorpus - milestoneVal);
                     document.getElementById('milestoneAgeLabel').innerText = startAge;
-                    
-                    // Graph: Add a vertical drop point
+
+                    // Add vertical drop to chart
                     labels.push("Age " + startAge + " (Payout)");
                     growthPoints.push(Math.round(finalPhase1Corpus));
                 } else {
                     document.getElementById('milestoneInputs')?.classList.add('hidden');
                 }
 
-                // 5. PHASE 2: HARVESTING (SWP)
+                // 5. PHASE 2: SWP HARVESTING
                 if (swpToggle) {
-                    runSwpLogic(finalPhase1Corpus, mfRate);
+                    runSwpLogic(finalPhase1Corpus, mfRate, investedSoFar);
                 }
 
-                // 6. CALCULATE TOTALS FOR SUMMARY
+                // 6. SUMMARY CALCULATIONS
                 const totalInvested = (acePrem * acePpt) + (mfSip * 12 * mfSipDuration) + totalLumpsums;
                 const totalAceBenefit = (aceInc * aceTerm) + aceMat;
 
-                // 7. UPDATE ALL UI ELEMENTS (Safely)
-                const safeSet = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
-
+                // 7. UPDATE UI
+                const safeSet = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
                 safeSet('pName', name);
                 safeSet('dyn_intro_name', name);
                 safeSet('footerClientName', name);
-                safeSet('pTable', ''); // Clear and then append is safer
                 document.getElementById('pTable').innerHTML = accumulationTableHtml;
-                
                 safeSet('pAceTotal', formatINR(totalAceBenefit));
                 safeSet('pMfTotal', formatINR(currentCorpus));
                 safeSet('pLifeCover', formatINR(lifeCov));
@@ -1358,11 +1233,9 @@
                 safeSet('dyn_pol_term', (age + aceTerm) + " Years");
                 safeSet('sum_total_invested', formatINR(totalInvested));
                 safeSet('sum_peak_corpus', formatINR(currentCorpus));
-                safeSet('tblRate', mfRate.toFixed(1));
                 safeSet('sum_ace_benefit', formatINR(totalAceBenefit));
                 safeSet('sum_retire_age', startAge);
 
-                // Milestone Summary Badge
                 const msDisplay = document.getElementById('sum_milestone_display');
                 if (msDisplay) {
                     if (milestoneActive && milestoneVal > 0) {
@@ -1373,142 +1246,122 @@
                     }
                 }
 
-                // 8. FINAL WEALTH MULTIPLIER MATH
-                // let totalBenefits = currentCorpus;
-                // if (swpToggle) {
-                //     const rawPayout = parseFloat(document.getElementById('dyn_total_withdrawal')?.innerText.replace(/[₹,]/g, '') || 0);
-                //     const rawLegacy = parseFloat(document.getElementById('dyn_legacy_swp')?.innerText.replace(/[₹,]/g, '') || 0);
-                //     totalBenefits = rawPayout + rawLegacy + milestoneVal;
-                    
-                //     // Update SWP Summary Fields
-                //     const swpRate = parseFloat(document.getElementById('swpRateInput')?.value) || 8;
-                //     const startMonthly = (finalPhase1Corpus * (swpRate/100)) / 12;
-                //     safeSet('sum_start_income', formatINR(startMonthly));
-                //     safeSet('sum_total_payout', formatINR(rawPayout));
-                //     safeSet('sum_legacy_val', formatINR(rawLegacy));
-                // }else{
-                //     if(document.getElementById('sum_legacy_val')) document.getElementById('sum_legacy_val').innerText = formatINR(currentCorpus);
-                // }
-                const totalWithdrawals = Object.values(plannedWithdrawals)
-                .flat()
-                .reduce((sum, w) => sum + (w.amount || 0), 0);
-                let totalBenefits = 0;
+                // 8. WEALTH MULTIPLIER
+                let totalBenefits = currentCorpus;
                 if (swpToggle) {
                     const rawPayout = parseFloat(document.getElementById('dyn_total_withdrawal')?.innerText.replace(/[₹,]/g, '') || 0);
                     const rawLegacy = parseFloat(document.getElementById('dyn_legacy_swp')?.innerText.replace(/[₹,]/g, '') || 0);
-
-                    totalBenefits = rawPayout + rawLegacy + milestoneVal + totalWithdrawals;     // 🔥 planned withdrawals
-
-                    // UI updates
+                    totalBenefits = rawPayout + rawLegacy + milestoneVal;
                     const swpRate = parseFloat(document.getElementById('swpRateInput')?.value) || 8;
-                    const startMonthly = (finalPhase1Corpus * (swpRate/100)) / 12;
-
-                    safeSet('sum_start_income', formatINR(startMonthly));
+                    safeSet('sum_start_income', formatINR((finalPhase1Corpus * (swpRate/100)) / 12));
                     safeSet('sum_total_payout', formatINR(rawPayout));
                     safeSet('sum_legacy_val', formatINR(rawLegacy));
                 }
-                else {
-                    // No SWP → everything is still part of wealth
-                    
-                    totalBenefits =
-                        currentCorpus +       // final corpus
-                        milestoneVal +        // milestone withdrawal
-                        totalWithdrawals;     // 🔥 planned withdrawals
 
-                    safeSet('sum_legacy_val', formatINR(totalBenefits));
-                }
-
-                const swpElements = [
-                    document.getElementById("retirementAgeBox"),
-                    document.getElementById("retirementHarvestBox")
-                ];
-
-                swpElements.forEach(el => {
-                    el.classList.toggle("hidden", !swpToggle);
-                });
-
-                if(document.getElementById('sum_life_cover')) document.getElementById('sum_life_cover').innerText = formatINR(lifeCov);
-
+                if (document.getElementById('sum_life_cover')) document.getElementById('sum_life_cover').innerText = formatINR(lifeCov);
                 if (totalInvested > 0 && document.getElementById('sum_multiplier')) {
                     const mult = (totalBenefits / totalInvested).toFixed(1);
                     document.getElementById('sum_multiplier').innerText = `${mult}x Wealth Multiplier`;
                 }
 
                 // 9. REFRESH GRAPHS
-                updateTaxLabels(acePrem);
-                updateLabelTax(acePrem);
                 updateFundPills();
                 updateMainChart(labels, growthPoints);
                 updateMixChart(acePrem, mfSip, totalLumpsums);
 
-            } catch (e) { 
-                console.error("Logic Error:", e); 
+            } catch (e) {
+                console.error("Logic Error:", e);
             }
+        }
+
+        /**
+        * SWP LOGIC (corrected for first-year LTCG)
+        */
+        /**
+* UPDATED SWP LOGIC
+* Matches Proportional Gain Ratio & 12.5% Tax Rate
+*/
+function runSwpLogic(finalCorpus, growthRate, investedSoFar) {
+    const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
+    const duration = parseInt(document.getElementById('swpDuration')?.value) || 25;
+    const swpRate = (parseFloat(document.getElementById('swpRateInput')?.value) || 8) / 100;
+    const stepUp = (parseFloat(document.getElementById('swpStepPct')?.value) || 0) / 100;
+    const interval = parseInt(document.getElementById('swpStepInterval')?.value) || 0;
+
+    let corpus = finalCorpus;
+    let currentCostBasis = investedSoFar;
+    let annualWithdrawal = corpus * swpRate;
+    let totalPaidOut = 0;
+
+    let swpHtml = "";
+    let swpLabels = [], swpInc = [], swpCorp = [];
+
+    for (let i = 1; i <= duration; i++) {
+        const age = startAge + i;
+
+        // 1. Calculate Growth for the year first
+        const valueAfterGrowth = corpus * (1 + (growthRate / 100));
+        
+        // 2. Determine Proportional Gain Ratio
+        // Gain Ratio = (Current Total Value - Original Cost) / Current Total Value
+        const totalGainInFund = valueAfterGrowth - currentCostBasis;
+        const gainRatio = Math.max(0, totalGainInFund / valueAfterGrowth);
+
+        // 3. Calculate LTCG portion of the withdrawal
+        const ltcgInWithdrawal = annualWithdrawal * gainRatio;
+
+        // 4. Tax Calculation (12.5% after 1.25L exemption)
+        const exempt = 125000;
+        const taxableLtcg = Math.max(0, ltcgInWithdrawal - exempt);
+        const tax = taxableLtcg * 0.125;
+        const netWithdrawal = annualWithdrawal - tax;
+
+        // 5. Update Cost Basis (Reduce by the 'Principal' portion withdrawn)
+        const principalPortion = annualWithdrawal - ltcgInWithdrawal;
+        currentCostBasis = Math.max(0, currentCostBasis - principalPortion);
+
+        // 6. Final Corpus after withdrawal
+        corpus = Math.max(0, valueAfterGrowth - annualWithdrawal);
+
+        // Store table/chart data
+        swpLabels.push("Age " + age);
+        swpInc.push(Math.round(netWithdrawal));
+        swpCorp.push(Math.round(corpus));
+        totalPaidOut += netWithdrawal;
+
+        swpHtml += `
+            <tr class="border-b border-emerald-50">
+                <td class="px-6 py-4 text-sm font-black text-center text-slate-800">${age}</td>
+                <td class="px-6 py-4 text-sm font-bold text-center text-blue-600">₹${Math.round(netWithdrawal/12).toLocaleString('en-IN')}</td>
+                <td class="px-6 py-4 text-sm text-center text-orange-500 font-black">₹${Math.round(annualWithdrawal).toLocaleString('en-IN')}</td>
+                <td class="px-6 py-4 text-sm text-center text-gray-600 font-semibold">₹${Math.round(ltcgInWithdrawal).toLocaleString('en-IN')}</td>
+                <td class="px-6 py-4 text-sm text-center text-red-500 font-semibold">₹${Math.round(tax).toLocaleString('en-IN')}</td>
+                <td class="px-6 py-4 text-sm text-center text-green-600 font-bold">₹${Math.round(netWithdrawal).toLocaleString('en-IN')}</td>
+                <td class="px-6 py-4 text-sm font-bold text-center text-purple-600">₹${Math.round(corpus).toLocaleString('en-IN')}</td>
+            </tr>`;
+
+        // Handle Step-up
+        if (interval > 0 && i % interval === 0) {
+            annualWithdrawal *= (1 + stepUp);
         }
         
-        /**
-         * SWP LOGIC
-         */
-        function runSwpLogic(peakCorpus, growthRate) {
-            const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
-            const duration = parseInt(document.getElementById('swpDuration')?.value) || 25;
-            const swpRate = (parseFloat(document.getElementById('swpRateInput')?.value) || 8) / 100;
-            const stepUp = (parseFloat(document.getElementById('swpStepPct')?.value) || 0) / 100;
-            const interval = parseInt(document.getElementById('swpStepInterval')?.value) || 0;
+        if (corpus <= 0) break;
+    }
 
-            let corpus = peakCorpus;
-            let annualWithdrawal = peakCorpus * swpRate;
-            let totalPaidOut = 0;
-            let swpHtml = "";
-            let swpLabels = [], swpInc = [], swpCorp = [];
+    // UI Updates
+    document.getElementById('pSwpTable').innerHTML = swpHtml;
+    document.getElementById('dyn_maturity_corpus').innerText = "₹ " + Math.round(finalCorpus).toLocaleString('en-IN');
+    document.getElementById('dyn_start_swp').innerText = "₹ " + Math.round((finalCorpus*swpRate)/12).toLocaleString('en-IN');
+    document.getElementById('dyn_total_withdrawal').innerText = "₹ " + Math.round(totalPaidOut).toLocaleString('en-IN');
+    document.getElementById('dyn_legacy_swp').innerText = "₹ " + Math.round(corpus).toLocaleString('en-IN');
+    document.getElementById('dyn_swp_start_age_text').innerText = startAge;
+    document.getElementById('dyn_swp_start_age_label').innerText = startAge + 1;
+    document.getElementById('dyn_final_age_label').innerText = startAge + duration;
+    document.getElementById('dyn_ret_age').innerText = startAge + " Years";
+    document.getElementById('dyn_benefit_yrs').innerText = duration + "+ Years";
 
-            for (let i = 1; i <= duration; i++) {
-                let age = startAge + i;
-
-                // Withdraw first, then grow
-                corpus = (corpus - annualWithdrawal) * (1 + (growthRate / 100));
-                if (corpus < 0) corpus = 0;
-
-                swpLabels.push("Age " + age);
-                swpInc.push(Math.round(annualWithdrawal));
-                swpCorp.push(Math.round(corpus));
-                totalPaidOut += annualWithdrawal;
-
-                swpHtml += `
-                    <tr class="border-b border-emerald-50">
-                        <td class="px-6 py-4 text-sm font-black text-center text-slate-800">${age}</td>
-                        <td class="px-6 py-4 text-sm font-bold text-center text-blue-600">
-                            ₹${Math.round(annualWithdrawal / 12).toLocaleString('en-IN')}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-center text-orange-500 font-black">
-                            ₹${Math.round(annualWithdrawal).toLocaleString('en-IN')}
-                        </td>
-                        <td class="px-6 py-4 text-sm font-bold text-center text-purple-600">
-                            ₹${Math.round(corpus).toLocaleString('en-IN')}
-                        </td>
-                    </tr>`;
-
-                // Step-up logic (guard against interval = 0)
-                if (interval > 0 && (i + 1) % interval === 0) {
-                    annualWithdrawal *= (1 + stepUp);
-                }
-
-                if (corpus === 0) break;
-            }
-
-            document.getElementById('pSwpTable').innerHTML = swpHtml;
-            document.getElementById('dyn_maturity_corpus').innerText = "₹ " + Math.round(peakCorpus).toLocaleString('en-IN');
-            document.getElementById('dyn_start_swp').innerText = "₹ " + Math.round((peakCorpus * swpRate) / 12).toLocaleString('en-IN');
-            document.getElementById('dyn_total_withdrawal').innerText = "₹ " + Math.round(totalPaidOut).toLocaleString('en-IN');
-            document.getElementById('dyn_legacy_swp').innerText = "₹ " + Math.round(corpus).toLocaleString('en-IN');
-            document.getElementById('dyn_swp_start_age_text').innerText = startAge;
-            document.getElementById('dyn_swp_start_age_label').innerText = startAge + 1;
-            document.getElementById('dyn_final_age_label').innerText = startAge + duration;
-            document.getElementById('dyn_ret_age').innerText = startAge + " Years";
-            document.getElementById('dyn_benefit_yrs').innerText = duration + "+ Years";
-
-            updateSwpChart(swpLabels, swpInc, swpCorp);
-        }
+    updateSwpChart(swpLabels, swpInc, swpCorp);
+}
 
         /**
          * CHARTS
