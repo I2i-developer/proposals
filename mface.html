@@ -19,7 +19,31 @@
         .a4-container { width: 210mm; min-height: 297mm; padding: 20mm; background: white; margin: 40px auto; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.6); position: relative; }
         .floating-input { transition: all 0.2s ease; border: 1.5px solid #e2e8f0; }
         .floating-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+        }
+
+        .chart-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
         @media print {
+            .chart-wrapper {
+                height: 280px !important;
+            }
+
+            .chart-wrapper canvas {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                transform: none !important;
+            }
+
             /* Reduce the main chart height */
             .w-full.relative[style*="height: 400px;"] {
                 height: 280px !important; /* Shorter graph for print */
@@ -444,9 +468,11 @@
                 <div class="grid grid-cols-12 gap-6 mb-12">
                     <div class="col-span-8 bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm flex flex-col items-center">
                         <h4 class="text-[13px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">Initial Capital Allocation</h4>
-                        <div class="w-full relative flex justify-center items-center" style="height: 280px;">
-                            <canvas id="mixChart"></canvas>
-                            
+                        <!-- <div class="w-full relative flex justify-center items-center" style="height: 280px;">
+                            <canvas id="mixChart"></canvas> -->
+                        <div class="w-full relative flex justify-center items-center chart-wrapper">
+                            <canvas id="mixChart"></canvas>    
+
                             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                 <span class="text-[9px] font-black text-slate-400 uppercase">Total Outlay</span>
                                 <span class="text-xl font-black text-slate-800" id="donut_total_val">₹0</span>
