@@ -672,7 +672,7 @@
                                     <p class="text-slate-700 font-medium text-[12px]">Total Lifetime Payout</p>
                                     <p class="text-2xl font-extrabold text-[#A0522D]" id="sum_total_payout">₹0</p>
                                 </div>
-                                <div class="pt-2 border-t-2 border-slate-400">
+                                <!-- <div class="pt-2 border-t-2 border-slate-400">
                                     <p class="text-slate-600 font-bold text-[11px] mb-1">Wealth Efficiency</p>
                                     <div class="flex items-center gap-2">
                                         <div class="bg-emerald-500/10 p-1.5 rounded-lg">
@@ -683,6 +683,10 @@
                                             <p class="text-[9px] text-slate-600 font-bold mt-1"></p>
                                         </div>
                                     </div>
+                                </div> -->
+                                <div class="pt-4 border-t-2 border-slate-400">
+                                    <p class="text-slate-800 font-medium text-[11px] mb-1">Projected Corpus @ Age <span id="sum_retire_age">60</span></p>
+                                    <p class="text-3xl font-black text-[#B83B26] tracking-tight" id="sum_peak_corpus">₹0</p>
                                 </div>
                             </div>
                         </div>
@@ -912,13 +916,13 @@
 
         function updateTaxLabels(amount) {
             const taxLabels = document.querySelectorAll(".tax-label");
-            const text = amount < 500000 ? "Tax-Free" : "Assured";
+            const text = amount < 500001 ? "Tax-Free" : "Assured";
 
             taxLabels.forEach(el => el.textContent = text);
         }
         function updateLabelTax(amount) {
             const taxLabels = document.querySelectorAll(".label-tax");
-            const text = amount < 500000 ? "100% TAX FREE*" : "ASSURED*";
+            const text = amount < 500001 ? "100% TAX FREE*" : "ASSURED*";
 
             taxLabels.forEach(el => el.textContent = text);
         }
@@ -1415,9 +1419,7 @@
                 // }else{
                 //     if(document.getElementById('sum_legacy_val')) document.getElementById('sum_legacy_val').innerText = formatINR(currentCorpus);
                 // }
-                const totalWithdrawals = Object.values(plannedWithdrawals)
-                .flat()
-                .reduce((sum, w) => sum + (w.amount || 0), 0);
+                const totalWithdrawals = Object.values(plannedWithdrawals).flat().reduce((sum, w) => sum + (w.amount || 0), 0);
                 let totalBenefits = 0;
                 if (swpToggle) {
                     const rawPayout = parseFloat(document.getElementById('dyn_total_withdrawal')?.innerText.replace(/[₹,]/g, '') || 0);
@@ -1431,15 +1433,12 @@
 
                     safeSet('sum_start_income', formatINR(startMonthly));
                     safeSet('sum_total_payout', formatINR(rawPayout));
-                    safeSet('sum_legacy_val', formatINR(rawLegacy));
+                    safeSet('sum_legacy_val', formatINR(totalBenefits));
                 }
                 else {
                     // No SWP → everything is still part of wealth
                     
-                    totalBenefits =
-                        currentCorpus +       // final corpus
-                        milestoneVal +        // milestone withdrawal
-                        totalWithdrawals;     // 🔥 planned withdrawals
+                    totalBenefits = currentCorpus + milestoneVal + totalWithdrawals;
 
                     safeSet('sum_legacy_val', formatINR(totalBenefits));
                 }
