@@ -686,7 +686,7 @@
                                 </div> -->
                                 <div class="pt-4 border-t-2 border-slate-400">
                                     <p class="text-slate-800 font-medium text-[11px] mb-1">Estimated Corpus @ Age <span id="sum_final_age">85</span></p>
-                                    <p class="text-3xl font-black text-[#B83B26] tracking-tight" id="sum_peak_corpus">₹0</p>
+                                    <p class="text-3xl font-black text-[#B83B26] tracking-tight" id="dyn_swp_corpus">₹0</p>
                                 </div>
                             </div>
                         </div>
@@ -1438,6 +1438,7 @@
 
                     safeSet('sum_start_income', formatINR(startMonthly));
                     safeSet('sum_total_payout', formatINR(rawPayout));
+                    safeSet('dyn_swp_corpus', formatINR(rawLegacy));
                     safeSet('sum_legacy_val', formatINR(totalBenefits));
                 }
                 else {
