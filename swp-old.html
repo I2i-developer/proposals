@@ -81,7 +81,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Client Name</label>
-                        <input type="text" id="inputClientName" value="Valuable Client" class="input-field w-full">
+                        <input type="text" id="inputClientName" value="Monica Ghambhir" class="input-field w-full">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Investment (₹)</label>
@@ -368,16 +368,15 @@
                 }
 
                 const opening = currentBalance;
-                const growth = opening * returnPercent;
-                const afterGrowth = opening + growth;
-                const afterWithdrawal = afterGrowth - currentYearlyWithdrawal;
-
+                const afterWithdrawal = opening - currentYearlyWithdrawal;
+                
                 if (afterWithdrawal < 0) {
                    tableBody.innerHTML += `<tr><td colspan="4" class="p-6 text-center text-red-500 font-bold uppercase italic">Portfolio depleted in Year ${i}</td></tr>`;
                    break;
                 }
 
-                const closing = afterWithdrawal;
+                const growth = afterWithdrawal * returnPercent;
+                const closing = afterWithdrawal + growth;
                 totalIncome += currentYearlyWithdrawal;
                 
                 tableBody.innerHTML += `
