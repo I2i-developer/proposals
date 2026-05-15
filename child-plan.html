@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Goal Plan | Ideas2Invest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0f172a;
+            --muted: #64748b;
+            --line: #e2e8f0;
+            --blue: #2563eb;
+            --green: #16a34a;
+            --amber: #d97706;
+            --rose: #e11d48;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #0f172a;
+            color: var(--ink);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #eef2f7; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+
+        .input-sidebar {
+            height: calc(100vh - 64px);
+            background: #ffffff;
+        }
+
+        .preview-area {
+            height: calc(100vh - 64px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(34, 197, 94, 0.18), transparent 28%),
+                radial-gradient(circle at 85% 0%, rgba(37, 99, 235, 0.18), transparent 32%),
+                linear-gradient(135deg, #111827, #0f172a 65%);
+        }
+
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 21mm 18mm;
+            background: #ffffff;
+            margin: 40px auto;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.65);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .a4-container:before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--blue), var(--green), var(--amber), var(--rose));
+        }
+
+        .field {
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            border: 1.5px solid var(--line);
+            background: #fff;
+        }
+
+        .field:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+            outline: none;
+        }
+
+        .range {
+            accent-color: var(--blue);
+        }
+
+        .mini-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 1px solid #e2e8f0;
+        }
+
+        .phase-pill {
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: 0 10px 28px -22px rgba(15, 23, 42, 0.6);
+        }
+
+        .chart-shell {
+            height: 280px;
+            position: relative;
+        }
+
+        .print-break {
+            break-inside: avoid;
+        }
+
+        @media (max-width: 1100px) {
+            body { overflow: auto; }
+            .layout { flex-direction: column; }
+            .input-sidebar { width: 100%; height: auto; }
+            .preview-area { height: auto; min-height: 100vh; }
+            .a4-container { width: min(100%, 210mm); margin: 0 auto; padding: 24px; }
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 8mm;
+            }
+
+            .no-print { display: none !important; }
+            html, body {
+                width: auto;
+                margin: 0;
+                background: #fff;
+                overflow: visible;
+            }
+
+            .preview-area { height: auto; overflow: visible; background: #fff; }
+
+            .a4-container {
+                width: 194mm;
+                max-width: 194mm;
+                min-height: auto;
+                margin: 0;
+                padding: 6mm 0 0 0;
+                box-shadow: none;
+                overflow: visible;
+            }
+
+            .a4-container:before { display: none; }
+
+            .a4-container > header,
+            .a4-container > section:not(:last-child) {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .a4-container > section:last-child {
+                break-before: page;
+                page-break-before: always;
+            }
+
+            header {
+                margin-bottom: 9mm !important;
+            }
+
+            header h1 {
+                font-size: 26px !important;
+                line-height: 1.08 !important;
+            }
+
+            header p {
+                font-size: 10px !important;
+                line-height: 1.45 !important;
+            }
+
+            header img {
+                width: 120px !important;
+                margin-bottom: 12px !important;
+            }
+
+            section {
+                margin-bottom: 8mm !important;
+            }
+
+            .mini-card {
+                padding: 14px !important;
+                border-radius: 12px !important;
+            }
+
+            .mini-card p:last-child {
+                font-size: 18px !important;
+                margin-top: 4px !important;
+            }
+
+            .phase-pill {
+                padding: 12px !important;
+                border-radius: 10px !important;
+            }
+
+            .phase-pill p:last-child {
+                font-size: 14px !important;
+            }
+
+            .chart-shell {
+                height: 270px !important;
+                padding: 10px !important;
+            }
+
+            .chart-shell canvas {
+                width: 100% !important;
+                height: 245px !important;
+                max-height: 245px !important;
+                display: block !important;
+            }
+
+            table {
+                table-layout: fixed !important;
+                font-size: 9px !important;
+                line-height: 1.48 !important;
+            }
+
+            th {
+                padding: 6px 8px !important;
+                font-size: 8px !important;
+                line-height: 1.15 !important;
+            }
+
+            td {
+                padding: 8px 8px !important;
+                line-height: 1.48 !important;
+            }
+
+            #projectionRows span {
+                font-size: 8px !important;
+                padding: 3px 5px !important;
+            }
+
+            .print-page-two {
+                padding-top: 1mm !important;
+                margin-bottom: 0 !important;
+            }
+
+            .print-plan-logic {
+                margin-bottom: 3mm !important;
+            }
+
+            .print-plan-logic h2 {
+                margin-bottom: 2mm !important;
+            }
+
+            .print-plan-logic > div {
+                padding: 8px !important;
+                border-radius: 12px !important;
+            }
+
+            .print-plan-logic p {
+                font-size: 9px !important;
+                line-height: 1.35 !important;
+            }
+
+            .print-plan-logic #formulaLine {
+                font-size: 8px !important;
+                margin-top: 4px !important;
+            }
+
+            .final-summary {
+                margin-top: 2.5mm !important;
+                padding: 10px !important;
+                border-radius: 12px !important;
+            }
+
+            .final-summary > p:first-child {
+                font-size: 10px !important;
+                margin-bottom: 8px !important;
+            }
+
+            .final-summary .grid {
+                gap: 8px !important;
+            }
+
+            .final-summary .rounded-xl {
+                padding: 9px !important;
+                border-radius: 10px !important;
+            }
+
+            .final-summary p {
+                line-height: 1.32 !important;
+            }
+
+            .final-summary .text-\[10px\] {
+                font-size: 9px !important;
+            }
+
+            .final-summary .text-\[11px\] {
+                font-size: 9px !important;
+            }
+
+            #summaryMfCorpus {
+                font-size: 22px !important;
+            }
+
+            #summaryFdCorpus {
+                font-size: 17px !important;
+            }
+
+            #summaryExtraCorpus {
+                font-size: 19px !important;
+            }
+
+            #summaryClosingLine {
+                font-size: 10px !important;
+                margin-top: 7px !important;
+            }
+
+            .qr-footer {
+                margin-top: 8px !important;
+                padding-top: 8px !important;
+            }
+
+            .qr-footer img {
+                width: 72px !important;
+                height: 72px !important;
+            }
+
+            .qr-footer p {
+                font-size: 10px !important;
+                line-height: 1.3 !important;
+            }
+
+            .qr-footer .contact-line {
+                font-size: 9px !important;
+            }
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+    <nav class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-8 z-50 relative no-print">
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='index.html'" class="text-slate-500 hover:text-blue-600 transition-colors text-sm font-bold">
+                <i class="fa fa-home fa-sm mr-1"></i> Dashboard
+            </button>
+            <div class="h-5 w-px bg-slate-300"></div>
+            <h1 class="font-black text-slate-700 uppercase text-xs tracking-widest">Child Goal Plan / <span class="text-blue-600">Target Age 25</span></h1>
+        </div>
+        <button onclick="window.print()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">
+            <i class="fas fa-download mr-2 text-xs"></i> Export PDF
+        </button>
+    </nav>
+
+    <div class="layout flex">
+        <aside class="w-[410px] input-sidebar no-print p-8 overflow-y-auto shadow-2xl z-40">
+            <section class="mb-9">
+                <p class="text-[11px] font-black text-blue-600 uppercase tracking-[0.22em] mb-2">1. Child Profile</p>
+                <h2 class="text-2xl font-black text-slate-900 leading-tight">Plan the corpus at age 25.</h2>
+                <p class="text-sm text-slate-500 mt-2 leading-relaxed">Enter the child's age, investment duration, SIP amount, and expected return. Contributions stop after the chosen years; the money remains invested until age 25.</p>
+            </section>
+
+            <section class="space-y-5 mb-9">
+                <div>
+                    <label for="childName" class="text-[11px] font-black text-slate-400 uppercase ml-1">Child Name</label>
+                    <input id="childName" type="text" value="Shyam" oninput="runPlan()" class="field w-full rounded-xl px-4 py-3 text-sm mt-1">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="childAge" class="text-[11px] font-black text-slate-400 uppercase ml-1">Current Age</label>
+                        <input id="childAge" type="number" min="0" max="24" value="5" oninput="sanitizeAge(); runPlan()" class="field w-full rounded-xl px-4 py-3 text-sm mt-1">
+                    </div>
+                    <div>
+                        <label for="targetAge" class="text-[11px] font-black text-slate-400 uppercase ml-1">Target Age</label>
+                        <input id="targetAge" type="number" value="25" readonly class="field w-full rounded-xl px-4 py-3 text-sm mt-1 bg-slate-50 text-slate-500">
+                    </div>
+                </div>
+                <div>
+                    <label for="investYears" class="text-[11px] font-black text-slate-400 uppercase ml-1">Investment Years</label>
+                    <input id="investYears" type="number" min="1" value="10" oninput="runPlan()" class="field w-full rounded-xl px-4 py-3 text-sm mt-1">
+                    <p id="durationWarning" class="hidden text-[12px] text-amber-700 font-bold mt-2"></p>
+                </div>
+            </section>
+
+            <section class="border-t border-slate-200 pt-7 mb-9">
+                <p class="text-[11px] font-black text-emerald-600 uppercase tracking-[0.22em] mb-5">2. Investment Engine</p>
+                <div class="space-y-5">
+                    <div>
+                        <label for="monthlySip" class="text-[11px] font-black text-slate-400 uppercase ml-1">Monthly SIP Amount (Rs.)</label>
+                        <input id="monthlySip" type="number" min="0" value="10000" oninput="runPlan()" class="field w-full rounded-xl px-4 py-3 text-sm mt-1">
+                    </div>
+                    <div>
+                        <label for="lumpsum" class="text-[11px] font-black text-slate-400 uppercase ml-1">Initial Lumpsum (Rs.)</label>
+                        <input id="lumpsum" type="number" min="0" value="0" oninput="runPlan()" class="field w-full rounded-xl px-4 py-3 text-sm mt-1">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-end">
+                            <label for="returnRate" class="text-[11px] font-black text-slate-400 uppercase ml-1">Expected Return (% p.a.)</label>
+                            <span id="returnLabel" class="text-blue-600 text-base font-black">12%</span>
+                        </div>
+                        <input id="returnRate" type="range" min="6" max="22" step="0.5" value="12" oninput="runPlan()" class="range w-full mt-3">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-400 mt-1">
+                            <span>Conservative</span>
+                            <span>Aggressive</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-end">
+                            <label for="fdRate" class="text-[11px] font-black text-slate-400 uppercase ml-1">Bank FD Rate (% p.a.)</label>
+                            <span id="fdLabel" class="text-amber-600 text-base font-black">6.5%</span>
+                        </div>
+                        <input id="fdRate" type="range" min="4" max="9" step="0.25" value="6.5" oninput="runPlan()" class="range w-full mt-3">
+                    </div>
+                </div>
+            </section>
+
+            <section class="border-t border-slate-200 pt-7 mb-9">
+                <div class="flex items-center justify-between p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                    <div>
+                        <p class="text-[13px] font-black text-amber-700 uppercase">Step-up SIP</p>
+                        <p class="text-[12px] text-amber-700">Increase SIP every year</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input id="stepEnabled" type="checkbox" class="sr-only peer" onchange="toggleStep(); runPlan()">
+                        <span class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:bg-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:translate-x-full"></span>
+                    </label>
+                </div>
+                <div id="stepBox" class="hidden mt-4">
+                    <label for="stepRate" class="text-[11px] font-black text-slate-400 uppercase ml-1">Annual Step-up (%)</label>
+                    <input id="stepRate" type="number" min="0" value="10" oninput="runPlan()" class="field w-full rounded-xl px-4 py-3 text-sm mt-1">
+                </div>
+            </section>
+
+        </aside>
+
+        <main class="flex-1 preview-area">
+            <div class="a4-container" id="proposal">
+                <header class="flex justify-between items-start gap-10 mb-10 print-break">
+                    <div>
+                        <p class="text-[10px] font-black text-blue-600 uppercase tracking-[0.35em] mb-3">Ideas2Invest Child Wealth Plan</p>
+                        <h1 class="text-4xl font-black text-slate-950 leading-tight">Corpus projection<br>for age 25</h1>
+                        <p class="text-sm text-slate-500 mt-5 leading-relaxed max-w-xl">
+                            A disciplined SIP plan where contributions are made for a fixed number of years and the accumulated amount stays invested without withdrawals until the child turns 25.
+                        </p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <img src="https://www.ideas2invest.com/assets/images/logo/logo.png" alt="Ideas2Invest Logo" class="w-40 mb-5">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Prepared For</p>
+                        <p id="pChildName" class="text-xl font-black text-slate-900">Shyam</p>
+                    </div>
+                </header>
+
+                <section class="grid grid-cols-12 gap-5 mb-10 print-break">
+                    <div class="col-span-4 mini-card rounded-2xl p-5">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Monthly SIP</p>
+                        <p id="pSip" class="text-2xl font-black text-blue-600 mt-2">Rs. 10,000</p>
+                    </div>
+                    <div class="col-span-4 mini-card rounded-2xl p-5">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Invested</p>
+                        <p id="pInvested" class="text-2xl font-black text-green-600 mt-2">Rs. 12,00,000</p>
+                    </div>
+                    <div class="col-span-4 mini-card rounded-2xl p-5">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Corpus at 25</p>
+                        <p id="pCorpus" class="text-2xl font-black text-slate-950 mt-2">Rs. 64,58,000</p>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-12 gap-8 mb-10 print-break">
+                    <div class="col-span-7">
+                        <h2 class="text-[13px] font-black text-blue-600 uppercase tracking-[0.25em] mb-3">Plan Summary</h2>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            <span id="summaryName" class="font-black text-slate-900">Shyam</span> is currently
+                            <span id="summaryAge" class="font-black text-slate-900">5</span> years old. The SIP will continue for
+                            <span id="summaryInvestYears" class="font-black text-slate-900">10</span> years, from age
+                            <span id="summaryStartAge" class="font-black text-slate-900">5</span> to
+                            <span id="summaryStopAge" class="font-black text-slate-900">15</span>. After that, no withdrawals are planned; the corpus remains invested for
+                            <span id="summaryHoldYears" class="font-black text-slate-900">10</span> more years, until age 25.
+                        </p>
+                        <div class="mt-6 grid grid-cols-3 gap-3">
+                            <div class="phase-pill rounded-xl p-4 bg-blue-50">
+                                <p class="text-[10px] font-black text-blue-700 uppercase">Start</p>
+                                <p id="phaseStart" class="text-lg font-black text-slate-900">Age 5</p>
+                            </div>
+                            <div class="phase-pill rounded-xl p-4 bg-green-50">
+                                <p class="text-[10px] font-black text-green-700 uppercase">SIP Ends</p>
+                                <p id="phaseStop" class="text-lg font-black text-slate-900">Age 15</p>
+                            </div>
+                            <div class="phase-pill rounded-xl p-4 bg-amber-50">
+                                <p class="text-[10px] font-black text-amber-700 uppercase">Target</p>
+                                <p class="text-lg font-black text-slate-900">Age 25</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-5 bg-slate-950 rounded-2xl p-6 text-white">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-5">Outcome Snapshot</p>
+                        <div class="space-y-4">
+                            <div class="flex justify-between gap-4">
+                                <span class="text-xs text-slate-400">Expected Return</span>
+                                <span id="pReturn" class="text-sm font-black">12% p.a.</span>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <span class="text-xs text-slate-400">Contribution Phase</span>
+                                <span id="pContributionPhase" class="text-sm font-black">10 Years</span>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <span class="text-xs text-slate-400">No Withdrawal Phase</span>
+                                <span id="pHoldPhase" class="text-sm font-black">10 Years</span>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <span class="text-xs text-slate-400">Wealth Multiplier</span>
+                                <span id="pMultiplier" class="text-sm font-black text-green-400">5.4x</span>
+                            </div>
+                            <div class="pt-5 mt-5 border-t border-white/10">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Final Corpus at Target</p>
+                                <p id="pTargetCorpus" class="text-3xl font-black text-green-400 mt-2">Rs. 64,58,000</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-10 print-break">
+                    <div class="flex justify-between items-end mb-5">
+                        <div>
+                            <h2 class="text-[13px] font-black text-blue-600 uppercase tracking-[0.25em]">Growth Journey</h2>
+                            <p class="text-sm text-slate-500 mt-1">Year-end corpus from current age to age 25.</p>
+                        </div>
+                        <p id="timelineText" class="text-xs font-black text-slate-500 uppercase">20-year plan</p>
+                    </div>
+                    <div class="chart-shell rounded-2xl border border-slate-200 p-4">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </section>
+
+                <section class="print-break print-page-two">
+                    <div class="print-plan-logic mb-6">
+                        <h2 class="text-[13px] font-black text-amber-600 uppercase tracking-[0.25em] mb-4">Plan Logic</h2>
+                        <div class="rounded-2xl bg-amber-50 border border-amber-100 p-5">
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                Contributions are invested monthly during the SIP period. Once the investment duration ends, the SIP stops and the full corpus continues compounding until the target age of 25.
+                            </p>
+                            <p id="formulaLine" class="text-xs font-black text-amber-800 uppercase tracking-wide mt-4"></p>
+                        </div>
+                    </div>
+                    <h2 class="text-[13px] font-black text-blue-600 uppercase tracking-[0.25em] mb-4">Yearly Projection</h2>
+                    <div class="overflow-hidden rounded-2xl border border-slate-200">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-950 text-white">
+                                <tr>
+                                    <th class="text-left px-5 py-3 text-[11px] uppercase tracking-widest">Age</th>
+                                    <th class="text-left px-5 py-3 text-[11px] uppercase tracking-widest">Phase</th>
+                                    <th class="text-right px-5 py-3 text-[11px] uppercase tracking-widest">Invested This Year</th>
+                                    <th class="text-right px-5 py-3 text-[11px] uppercase tracking-widest">Total Invested</th>
+                                    <th class="text-right px-5 py-3 text-[11px] uppercase tracking-widest">Year-end Corpus</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectionRows"></tbody>
+                        </table>
+                    </div>
+                    <div class="final-summary mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-5">
+                        <p class="text-[11px] font-black text-blue-700 uppercase tracking-[0.25em] mb-3">Final Summary</p>
+                        <div class="grid grid-cols-12 gap-4 items-stretch">
+                            <div class="col-span-5 rounded-xl bg-white border border-blue-200 p-4">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mutual Fund Corpus at Age 25</p>
+                                <p id="summaryMfCorpus" class="text-3xl font-black text-blue-700 mt-2">Rs. 0</p>
+                            </div>
+                            <div class="col-span-3 rounded-xl bg-white border border-amber-200 p-4">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bank FD Corpus</p>
+                                <p id="summaryFdCorpus" class="text-xl font-black text-amber-700 mt-2">Rs. 0</p>
+                                <p id="summaryFdRate" class="text-[11px] font-bold text-slate-500 mt-1">at 6.5% p.a.</p>
+                            </div>
+                            <div class="col-span-4 rounded-xl bg-slate-950 p-4">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Extra Wealth via MF</p>
+                                <p id="summaryExtraCorpus" class="text-2xl font-black text-green-400 mt-2">Rs. 0</p>
+                                <p id="summaryExtraPercent" class="text-[11px] font-bold text-slate-300 mt-1">0% higher than FD</p>
+                            </div>
+                        </div>
+                        <p id="summaryClosingLine" class="text-sm text-slate-700 leading-relaxed mt-4">
+                            The same deposits may grow meaningfully larger through Mutual Funds because the investment remains exposed to long-term compounding until age 25.
+                        </p>
+                        <div class="qr-footer mt-4 pt-4 border-t border-blue-100 flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-4">
+                                <img src="Ideas2invest - Child Education Planner QR.png" alt="Ideas2Invest Child Education Planner QR" class="w-20 h-20 object-contain bg-white rounded-lg border border-slate-200 p-1">
+                                <div>
+                                    <p class="text-sm font-black text-slate-900">For more details, scan the QR code</p>
+                                    <p class="text-xs text-slate-600 mt-1">Explore the Ideas2Invest Child Education Planner.</p>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p class="contact-line text-xs font-bold text-slate-500">Website: <span class="text-slate-900">www.ideas2invest.com</span></p>
+                                <p class="contact-line text-xs font-bold text-slate-500 mt-1">Email: <span class="text-slate-900">info@ideas2invest.in</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let growthChart;
+        const TARGET_AGE = 25;
+
+        function byId(id) {
+            return document.getElementById(id);
+        }
+
+        function money(value) {
+            const rounded = Math.round(Number(value) || 0);
+            const sign = rounded < 0 ? '-' : '';
+            return sign + 'Rs. ' + Math.abs(rounded).toLocaleString('en-IN');
+        }
+
+        function shortMoney(value) {
+            const amount = Math.round(Number(value) || 0);
+            const sign = amount < 0 ? '-' : '';
+            const absAmount = Math.abs(amount);
+            if (absAmount >= 10000000) return sign + 'Rs. ' + (absAmount / 10000000).toFixed(2) + ' Cr';
+            if (absAmount >= 100000) return sign + 'Rs. ' + (absAmount / 100000).toFixed(2) + ' L';
+            return money(amount);
+        }
+
+        function readNumber(id, fallback) {
+            const value = parseFloat(byId(id).value);
+            return Number.isFinite(value) ? value : fallback;
+        }
+
+        function sanitizeAge() {
+            const ageInput = byId('childAge');
+            let age = parseInt(ageInput.value, 10);
+            if (!Number.isFinite(age)) age = 0;
+            ageInput.value = Math.min(Math.max(age, 0), 24);
+        }
+
+        function toggleStep() {
+            byId('stepBox').classList.toggle('hidden', !byId('stepEnabled').checked);
+        }
+
+        function calculatePlan() {
+            const childAge = parseInt(byId('childAge').value, 10) || 0;
+            const targetAge = TARGET_AGE;
+            const requestedInvestYears = Math.max(0, parseInt(byId('investYears').value, 10) || 0);
+            const maxInvestYears = Math.max(0, targetAge - childAge);
+            const investYears = Math.min(requestedInvestYears, maxInvestYears);
+            const holdYears = Math.max(0, targetAge - childAge - investYears);
+            const monthlySip = Math.max(0, readNumber('monthlySip', 0));
+            const lumpsum = Math.max(0, readNumber('lumpsum', 0));
+            const annualReturn = Math.max(0, readNumber('returnRate', 12)) / 100;
+            const monthlyReturn = Math.pow(1 + annualReturn, 1 / 12) - 1;
+            const fdAnnualReturn = Math.max(0, readNumber('fdRate', 6.5)) / 100;
+            const fdMonthlyReturn = Math.pow(1 + fdAnnualReturn, 1 / 12) - 1;
+            const stepEnabled = byId('stepEnabled').checked;
+            const annualStep = stepEnabled ? Math.max(0, readNumber('stepRate', 0)) / 100 : 0;
+
+            let corpus = lumpsum;
+            let fdCorpus = lumpsum;
+            let totalInvested = lumpsum;
+            let currentSip = monthlySip;
+            let yearlySip = 0;
+            let rows = [];
+            let labels = ['Age ' + childAge];
+            let corpusData = [Math.round(corpus)];
+            const totalMonths = Math.max(0, (targetAge - childAge) * 12);
+            const investMonths = investYears * 12;
+
+            for (let month = 1; month <= totalMonths; month++) {
+                const isContributionMonth = month <= investMonths;
+                let investedThisMonth = 0;
+
+                if (isContributionMonth) {
+                    if (stepEnabled && month > 1 && (month - 1) % 12 === 0) {
+                        currentSip *= (1 + annualStep);
+                    }
+                    investedThisMonth = currentSip;
+                    corpus += investedThisMonth;
+                    fdCorpus += investedThisMonth;
+                    totalInvested += investedThisMonth;
+                    yearlySip += investedThisMonth;
+                }
+
+                corpus *= (1 + monthlyReturn);
+                fdCorpus *= (1 + fdMonthlyReturn);
+
+                if (month % 12 === 0) {
+                    const age = childAge + (month / 12);
+                    const phase = month <= investMonths ? 'SIP Contribution' : 'No Withdrawal Growth';
+                    rows.push({
+                        age,
+                        phase,
+                        investedThisYear: yearlySip,
+                        totalInvested,
+                        corpus
+                    });
+                    labels.push('Age ' + age);
+                    corpusData.push(Math.round(corpus));
+                    yearlySip = 0;
+                }
+            }
+
+            return {
+                childAge,
+                targetAge,
+                requestedInvestYears,
+                maxInvestYears,
+                investYears,
+                holdYears,
+                monthlySip,
+                lumpsum,
+                annualReturn,
+                fdAnnualReturn,
+                corpus,
+                fdCorpus,
+                totalInvested,
+                gain: corpus - totalInvested,
+                mfAdvantage: corpus - fdCorpus,
+                multiplier: totalInvested > 0 ? corpus / totalInvested : 0,
+                rows,
+                labels,
+                corpusData
+            };
+        }
+
+        function renderProjection(rows) {
+            byId('projectionRows').innerHTML = rows.map((row) => {
+                const phaseClass = row.phase === 'SIP Contribution'
+                    ? 'text-blue-700 bg-blue-50'
+                    : 'text-amber-700 bg-amber-50';
+                return `
+                    <tr class="border-b border-slate-100">
+                        <td class="px-5 py-3 font-black text-slate-900">${row.age}</td>
+                        <td class="px-5 py-3"><span class="px-2 py-1 rounded-md text-[11px] font-black uppercase ${phaseClass}">${row.phase}</span></td>
+                        <td class="px-5 py-3 text-right font-bold text-slate-600">${money(row.investedThisYear)}</td>
+                        <td class="px-5 py-3 text-right font-bold text-slate-600">${money(row.totalInvested)}</td>
+                        <td class="px-5 py-3 text-right font-black text-slate-900">${money(row.corpus)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderChart(labels, corpusData) {
+            const canvas = byId('growthChart');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            if (growthChart) growthChart.destroy();
+            growthChart = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Projected Corpus',
+                        data: corpusData,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.09)',
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#2563eb',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Corpus: ' + money(context.parsed.y);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11, weight: '700' }, maxTicksLimit: 9 }
+                        },
+                        y: {
+                            position: 'right',
+                            grid: { color: '#eef2f7' },
+                            ticks: {
+                                font: { size: 11, weight: '700' },
+                                callback: function(value) {
+                                    if (value >= 10000000) return 'Rs. ' + (value / 10000000).toFixed(1) + ' Cr';
+                                    if (value >= 100000) return 'Rs. ' + (value / 100000).toFixed(1) + ' L';
+                                    return 'Rs. ' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function runPlan() {
+            sanitizeAge();
+            const plan = calculatePlan();
+            const name = byId('childName').value.trim() || 'Child';
+            const stopAge = plan.childAge + plan.investYears;
+
+            byId('returnLabel').textContent = (plan.annualReturn * 100).toFixed(1).replace('.0', '') + '%';
+            byId('fdLabel').textContent = (plan.fdAnnualReturn * 100).toFixed(2).replace(/\.?0+$/, '') + '%';
+            byId('durationWarning').classList.toggle('hidden', plan.requestedInvestYears <= plan.maxInvestYears);
+            byId('durationWarning').textContent = 'Investment duration capped at ' + plan.maxInvestYears + ' years because the target age is 25.';
+
+            byId('pChildName').textContent = name;
+            byId('summaryName').textContent = name;
+            byId('summaryAge').textContent = plan.childAge;
+            byId('summaryInvestYears').textContent = plan.investYears;
+            byId('summaryStartAge').textContent = plan.childAge;
+            byId('summaryStopAge').textContent = stopAge;
+            byId('summaryHoldYears').textContent = plan.holdYears;
+            byId('phaseStart').textContent = 'Age ' + plan.childAge;
+            byId('phaseStop').textContent = 'Age ' + stopAge;
+
+            byId('pSip').textContent = money(plan.monthlySip);
+            byId('pInvested').textContent = shortMoney(plan.totalInvested);
+            byId('pCorpus').textContent = shortMoney(plan.corpus);
+            byId('pReturn').textContent = (plan.annualReturn * 100).toFixed(1).replace('.0', '') + '% p.a.';
+            byId('pContributionPhase').textContent = plan.investYears + ' Years';
+            byId('pHoldPhase').textContent = plan.holdYears + ' Years';
+            byId('pMultiplier').textContent = plan.multiplier.toFixed(1) + 'x';
+            byId('pTargetCorpus').textContent = shortMoney(plan.corpus);
+            byId('timelineText').textContent = (TARGET_AGE - plan.childAge) + '-year plan';
+            byId('formulaLine').textContent = 'Invest till age ' + stopAge + ' + stay invested till age 25 = ' + shortMoney(plan.corpus);
+            byId('summaryMfCorpus').textContent = shortMoney(plan.corpus);
+            byId('summaryFdCorpus').textContent = shortMoney(plan.fdCorpus);
+            byId('summaryFdRate').textContent = 'at ' + (plan.fdAnnualReturn * 100).toFixed(2).replace(/\.?0+$/, '') + '% p.a.';
+            byId('summaryExtraCorpus').textContent = shortMoney(plan.mfAdvantage);
+            const extraPercent = plan.fdCorpus > 0 ? (plan.mfAdvantage / plan.fdCorpus) * 100 : 0;
+            byId('summaryExtraPercent').textContent = plan.mfAdvantage >= 0
+                ? extraPercent.toFixed(0) + '% higher than FD'
+                : Math.abs(extraPercent).toFixed(0) + '% below FD';
+            byId('summaryClosingLine').textContent = plan.mfAdvantage >= 0
+                ? 'For the same deposits, the projected Mutual Fund corpus at age 25 is ' + shortMoney(plan.corpus) + ', compared with ' + shortMoney(plan.fdCorpus) + ' in a bank FD. The MF route creates an estimated extra corpus of ' + shortMoney(plan.mfAdvantage) + '.'
+                : 'For the same deposits, the projected Mutual Fund corpus at age 25 is ' + shortMoney(plan.corpus) + ', compared with ' + shortMoney(plan.fdCorpus) + ' in a bank FD under these assumptions.';
+
+            renderProjection(plan.rows);
+            renderChart(plan.labels, plan.corpusData);
+        }
+
+        window.addEventListener('beforeprint', function() {
+            if (growthChart) {
+                growthChart.resize(650, 245);
+            }
+        });
+
+        window.addEventListener('afterprint', function() {
+            if (growthChart) {
+                growthChart.resize();
+            }
+        });
+
+        window.addEventListener('load', runPlan);
+    </script>
+</body>
+</html>

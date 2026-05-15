@@ -120,6 +120,25 @@
                 </div>
             </div>
 
+            <div onclick="navigateTo('child')" class="proposal-card bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="icon-box w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-all duration-300">
+                        <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                    </div>
+                    <span class="bg-amber-50 text-amber-700 text-[12px] font-bold px-3 py-2 mt-5 rounded-full uppercase tracking-wider">Goal Plan</span>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-slate-800 mb-3 tracking-tight">Child Goal Plan</h3>
+                <p class="text-slate-500 mb-8 leading-relaxed">Plan a future corpus for the child's age 25 milestone with SIP, lumpsum, step-up, and FD comparison views.</p>
+                
+                <div class="pt-6 border-t border-slate-50 flex justify-between items-center">
+                    <span class="text-base font-medium text-slate-400">Setup time: ~4 mins</span>
+                    <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-all">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+
             <div onclick="navigateTo('ace')" class="proposal-card bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
                 <div class="flex justify-between items-start mb-8">
                     <div class="icon-box w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -184,6 +203,8 @@
                     window.location.href = 'mf.html';
                 } else if (type === 'swp') {
                     window.location.href = 'swp.html';
+                } else if (type === 'child') {
+                    window.location.href = 'child-plan.html';
                 } else if (type === 'ace') {
                     window.location.href = 'ace.html';
                 } else if (type === 'mface') {
