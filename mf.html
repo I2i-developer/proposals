@@ -596,7 +596,7 @@
     function runLogic() {
         try {
             const name = document.getElementById('cName').value || "Aditya Vikram";
-            const age = parseInt(document.getElementById('cAge').value) || 30;
+            const age = parseInt(document.getElementById('cAge').value) || 0;
             const duration = parseInt(document.getElementById('cDur').value) || 15;
             const monthlySip = parseFloat(document.getElementById('cSip').value) || 0;
             const rate = parseFloat(document.getElementById('cRet').value) || 12;
@@ -853,7 +853,8 @@
                 document.getElementById('bar_distribution').style.width = '0%';
             }
 
-            const startAge = parseInt(document.getElementById('cAge').value) || 30;
+            const parsedStartAge = parseInt(document.getElementById('cAge').value);
+            const startAge = Number.isNaN(parsedStartAge) ? 30 : parsedStartAge;
             const sipDuration = parseInt(document.getElementById('cDur').value) || 0;
             const mfCorpusAge = startAge + sipDuration;
             const retireAge = parseInt(document.getElementById('cRetireAge').value) || 60;
