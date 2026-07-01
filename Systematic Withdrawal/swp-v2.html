@@ -73,7 +73,7 @@
         <!-- Input Section (Hidden on Print) -->
         <div class="no-print bg-white p-6 rounded-3xl shadow-lg mb-8 border border-blue-100">
             <div class="flex items-center gap-4 mb-4 border-b border-slate-200 pb-3">
-                <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-blue-600 transition-colors">
+                <button onclick="window.location.href='../index.html'" class="text-slate-400 hover:text-blue-600 transition-colors">
                     <i class="fa fa-home fa-sm mr-1"></i> Dashboard
                 </button>
                 <div class="h-4 w-[1px] bg-slate-300"></div>
@@ -279,8 +279,7 @@
                                 <tr>
                                     <th class="p-3 text-sm font-bold text-gray-500 border-b uppercase">Year</th>
                                     <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Opening Bal</th>
-                                    <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Monthly Withdrawal</th>
-                                    <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Annual Withdrawal</th>
+                                    <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Withdrawal</th>
                                     <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Closing Bal</th>
                                 </tr>
                             </thead>
@@ -402,12 +401,9 @@
             let totalIncome = 0;
 
             for (let i = 1; i <= years; i++) {
-                let stepUpApplied = false;
-
                 // Apply step-up if interval met
                 if (i > 1 && (i - 1) % stepUpInterval === 0 && stepUpRate > 0) {
                     currentYearlyWithdrawal *= (1 + stepUpRate);
-                    stepUpApplied = true;
                 }
 
                 const opening = currentBalance;
@@ -416,28 +412,18 @@
                 const afterWithdrawal = afterGrowth - currentYearlyWithdrawal;
 
                 if (afterWithdrawal < 0) {
-                   tableBody.innerHTML += `<tr><td colspan="5" class="p-6 text-center text-red-500 font-bold uppercase italic">Portfolio depleted in Year ${i}</td></tr>`;
+                   tableBody.innerHTML += `<tr><td colspan="4" class="p-6 text-center text-red-500 font-bold uppercase italic">Portfolio depleted in Year ${i}</td></tr>`;
                    break;
                 }
 
                 const closing = afterWithdrawal;
-                const monthlyWithdrawal = currentYearlyWithdrawal / 12;
-                const stepUpNote = stepUpApplied
-                    ? `${(stepUpRate * 100).toFixed(0)}% step-up`
-                    : '';
                 totalIncome += currentYearlyWithdrawal;
                 
                 tableBody.innerHTML += `
                     <tr class="hover:bg-gray-100 transition-colors">
                         <td class="p-3 text-[15px] font-semibold text-gray-500">Year ${i}</td>
                         <td class="p-3 text-[15px] font-semibold text-right text-gray-700">₹ ${formatCurrency(opening)}</td>
-                        <td class="p-3 text-center">
-                            <div class="text-[15px] font-semibold text-blue-600">₹ ${formatCurrency(monthlyWithdrawal)}</div>
-                            ${stepUpApplied ? `<div class="text-[11px] font-bold uppercase tracking-wide text-emerald-600"><i class="fa fa-arrow-up mr-1"></i>${stepUpNote}</div>` : ''}
-                        </td>
-                        <td class="p-3 text-center">
-                            <div class="text-[15px] font-semibold text-orange-600">₹ ${formatCurrency(currentYearlyWithdrawal)}</div>
-                        </td>
+                        <td class="p-3 text-[15px] font-semibold text-right text-orange-600">₹ ${formatCurrency(currentYearlyWithdrawal)}</td>
                         <td class="p-3 text-[15px] font-semibold text-right font-bold text-green-700">₹ ${formatCurrency(closing)}</td>
                     </tr>
                 `;

@@ -51,6 +51,12 @@
                 box-shadow: none !important;
                 border: 1px solid #e2e8f0 !important;
             }
+            .print-summary-page {
+                break-before: page;
+                page-break-before: always;
+                break-inside: avoid;
+                margin-top: 0 !important;
+            }
             @page { size: A4; margin: 1cm; }
             body { background-color: white !important; padding: 0 !important; margin: 0 !important; }
             .no-print { display: none !important; }
@@ -67,7 +73,7 @@
         <!-- Input Section (Hidden on Print) -->
         <div class="no-print bg-white p-6 rounded-3xl shadow-lg mb-8 border border-blue-100">
             <div class="flex items-center gap-4 mb-4 border-b border-slate-200 pb-3">
-                <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-blue-600 transition-colors">
+                <button onclick="window.location.href='../index.html'" class="text-slate-400 hover:text-blue-600 transition-colors">
                     <i class="fa fa-home fa-sm mr-1"></i> Dashboard
                 </button>
                 <div class="h-4 w-[1px] bg-slate-300"></div>
@@ -81,7 +87,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Client Name</label>
-                        <input type="text" id="inputClientName" value="Monica Ghambhir" class="input-field w-full">
+                        <input type="text" id="inputClientName" value="Valuable Client" class="input-field w-full">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Investment (₹)</label>
@@ -273,7 +279,8 @@
                                 <tr>
                                     <th class="p-3 text-sm font-bold text-gray-500 border-b uppercase">Year</th>
                                     <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Opening Bal</th>
-                                    <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Withdrawal</th>
+                                    <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Monthly Withdrawal</th>
+                                    <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Annual Withdrawal</th>
                                     <th class="p-3 text-sm font-bold text-gray-500 border-b text-right uppercase">Closing Bal</th>
                                 </tr>
                             </thead>
@@ -310,6 +317,39 @@
                 </div>
 
             </div>
+
+            <!-- Client Plan Summary -->
+            <section class="print-summary-page mt-8 mb-8 rounded-[2rem] border-2 border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-amber-50 p-6 md:p-8 shadow-xl">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                    <div>
+                        <p class="text-[12px] font-extrabold uppercase tracking-[0.2em] text-emerald-700">Plan Summary</p>
+                        <h2 class="mt-2 text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
+                            Total Corpus Value Created
+                        </h2>
+                        <p class="mt-2 text-sm md:text-base font-semibold text-gray-600">
+                            A simple snapshot of income generated and wealth retained.
+                        </p>
+                    </div>
+                    <div class="text-left lg:text-right">
+                        <p id="totalCorpusLabel" class="text-4xl md:text-5xl font-black text-emerald-700 leading-none"></p>
+                        <p id="totalCorpusSubtitle" class="mt-3 text-sm font-bold text-gray-600"></p>
+                    </div>
+                </div>
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="rounded-2xl bg-white/85 border border-blue-100 p-4">
+                        <p class="text-xs font-bold uppercase tracking-wide text-blue-600">Withdrawals Received</p>
+                        <p id="summaryBandIncomeLabel" class="mt-1 text-xl font-extrabold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl bg-white/85 border border-green-100 p-4">
+                        <p class="text-xs font-bold uppercase tracking-wide text-green-600">Final Corpus Left</p>
+                        <p id="summaryBandFinalLabel" class="mt-1 text-xl font-extrabold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl bg-white/85 border border-amber-100 p-4">
+                        <p class="text-xs font-bold uppercase tracking-wide text-amber-600">Plan Horizon</p>
+                        <p id="summaryBandHorizonLabel" class="mt-1 text-xl font-extrabold text-gray-900"></p>
+                    </div>
+                </div>
+            </section>
 
             <footer class="mt-8 text-center text-gray-500 text-[13px] mb-12 pb-2 border-t pt-8">
                 <p>© Prepared for <span id="footerClientName">Monica Ghambhir</span> | Confidential Investment Proposal</p>
@@ -362,28 +402,42 @@
             let totalIncome = 0;
 
             for (let i = 1; i <= years; i++) {
+                let stepUpApplied = false;
+
                 // Apply step-up if interval met
                 if (i > 1 && (i - 1) % stepUpInterval === 0 && stepUpRate > 0) {
                     currentYearlyWithdrawal *= (1 + stepUpRate);
+                    stepUpApplied = true;
                 }
 
                 const opening = currentBalance;
-                const afterWithdrawal = opening - currentYearlyWithdrawal;
-                
+                const growth = opening * returnPercent;
+                const afterGrowth = opening + growth;
+                const afterWithdrawal = afterGrowth - currentYearlyWithdrawal;
+
                 if (afterWithdrawal < 0) {
-                   tableBody.innerHTML += `<tr><td colspan="4" class="p-6 text-center text-red-500 font-bold uppercase italic">Portfolio depleted in Year ${i}</td></tr>`;
+                   tableBody.innerHTML += `<tr><td colspan="5" class="p-6 text-center text-red-500 font-bold uppercase italic">Portfolio depleted in Year ${i}</td></tr>`;
                    break;
                 }
 
-                const growth = afterWithdrawal * returnPercent;
-                const closing = afterWithdrawal + growth;
+                const closing = afterWithdrawal;
+                const monthlyWithdrawal = currentYearlyWithdrawal / 12;
+                const stepUpNote = stepUpApplied
+                    ? `${(stepUpRate * 100).toFixed(0)}% step-up`
+                    : '';
                 totalIncome += currentYearlyWithdrawal;
                 
                 tableBody.innerHTML += `
                     <tr class="hover:bg-gray-100 transition-colors">
                         <td class="p-3 text-[15px] font-semibold text-gray-500">Year ${i}</td>
                         <td class="p-3 text-[15px] font-semibold text-right text-gray-700">₹ ${formatCurrency(opening)}</td>
-                        <td class="p-3 text-[15px] font-semibold text-right text-orange-600">₹ ${formatCurrency(currentYearlyWithdrawal)}</td>
+                        <td class="p-3 text-center">
+                            <div class="text-[15px] font-semibold text-blue-600">₹ ${formatCurrency(monthlyWithdrawal)}</div>
+                            ${stepUpApplied ? `<div class="text-[11px] font-bold uppercase tracking-wide text-emerald-600"><i class="fa fa-arrow-up mr-1"></i>${stepUpNote}</div>` : ''}
+                        </td>
+                        <td class="p-3 text-center">
+                            <div class="text-[15px] font-semibold text-orange-600">₹ ${formatCurrency(currentYearlyWithdrawal)}</div>
+                        </td>
                         <td class="p-3 text-[15px] font-semibold text-right font-bold text-green-700">₹ ${formatCurrency(closing)}</td>
                     </tr>
                 `;
@@ -432,9 +486,15 @@
             updateFundBadges();
 
             // Summaries
+            const totalCorpus = totalIncome + currentBalance;
             document.getElementById('totalIncomeLabel').innerText = `₹ ${(totalIncome / 10000000).toFixed(2)} Cr`;
             document.getElementById('summaryIncomeLabel').innerText = `₹ ${formatCurrency(totalIncome)}`;
             document.getElementById('finalValueLabel').innerText = `₹ ${formatCurrency(currentBalance)}`;
+            document.getElementById('totalCorpusLabel').innerText = `₹ ${(totalCorpus / 10000000).toFixed(2)} Cr`;
+            document.getElementById('totalCorpusSubtitle').innerText = `Projected over ${years} years`;
+            document.getElementById('summaryBandIncomeLabel').innerText = `₹ ${formatCurrency(totalIncome)}`;
+            document.getElementById('summaryBandFinalLabel').innerText = `₹ ${formatCurrency(currentBalance)}`;
+            document.getElementById('summaryBandHorizonLabel').innerText = `${years} Years`;
             
             // // Insight logic
             // const wealthMult = (currentBalance / investment).toFixed(1);
@@ -447,9 +507,7 @@
             const statusText = delta > 0 ? "Growth exceeding payout" : "Capital depletion trajectory";
             // document.getElementById('insightText').innerText = `This plan maintains a ${delta.toFixed(1)}% growth buffer. ${statusText}. Total wealth creation (Income + Assets) is estimated at ₹ ${formatCurrency(totalIncome + currentBalance)}.`;
             document.getElementById('insightText').innerHTML = 
-                `This plan maintains a <strong>${delta.toFixed(1)}%</strong> growth buffer. ${statusText}. 
-                Total wealth creation (Income + Assets) is estimated at 
-                <strong>₹ ${formatCurrency(totalIncome + currentBalance)}</strong>.`;
+                `This plan maintains a <strong>${delta.toFixed(1)}%</strong> growth buffer. ${statusText}.`;
 
             updateChart(totalIncome, currentBalance);
         }
