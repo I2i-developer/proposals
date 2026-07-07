@@ -411,21 +411,36 @@
                 }
 
                 const opening = currentBalance;
-                const growth = opening * returnPercent;
-                const afterGrowth = opening + growth;
-                const afterWithdrawal = afterGrowth - currentYearlyWithdrawal;
+                const monthlyWithdrawal = currentYearlyWithdrawal / 12;
+                const yearlyWithdrawalTaken = Math.min(currentYearlyWithdrawal, opening);
+                const balanceAfterWithdrawal = opening - yearlyWithdrawalTaken;
+                const growth = balanceAfterWithdrawal * returnPercent;
+                const closing = balanceAfterWithdrawal + growth;
 
-                if (afterWithdrawal < 0) {
-                   tableBody.innerHTML += `<tr><td colspan="5" class="p-6 text-center text-red-500 font-bold uppercase italic">Portfolio depleted in Year ${i}</td></tr>`;
-                   break;
+                if (yearlyWithdrawalTaken < currentYearlyWithdrawal) {
+                    tableBody.innerHTML += `
+                        <tr class="hover:bg-gray-100 transition-colors">
+                            <td class="p-3 text-[15px] font-semibold text-gray-500">Year ${i}</td>
+                            <td class="p-3 text-[15px] font-semibold text-right text-gray-700">₹ ${formatCurrency(opening)}</td>
+                            <td class="p-3 text-center">
+                                <div class="text-[15px] font-semibold text-blue-600">₹ ${formatCurrency(opening / 12)}</div>
+                            </td>
+                            <td class="p-3 text-center">
+                                <div class="text-[15px] font-semibold text-orange-600">₹ ${formatCurrency(yearlyWithdrawalTaken)}</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wide text-red-500">Portfolio depleted</div>
+                            </td>
+                            <td class="p-3 text-[15px] font-semibold text-right font-bold text-green-700">₹ 0</td>
+                        </tr>
+                    `;
+                    totalIncome += yearlyWithdrawalTaken;
+                    currentBalance = 0;
+                    break;
                 }
 
-                const closing = afterWithdrawal;
-                const monthlyWithdrawal = currentYearlyWithdrawal / 12;
                 const stepUpNote = stepUpApplied
                     ? `${(stepUpRate * 100).toFixed(0)}% step-up`
                     : '';
-                totalIncome += currentYearlyWithdrawal;
+                totalIncome += yearlyWithdrawalTaken;
                 
                 tableBody.innerHTML += `
                     <tr class="hover:bg-gray-100 transition-colors">
@@ -436,11 +451,12 @@
                             ${stepUpApplied ? `<div class="text-[11px] font-bold uppercase tracking-wide text-emerald-600"><i class="fa fa-arrow-up mr-1"></i>${stepUpNote}</div>` : ''}
                         </td>
                         <td class="p-3 text-center">
-                            <div class="text-[15px] font-semibold text-orange-600">₹ ${formatCurrency(currentYearlyWithdrawal)}</div>
+                            <div class="text-[15px] font-semibold text-orange-600">₹ ${formatCurrency(yearlyWithdrawalTaken)}</div>
                         </td>
                         <td class="p-3 text-[15px] font-semibold text-right font-bold text-green-700">₹ ${formatCurrency(closing)}</td>
                     </tr>
                 `;
+
                 currentBalance = closing;
             }
 
