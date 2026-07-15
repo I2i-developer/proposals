@@ -90,7 +90,7 @@
                         </div>
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Goal Year</label>
-                            <input type="number" id="cDur" min="0" oninput="this.value < 0 ? this.value = 0 : runLogic()" value="15" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                            <input type="number" id="cDur" min="1" oninput="handleGoalDurationChange()" value="15" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                         </div>
                     </div>
                 </div>
@@ -103,6 +103,11 @@
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Monthly SIP Amount (₹)</label>
                         <input type="number" id="cSip" oninput="runLogic()" value="25000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                         <p id="cSipWords" class="amount-words mt-1 ml-1 text-[11px] font-semibold text-emerald-600 leading-snug"></p>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">SIP Duration (Years)</label>
+                        <input type="number" id="cSipDur" min="1" max="15" oninput="this.dataset.custom = 'true'; runLogic()" value="15" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <p class="mt-1 ml-1 text-[11px] font-semibold text-slate-400 leading-snug">Range: 1 year to goal year</p>
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Return Expectation (% p.a.)</label>
@@ -694,13 +699,42 @@
         runLogic();
     }
 
+    function handleGoalDurationChange() {
+        const goalInput = document.getElementById('cDur');
+        const sipDurationInput = document.getElementById('cSipDur');
+        if (!goalInput || !sipDurationInput) {
+            runLogic();
+            return;
+        }
+
+        const goalYears = Math.max(1, parseInt(goalInput.value) || 1);
+        goalInput.value = goalYears;
+        sipDurationInput.max = goalYears;
+
+        const sipYears = parseInt(sipDurationInput.value) || goalYears;
+        if (sipDurationInput.dataset.custom !== 'true' || sipYears > goalYears) {
+            sipDurationInput.value = goalYears;
+        }
+
+        runLogic();
+    }
+
     function runLogic() {
         try {
             updateSidebarAmountWords();
 
             const name = document.getElementById('cName').value || "Aditya Vikram";
             const age = parseInt(document.getElementById('cAge').value) || 0;
-            const duration = parseInt(document.getElementById('cDur').value) || 15;
+            const duration = Math.max(1, parseInt(document.getElementById('cDur').value) || 15);
+            const sipDurationInput = document.getElementById('cSipDur');
+            if (sipDurationInput) {
+                sipDurationInput.max = duration;
+            }
+            let sipDurationYears = sipDurationInput ? (parseInt(sipDurationInput.value) || duration) : duration;
+            sipDurationYears = Math.min(Math.max(1, sipDurationYears), duration);
+            if (sipDurationInput && parseInt(sipDurationInput.value) !== sipDurationYears) {
+                sipDurationInput.value = sipDurationYears;
+            }
             const monthlySip = parseFloat(document.getElementById('cSip').value) || 0;
             const rate = parseFloat(document.getElementById('cRet').value) || 12;
 
@@ -814,17 +848,23 @@
                     }
                 }
 
+                const isSipActive = i <= sipDurationYears;
+                let displayedSip = 0;
+
                 // Process 12 months for this year
                 for (let m = 1; m <= 12; m++) {
                     const totalMonthsPassed = ((i - 1) * 12) + m;
 
-                    if (stepUpEnabled && totalMonthsPassed > 1 && (totalMonthsPassed - 1) % stepUpFreq === 0) {
+                    if (isSipActive && stepUpEnabled && totalMonthsPassed > 1 && (totalMonthsPassed - 1) % stepUpFreq === 0) {
                         runningSip = runningSip * (1 + stepUpPerc / 100);
                     }
 
-                    totalInvested += runningSip;
-                    currentCorpus = (currentCorpus + runningSip) * (1 + monthlyRate);
+                    const monthlyContribution = isSipActive ? runningSip : 0;
+                    totalInvested += monthlyContribution;
+                    currentCorpus = (currentCorpus + monthlyContribution) * (1 + monthlyRate);
                 }
+
+                displayedSip = isSipActive ? runningSip : 0;
 
                 chartLabels.push(`Age ${currentAge}`);
                 corpusData.push(Math.round(currentCorpus));
@@ -832,7 +872,7 @@
                 tableHtml += `
                     <tr class="border-b border-slate-50 hover:bg-blue-50/50 transition-colors text-sm text-center">
                         <td class="px-2 py-4 font-bold text-slate-900">${currentAge} yrs</td>
-                        <td class="px-2 py-4 font-bold text-slate-500">₹ ${formatIndianCurrency(Math.round(runningSip))}</td>
+                        <td class="px-2 py-4 font-bold text-slate-500">₹ ${formatIndianCurrency(Math.round(displayedSip))}</td>
                         ${hasAdditionalTransactions ? `<td class="px-2 py-4 font-bold text-slate-700">${cashFlowLabels.join('')}</td>` : ''}
                         <td class="px-2 py-4 font-bold text-slate-700 text-right">₹ ${formatIndianCurrency(Math.round(totalInvested))}</td>
                         <td class="px-2 py-4 text-right font-black text-blue-600">₹ ${formatIndianCurrency(Math.round(currentCorpus))}</td>
@@ -980,14 +1020,15 @@
 
             const parsedStartAge = parseInt(document.getElementById('cAge').value);
             const startAge = Number.isNaN(parsedStartAge) ? 30 : parsedStartAge;
-            const sipDuration = parseInt(document.getElementById('cDur').value) || 0;
-            const mfCorpusAge = startAge + sipDuration;
+            const goalDuration = parseInt(document.getElementById('cDur').value) || 0;
+            const sipInvestmentEndAge = startAge + sipDurationYears - 1;
+            const mfCorpusAge = startAge + goalDuration;
             const retireAge = parseInt(document.getElementById('cRetireAge').value) || 60;
             const swpDurationVal = parseInt(document.getElementById('cSwpDur').value) || 25;
             const finalAge = retireAge + swpDurationVal;
 
             document.getElementById('sum_age_start').innerText = startAge;
-            document.getElementById('sum_age_retire_1').innerText = mfCorpusAge;
+            document.getElementById('sum_age_retire_1').innerText = sipInvestmentEndAge;
             document.getElementById('sum_age_retire_2').innerText = mfCorpusAge;
             document.getElementById('sum_age_retire_3').innerText = retireAge;
             document.getElementById('sum_age_final_1').innerText = finalAge;
@@ -1037,9 +1078,9 @@
             }
 
             if (swpEnabled) {
-                const totalCycle = sipDuration + swpDurationVal;
+                const totalCycle = goalDuration + swpDurationVal;
                 if (totalCycle > 0) {
-                    document.getElementById('bar_accumulation').style.width = ((sipDuration / totalCycle) * 100) + '%';
+                    document.getElementById('bar_accumulation').style.width = ((goalDuration / totalCycle) * 100) + '%';
                     document.getElementById('bar_distribution').style.width = ((swpDurationVal / totalCycle) * 100) + '%';
                 }
             } else {
