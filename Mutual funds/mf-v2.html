@@ -102,10 +102,9 @@
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Monthly SIP Amount (₹)</label>
                         <input type="number" id="cSip" oninput="runLogic()" value="25000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
-                        <p id="cSipWords" class="amount-words mt-1 ml-1 text-[11px] font-semibold text-emerald-600 leading-snug"></p>
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Return Expectation (% p.a.)</label>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Growth Expectation (% p.a.)</label>
                         <input type="range" id="cRet" oninput="runLogic()" min="6" max="22" step="0.5" value="12" class="w-full mt-2">
                         <div class="flex justify-between text-[12px] font-bold text-slate-400 mt-1">
                             <span>10% Conservative</span>
@@ -116,16 +115,21 @@
             </section>
 
             <section class="mb-10 border-t border-slate-200 pt-6">
-                <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4">3. SIP Fund Selection</h3>
+                <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4">3. SIP Asset Selection</h3>
                 <div id="fundInputs" class="space-y-3">
                     <div class="flex gap-2 text-base">
-                        <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="Motilal Oswal Small Cap Fund">
-                        <input type="number" placeholder="%" class="fund-perc floating-input w-20 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="100">
+                        <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="HDFC Top 100 Fund">
+                        <input type="number" placeholder="%" class="fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="50">
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="Parag Parikh Flexi Cap">
+                        <input type="number" placeholder="%" class="fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="30">
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="SBI Small Cap Fund">
+                        <input type="number" placeholder="%" class="fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="20">
                     </div>
                 </div>
-                <button onclick="addFundRow()" class="w-full mt-4 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
-                    <i class="fa fa-plus-circle text-xs"></i> Add Fund
-                </button>
             </section>
 
             <section class="mb-10 border-t border-slate-200 pt-6">
@@ -133,27 +137,21 @@
                 <p class="text-[11px] text-slate-500 mb-3">Add lumpsum injections or withdrawals at specific ages.</p>
                 <div id="transactionInputs" class="space-y-3 mb-4">
                     <div class="transaction-row grid grid-cols-12 gap-2 text-base">
-                        <input type="number" placeholder="Age" class="transaction-age floating-input col-span-3 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="30">
+                        <input type="number" placeholder="Age" class="transaction-age floating-input col-span-2 w-14 rounded-xl px-2 py-2 text-sm outline-none" oninput="runLogic()" value="31">
                         <select class="transaction-type floating-input col-span-4 rounded-xl px-2 py-2 text-sm outline-none bg-white" onchange="toggleTransactionFields(this); runLogic()">
                             <option value="injection">Lumpsum</option>
                             <option value="withdrawal">Withdrawal</option>
                         </select>
-                        <div class="transaction-amount-wrap col-span-4">
-                            <input type="number" placeholder="Amount (₹)" class="transaction-amount floating-input w-full rounded-xl px-2 py-2 text-sm outline-none" oninput="runLogic()" value="50000">
-                            <p class="transaction-amount-words amount-words mt-1 px-1 text-[10px] font-semibold text-emerald-600 leading-snug"></p>
-                        </div>
-                        <button onclick="this.parentElement.remove(); runLogic()" class="transaction-delete-main col-span-1 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                        <input type="number" placeholder="Amount (₹)" class="transaction-amount floating-input col-span-4 rounded-xl px-2 py-2 text-sm outline-none" oninput="runLogic()" value="50000">
+                        <button onclick="this.parentElement.remove(); runLogic()" class="col-span-1 pt-2 text-red-400 hover:text-red-600 transition-colors">
                             <i class="fa fa-trash text-lg"></i>
                         </button>
-                        <div class="transaction-lumpsum-fields col-span-7">
-                            <input type="text" placeholder="Fund Name" class="transaction-fund-name floating-input w-full rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="Motilal Oswal Small Cap Fund">
+                        <div class="transaction-lumpsum-fields col-span-8">
+                            <input type="text" placeholder="Fund Name" class="transaction-fund-name floating-input w-full rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="HDFC Top 100 Fund">
                         </div>
                         <div class="transaction-lumpsum-fields col-span-4">
                             <input type="number" placeholder="Allocation %" class="transaction-allocation floating-input w-full rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="100">
                         </div>
-                        <button onclick="this.parentElement.remove(); runLogic()" class="transaction-delete-lumpsum col-span-1 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                            <i class="fa fa-trash text-lg"></i>
-                        </button>
                     </div>
                 </div>
                 <button onclick="addTransactionRow()" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
@@ -260,12 +258,6 @@
                         <div class="mt-6 p-5 bg-blue-50/30 border-l-4 border-blue-600 rounded-r-2xl">
                             <p id="dyn_intro_quote" class="text-slate-600 text-[13px] leading-relaxed italic font-medium"></p>
                         </div>
-                        <!-- <div id="dyn_accumulation_withdrawal_note" class="hidden mt-4 p-4 bg-red-50/60 border border-red-100 rounded-2xl">
-                            <p class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">Accumulation Withdrawals</p>
-                            <p class="text-[12px] leading-relaxed text-slate-600">
-                                Withdrawals taken before maturity are treated as wealth already received. They are included along with the remaining corpus while calculating Total Wealth Created.
-                            </p>
-                        </div> -->
                     </div>
 
                     <div class="col-span-5 bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
@@ -366,7 +358,7 @@
                             <tr class="bg-slate-900 text-[10px] text-white uppercase tracking-widest text-center">
                                 <th class="px-6 py-4 font-black">Age</th>
                                 <th class="px-6 py-4 font-black">Monthly Investment</th>
-                                <th id="accumulation_cash_flow_header" class="px-6 py-4 font-black">Cash Flow</th>
+                                <th class="px-6 py-4 font-black">Cash Flow</th>
                                 <th class="px-6 py-4 font-black">Total Invested</th>
                                 <th class="px-6 py-4 font-black text-right">Year-End Corpus Value</th>
                             </tr>
@@ -439,7 +431,7 @@
                     <div class="relative z-10">
                         <h3 class="mx-auto w-fit bg-pink-100 px-6 py-1 rounded-full text-center text-[13px] font-black text-pink-600 uppercase tracking-[0.3em] mb-6">Executive Summary</h3>
 
-                        <div id="summary_phase_grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div class="p-6 rounded-3xl bg-slate-50/50 border border-indigo-200 shadow-md">
                                 <p class="text-base font-bold text-blue-600 mb-6 flex items-center gap-2">
                                     <span class="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-sm shadow-blue-200"></span>
@@ -454,15 +446,10 @@
                                         <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Peak Portfolio Value (At Age <span id="sum_age_retire_2">60</span>)</p>
                                         <p class="text-2xl font-black text-blue-600" id="sum_peak_corpus">₹ 0 (0)</p>
                                     </div>
-                                    <div id="sum_accumulation_withdrawal_block" class="hidden pt-4 border-t border-indigo-100">
-                                        <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Withdrawals During this phase</p>
-                                        <p class="text-2xl font-black text-red-600" id="sum_accumulation_withdrawal">₹ 0</p>
-                                        <p class="mt-1 text-[11px] text-slate-500 leading-relaxed">Included in Total Wealth Created as money already received from the portfolio.</p>
-                                    </div>
                                 </div>
                             </div>
 
-                            <div id="summary_distribution_phase" class="p-6 rounded-3xl bg-emerald-50/30 border border-emerald-300/50 shadow-md">
+                            <div class="p-6 rounded-3xl bg-emerald-50/30 border border-emerald-300/50 shadow-md">
                                 <p class="text-base font-bold text-emerald-700 mb-6 flex items-center gap-2">
                                     <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-sm shadow-emerald-200"></span>
                                     Phase II: Financial Freedom
@@ -489,10 +476,9 @@
                                 Total Out-of-Pocket Investment:
                                 <span class="text-sm text-emerald-300" id="grand_total_investment">₹ 0</span>
                             </p>
-                            <p id="grand_wealth_formula" class="hidden mt-3 text-[11px] font-semibold text-slate-300 leading-relaxed"></p>
                         </div>
 
-                        <div id="phase_timeline_bar" class="mt-5 pt-4 border-t border-slate-300">
+                        <div class="mt-5 pt-4 border-t border-slate-300">
                             <div class="flex justify-between text-[11px] font-bold uppercase mb-2 tracking-widest">
                                 <span class="flex items-center gap-2 text-blue-500"><span class="w-2 h-2 bg-indigo-500 rounded-full"></span> Accumulation Phase</span>
                                 <span class="flex items-center gap-2 text-emerald-600"><span class="w-2 h-2 bg-emerald-700 rounded-full"></span> Distribution Phase</span>
@@ -549,72 +535,6 @@
         `;
     }
 
-    function numberToIndianWords(num) {
-        const value = Math.floor(Math.abs(Number(num) || 0));
-        if (value === 0) return '';
-
-        const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-        const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-        function twoDigitWords(n) {
-            if (n < 20) return ones[n];
-            return (tens[Math.floor(n / 10)] + ' ' + ones[n % 10]).trim();
-        }
-
-        function threeDigitWords(n) {
-            const hundred = Math.floor(n / 100);
-            const rest = n % 100;
-            const parts = [];
-            if (hundred) parts.push(ones[hundred] + ' Hundred');
-            if (rest) parts.push(twoDigitWords(rest));
-            return parts.join(' ');
-        }
-
-        const crore = Math.floor(value / 10000000);
-        const lakh = Math.floor((value % 10000000) / 100000);
-        const thousand = Math.floor((value % 100000) / 1000);
-        const hundred = value % 1000;
-        const parts = [];
-
-        if (crore) parts.push(threeDigitWords(crore) + ' Crore');
-        if (lakh) parts.push(threeDigitWords(lakh) + ' Lakh');
-        if (thousand) parts.push(threeDigitWords(thousand) + ' Thousand');
-        if (hundred) parts.push(threeDigitWords(hundred));
-
-        return parts.join(' ') + ' Rupees';
-    }
-
-    function updateSidebarAmountWords() {
-        const sipInput = document.getElementById('cSip');
-        const sipWords = document.getElementById('cSipWords');
-        if (sipInput && sipWords) {
-            sipWords.innerText = numberToIndianWords(sipInput.value);
-        }
-
-        document.querySelectorAll('.transaction-row').forEach(function(row) {
-            const amountInput = row.querySelector('.transaction-amount');
-            const wordsOutput = row.querySelector('.transaction-amount-words');
-            if (amountInput && wordsOutput) {
-                wordsOutput.innerText = numberToIndianWords(amountInput.value);
-            }
-        });
-    }
-
-    function addFundRow() {
-        const container = document.getElementById('fundInputs');
-        const rowHtml = `
-            <div class="flex gap-2 text-base">
-                <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
-                <input type="number" placeholder="%" class="fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
-                <button onclick="this.parentElement.remove(); runLogic()" class="w-9 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                    <i class="fa fa-trash text-sm"></i>
-                </button>
-            </div>`;
-
-        container.insertAdjacentHTML('beforeend', rowHtml);
-        runLogic();
-    }
-
     function addTransactionRow() {
         transactionCount++;
         const container = document.getElementById('transactionInputs');
@@ -622,27 +542,21 @@
 
         const rowHtml = `
             <div id="${rowId}" class="transaction-row grid grid-cols-12 gap-2 text-base group">
-                <input type="number" placeholder="Age" class="transaction-age floating-input col-span-3 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
+                <input type="number" placeholder="Age" class="transaction-age floating-input col-span-2 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
                 <select class="transaction-type floating-input col-span-4 rounded-xl px-3 py-2 text-sm outline-none bg-white" onchange="toggleTransactionFields(this); runLogic()">
                     <option value="injection">Lumpsum</option>
                     <option value="withdrawal">Withdrawal</option>
                 </select>
-                <div class="transaction-amount-wrap col-span-4">
-                    <input type="number" placeholder="Amount" class="transaction-amount floating-input w-full rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
-                    <p class="transaction-amount-words amount-words mt-1 px-1 text-[10px] font-semibold text-emerald-600 leading-snug"></p>
-                </div>
-                <button onclick="this.parentElement.remove(); runLogic()" class="transaction-delete-main col-span-1 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                <input type="number" placeholder="Amount" class="transaction-amount floating-input col-span-5 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
+                <button onclick="this.parentElement.remove(); runLogic()" class="col-span-1 pt-2 text-red-400 hover:text-red-600 transition-colors">
                     <i class="fa fa-trash text-lg"></i>
                 </button>
-                <div class="transaction-lumpsum-fields col-span-7">
+                <div class="transaction-lumpsum-fields col-span-8">
                     <input type="text" placeholder="Fund Name" class="transaction-fund-name floating-input w-full rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
                 </div>
                 <div class="transaction-lumpsum-fields col-span-4">
                     <input type="number" placeholder="Allocation %" class="transaction-allocation floating-input w-full rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="100">
                 </div>
-                <button onclick="this.parentElement.remove(); runLogic()" class="transaction-delete-lumpsum col-span-1 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                    <i class="fa fa-trash text-lg"></i>
-                </button>
             </div>`;
 
         container.insertAdjacentHTML('beforeend', rowHtml);
@@ -657,21 +571,6 @@
         lumpsumFields.forEach(function(field) {
             field.classList.toggle('hidden', selectEl.value !== 'injection');
         });
-
-        const amountWrap = row.querySelector('.transaction-amount-wrap');
-        if (amountWrap) {
-            amountWrap.classList.toggle('col-span-5', selectEl.value === 'injection');
-            amountWrap.classList.toggle('col-span-4', selectEl.value !== 'injection');
-        }
-
-        const mainDelete = row.querySelector('.transaction-delete-main');
-        const lumpsumDelete = row.querySelector('.transaction-delete-lumpsum');
-        if (mainDelete) {
-            mainDelete.classList.toggle('hidden', selectEl.value === 'injection');
-        }
-        if (lumpsumDelete) {
-            lumpsumDelete.classList.toggle('hidden', selectEl.value !== 'injection');
-        }
     }
 
     function escapeHtml(value) {
@@ -696,8 +595,6 @@
 
     function runLogic() {
         try {
-            updateSidebarAmountWords();
-
             const name = document.getElementById('cName').value || "Aditya Vikram";
             const age = parseInt(document.getElementById('cAge').value) || 0;
             const duration = parseInt(document.getElementById('cDur').value) || 15;
@@ -764,7 +661,6 @@
             let chartLabels = [];
             let corpusData = [];
             let runningSip = monthlySip;
-            let totalWithdrawn = 0;
 
             // Get all transactions and organize by age
             const transactions = [];
@@ -788,14 +684,8 @@
                 }
             }
 
-            const hasAdditionalTransactions = transactions.length > 0;
-            const cashFlowHeader = document.getElementById('accumulation_cash_flow_header');
-            if (cashFlowHeader) {
-                cashFlowHeader.classList.toggle('hidden', !hasAdditionalTransactions);
-            }
-
             for (let i = 1; i <= duration; i++) {
-                const currentAge = age + i - 1;
+                const currentAge = age + i;
 
                 // Apply transactions at the start of the year so lumpsums earn that year's growth.
                 let cashFlowLabels = [];
@@ -808,7 +698,6 @@
                             cashFlowLabels.push('<div class="text-emerald-600">Lumpsum Added: + ₹' + formatIndianCurrency(t.amount) + fundAllocationText + '</div>');
                         } else {
                             currentCorpus -= t.amount;
-                            totalWithdrawn += t.amount;
                             cashFlowLabels.push('<div class="text-red-600">Withdrawal: — ₹' + formatIndianCurrency(t.amount) + '</div>');
                         }
                     }
@@ -833,7 +722,9 @@
                     <tr class="border-b border-slate-50 hover:bg-blue-50/50 transition-colors text-sm text-center">
                         <td class="px-2 py-4 font-bold text-slate-900">${currentAge} yrs</td>
                         <td class="px-2 py-4 font-bold text-slate-500">₹ ${formatIndianCurrency(Math.round(runningSip))}</td>
-                        ${hasAdditionalTransactions ? `<td class="px-2 py-4 font-bold text-slate-700">${cashFlowLabels.join('')}</td>` : ''}
+                        <td class="px-2 py-4 font-bold text-slate-700">
+                            ${cashFlowLabels.join('')}
+                        </td>
                         <td class="px-2 py-4 font-bold text-slate-700 text-right">₹ ${formatIndianCurrency(Math.round(totalInvested))}</td>
                         <td class="px-2 py-4 text-right font-black text-blue-600">₹ ${formatIndianCurrency(Math.round(currentCorpus))}</td>
                     </tr>`;
@@ -946,23 +837,7 @@
             const swpEnabled = document.getElementById('swpEnabled').checked;
             const swpInputContainer = document.getElementById('swpInputs');
             const swpProposalSection = document.getElementById('proposal_swp_section');
-            const summaryPhaseGrid = document.getElementById('summary_phase_grid');
-            const summaryDistributionPhase = document.getElementById('summary_distribution_phase');
-            const phaseTimelineBar = document.getElementById('phase_timeline_bar');
             let swpSummary = { totalPaidOut: 0, finalLegacyCorpus: 0 };
-
-            if (summaryDistributionPhase) {
-                summaryDistributionPhase.classList.toggle('hidden', !swpEnabled);
-            }
-
-            if (summaryPhaseGrid) {
-                summaryPhaseGrid.classList.toggle('md:grid-cols-2', swpEnabled);
-                summaryPhaseGrid.classList.toggle('md:grid-cols-1', !swpEnabled);
-            }
-
-            if (phaseTimelineBar) {
-                phaseTimelineBar.classList.toggle('hidden', !swpEnabled);
-            }
 
             if (swpEnabled) {
                 swpInputContainer.classList.remove('hidden');
@@ -995,46 +870,13 @@
 
             const grandEndAge = swpEnabled ? finalAge : mfCorpusAge;
             const totalWealthCreated = swpEnabled
-                ? totalWithdrawn + swpSummary.totalPaidOut + swpSummary.finalLegacyCorpus
-                : totalWithdrawn + currentCorpus;
+                ? swpSummary.totalPaidOut + swpSummary.finalLegacyCorpus
+                : currentCorpus;
 
             document.getElementById('grand_age_start').innerText = startAge;
             document.getElementById('grand_age_end').innerText = grandEndAge;
             document.getElementById('grand_total_wealth').innerHTML = formatIndianCurrencyWithShort(totalWealthCreated);
             document.getElementById('grand_total_investment').innerHTML = formatIndianCurrencyWithShort(actualInvestment);
-
-            const withdrawalNote = document.getElementById('dyn_accumulation_withdrawal_note');
-            const withdrawalBlock = document.getElementById('sum_accumulation_withdrawal_block');
-            const withdrawalValue = document.getElementById('sum_accumulation_withdrawal');
-            const wealthFormula = document.getElementById('grand_wealth_formula');
-            const hasAccumulationWithdrawals = totalWithdrawn > 0;
-
-            if (withdrawalNote) {
-                withdrawalNote.classList.toggle('hidden', !hasAccumulationWithdrawals);
-            }
-
-            if (withdrawalBlock) {
-                withdrawalBlock.classList.toggle('hidden', !hasAccumulationWithdrawals);
-            }
-
-            if (withdrawalValue) {
-                withdrawalValue.innerHTML = formatIndianCurrencyWithShort(totalWithdrawn);
-            }
-
-            if (wealthFormula) {
-                wealthFormula.classList.add('hidden');
-                if (hasAccumulationWithdrawals) {
-                    const endingWealth = swpEnabled
-                        ? swpSummary.totalPaidOut + swpSummary.finalLegacyCorpus
-                        : currentCorpus;
-                    wealthFormula.innerHTML = 'Total Wealth Created includes accumulation withdrawals of ' +
-                        formatIndianCurrencyWithShort(totalWithdrawn) +
-                        ' plus ' + formatIndianCurrencyWithShort(endingWealth) +
-                        ' from the remaining portfolio value and distribution phase.';
-                } else {
-                    wealthFormula.innerHTML = '';
-                }
-            }
 
             if (swpEnabled) {
                 const totalCycle = sipDuration + swpDurationVal;
@@ -1075,8 +917,6 @@
             let swpPayoutData = [];
 
             for (let y = 1; y <= swpDur; y++) {
-                const currentSwpAge = retireAge + y - 1;
-
                 if (stepUp > 0 && interval > 0) {
                     if (y > 1 && (y - 1) % interval === 0) {
                         annualWithdrawal *= (1 + stepUp);
@@ -1088,13 +928,13 @@
 
                 if (runningCorpus < 0) runningCorpus = 0;
 
-                swpLabels.push(`Age ${currentSwpAge}`);
+                swpLabels.push(`Age ${retireAge + y}`);
                 swpCorpusData.push(Math.round(runningCorpus));
                 swpPayoutData.push(Math.round(annualWithdrawal));
 
                 swpTableHtml += `
                     <tr class="border-b border-emerald-50 text-sm hover:bg-emerald-50/50">
-                        <td class="px-6 py-3 font-bold text-slate-900">${currentSwpAge} yrs</td>
+                        <td class="px-6 py-3 font-bold text-slate-900">${retireAge + y} yrs</td>
                         <td class="px-6 py-3 text-emerald-700 font-bold">₹${formatIndianCurrency(annualWithdrawal / 12)}</td>
                         <td class="px-6 py-3 font-bold text-slate-500">₹${formatIndianCurrency(annualWithdrawal)}</td>
                         <td class="px-6 py-3 text-right font-black text-slate-700">₹${formatIndianCurrency(runningCorpus)}</td>
