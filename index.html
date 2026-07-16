@@ -81,7 +81,7 @@
 
         <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
             
-            <div onclick="navigateTo('mf')" class="proposal-card bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+            <div onclick="navigateTo('mf')" class="proposal-card order-1 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
                 <div class="flex justify-between items-start mb-8">
                     <div class="icon-box w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white">
                         <!-- <i class="fas fa-coins text-2xl"></i> -->
@@ -100,7 +100,7 @@
                 </div>
             </div>
 
-            <div onclick="navigateTo('swp')" class="proposal-card bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+            <div onclick="navigateTo('swp')" class="proposal-card order-2 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
                 <div class="flex justify-between items-start mb-8">
                     <div class="icon-box w-16 h-16 bg-fuchsia-50 text-fuchsia-600 rounded-2xl flex items-center justify-center group-hover:bg-fuchsia-600 group-hover:text-white transition-all duration-300">
                         <!-- <i class="fa-solid fa-calendar-check text-3xl"></i> -->
@@ -120,7 +120,7 @@
                 </div>
             </div>
 
-            <div onclick="navigateTo('child')" class="proposal-card bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+            <div onclick="navigateTo('child')" class="proposal-card order-5 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
                 <div class="flex justify-between items-start mb-8">
                     <div class="icon-box w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-all duration-300">
                         <i class="fa-solid fa-graduation-cap text-3xl"></i>
@@ -139,7 +139,7 @@
                 </div>
             </div>
 
-            <div onclick="navigateTo('ace')" class="proposal-card bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+            <div onclick="navigateTo('ace')" class="proposal-card order-6 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
                 <div class="flex justify-between items-start mb-8">
                     <div class="icon-box w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
                         <!-- <svg
@@ -168,7 +168,7 @@
                 </div>
             </div>
 
-            <div onclick="navigateTo('mface')" class="proposal-card bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+            <div onclick="navigateTo('mface')" class="proposal-card order-3 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
                 <div class="flex justify-between items-start mb-8">
                     <div class="icon-box w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white">
                         <i class="fas fa-bezier-curve text-3xl"></i>
@@ -181,6 +181,24 @@
                 <div class="pt-6 border-t border-slate-50 flex justify-between items-center">
                     <span class="text-base font-medium text-slate-400">Setup time: ~8 mins</span>
                     <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div onclick="navigateTo('reverse-mf')" class="proposal-card order-4 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="icon-box w-16 h-16 bg-cyan-50 text-cyan-600 rounded-2xl flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white">
+                        <i class="fa-solid fa-calculator text-3xl"></i>
+                    </div>
+                    <span class="bg-cyan-50 text-cyan-700 text-[12px] font-bold px-3 py-2 mt-5 rounded-full uppercase tracking-wider">Reverse Goal</span>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-3 tracking-tight">Reverse MF Calculator</h3>
+                <p class="text-slate-500 mb-8 leading-relaxed">Start with the target corpus and solve backward for the SIP or lumpsum investment needed to reach it.</p>
+
+                <div class="pt-6 border-t border-slate-50 flex justify-between items-center">
+                    <span class="text-base font-medium text-slate-400">Setup time: ~2 mins</span>
+                    <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white transition-all">
                         <i class="fas fa-chevron-right"></i>
                     </div>
                 </div>
@@ -209,6 +227,8 @@
                     window.location.href = 'ACE/ace.html';
                 } else if (type === 'mface') {
                     window.location.href = 'ACE+MF/mface.html';
+                } else if (type === 'reverse-mf') {
+                    window.location.href = 'Reverse/reverse-mf.html';
                 } else {
                     alert(
                         'The ' + type.toUpperCase() +
