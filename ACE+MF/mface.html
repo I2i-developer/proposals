@@ -203,6 +203,50 @@
                         </div>
                         <p class="text-[12px] text-slate-400 mt-1 font-medium">Choose a Period between 5 and Policy Term-(<span id="polTerm" class="text-slate-500">20</span>)</p>
                     </div>
+                    <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[13px] font-black text-amber-700 uppercase">Step-Up SIP</p>
+                                <p class="text-[12px] text-amber-600">Increase the MF SIP periodically</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="mfStepUpEnabled" class="sr-only peer" onchange="toggleMfStepUp()">
+                                <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                            </label>
+                        </div>
+
+                        <div id="mfStepUpInputs" class="hidden mt-4 space-y-4">
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up Format</label>
+                                <select id="mfStepUpType" onchange="toggleMfStepUpMode(); runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 bg-white">
+                                    <option value="percent">% Percentage Increase</option>
+                                    <option value="amount">Fixed Amount Increase</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <div id="mfStepUpPercentWrap">
+                                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up (%)</label>
+                                        <input type="number" id="mfStepUpPerc" value="10" min="0" step="0.5" oninput="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 bg-white">
+                                    </div>
+                                    <div id="mfStepUpAmountWrap" class="hidden">
+                                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up Amount (₹)</label>
+                                        <input type="number" id="mfStepUpAmount" value="5000" min="0" step="500" oninput="updateWordDisplay(this); runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 bg-white">
+                                        <p id="mfStepUpAmountWords" class="text-[10px] font-medium italic text-amber-600 mt-1 ml-1 h-3"></p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Frequency</label>
+                                    <select id="mfStepUpFreq" onchange="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 bg-white">
+                                        <option value="12">Annually</option>
+                                        <option value="6">Semi-Annually</option>
+                                        <option value="3">Quarterly</option>
+                                        <option value="1">Monthly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Additional Lumpsum (₹)</label>
                         <input type="number" id="mfLumpsum" oninput="runLogic()" value="5000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
@@ -524,6 +568,18 @@
                         <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
                     </div>
                 </div>
+                <div id="mfStepUpPreviewNote" class="hidden mt-8 p-5 bg-amber-50 border border-amber-100 rounded-2xl">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-white text-amber-600 flex items-center justify-center shadow-sm">
+                            <i class="fa fa-arrow-trend-up text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-amber-700 uppercase tracking-widest mb-1">Fresh MF SIP Step-Up Assumption</p>
+                            <p id="mfStepUpPreviewText" class="text-sm font-semibold text-slate-700 leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mt-10">
                     <div class="flex items-center justify-between mb-6">
                         <div>
@@ -732,6 +788,7 @@
          */
         window.onload = function() {
             console.log("Financial Engine Loaded");
+            toggleMfStepUpMode();
             toggleSWPView(); 
         };
 
@@ -780,6 +837,59 @@
                     displayElement.classList.remove('opacity-100');
                 }
             }
+        }
+
+        function toggleMfStepUp() {
+            const container = document.getElementById('mfStepUpInputs');
+            const isEnabled = document.getElementById('mfStepUpEnabled')?.checked || false;
+            if (container) container.classList.toggle('hidden', !isEnabled);
+            toggleMfStepUpMode();
+            runLogic();
+        }
+
+        function toggleMfStepUpMode() {
+            const type = document.getElementById('mfStepUpType')?.value || 'percent';
+            document.getElementById('mfStepUpPercentWrap')?.classList.toggle('hidden', type !== 'percent');
+            document.getElementById('mfStepUpAmountWrap')?.classList.toggle('hidden', type !== 'amount');
+        }
+
+        function getMfStepUpFrequencyLabel(months) {
+            const labels = {
+                12: 'annually',
+                6: 'semi-annually',
+                3: 'quarterly',
+                1: 'monthly'
+            };
+            return labels[months] || `every ${months} months`;
+        }
+
+        function getMfStepUpConfig() {
+            const enabled = document.getElementById('mfStepUpEnabled')?.checked || false;
+            const type = document.getElementById('mfStepUpType')?.value || 'percent';
+            const percent = Math.max(0, parseFloat(document.getElementById('mfStepUpPerc')?.value) || 0);
+            const amount = Math.max(0, parseFloat(document.getElementById('mfStepUpAmount')?.value) || 0);
+            const frequency = Math.max(1, parseInt(document.getElementById('mfStepUpFreq')?.value) || 12);
+            const frequencyLabel = getMfStepUpFrequencyLabel(frequency);
+            const valueLabel = type === 'amount'
+                ? '₹' + Math.round(amount).toLocaleString('en-IN')
+                : percent.toLocaleString('en-IN', { maximumFractionDigits: 2 }) + '%';
+
+            return {
+                enabled,
+                type,
+                percent,
+                amount,
+                frequency,
+                frequencyLabel,
+                valueLabel,
+                hasValue: type === 'amount' ? amount > 0 : percent > 0
+            };
+        }
+
+        function applyMfSipStepUp(currentSip, stepUpConfig) {
+            if (!stepUpConfig.enabled || !stepUpConfig.hasValue) return currentSip;
+            if (stepUpConfig.type === 'amount') return currentSip + stepUpConfig.amount;
+            return currentSip * (1 + stepUpConfig.percent / 100);
         }
 
         function addLumpsumRow() {
@@ -1229,6 +1339,7 @@
                 const mfSipDuration = parseInt(document.getElementById('mfSipDuration')?.value) || 0;
                 const mfRate = parseFloat(document.getElementById('mfRate')?.value) || 12;
                 const mfName = document.getElementById('mfName')?.value || "Mutual Fund";
+                const mfStepUpConfig = getMfStepUpConfig();
 
                 const swpToggle = document.getElementById('swpToggle')?.checked;
                 const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
@@ -1270,6 +1381,9 @@
                 let labels = [];
                 let growthPoints = [];
                 const totalYears = aceTerm;
+                let runningMfSip = mfSip;
+                let totalMfSipInvested = 0;
+                let firstYearMfSipAverage = mfSip;
 
                 for (let yr = 1; yr <= totalYears; yr++) {
                     let currentAge = projectionStartAge + yr - 1;
@@ -1289,7 +1403,23 @@
                     let yrAceIn = (yr <= aceTerm) ? aceInc : 0;
                     if (yr === aceTerm) yrAceIn += aceMat;
 
-                    let annualSip = (yr <= mfSipDuration) ? (mfSip * 12) : 0;
+                    let annualSip = 0;
+                    let yearStartSip = runningMfSip;
+
+                    if (yr <= mfSipDuration) {
+                        for (let month = 1; month <= 12; month++) {
+                            const totalMonthsPassed = ((yr - 1) * 12) + month;
+                            if (totalMonthsPassed > 1 && (totalMonthsPassed - 1) % mfStepUpConfig.frequency === 0) {
+                                runningMfSip = applyMfSipStepUp(runningMfSip, mfStepUpConfig);
+                            }
+                            annualSip += runningMfSip;
+                        }
+                    }
+
+                    totalMfSipInvested += annualSip;
+                    if (yr === 1) {
+                        firstYearMfSipAverage = annualSip / 12;
+                    }
                     
                     // Compounding: Previous Balance + Income + SIP + New Lumpsum
                     // currentCorpus = (currentCorpus + yrAceIn + annualSip + yrLumpsum) * (1 + (mfRate / 100));
@@ -1315,6 +1445,13 @@
 
                     if (yr <= mfSipDuration) {
                         sipDisplay += `₹${annualSip.toLocaleString('en-IN')}`;
+                        if (mfStepUpConfig.enabled && mfStepUpConfig.hasValue) {
+                            const yearEndSip = runningMfSip;
+                            const monthlyDetail = Math.round(yearStartSip) === Math.round(yearEndSip)
+                                ? `Monthly: ₹${Math.round(yearEndSip).toLocaleString('en-IN')}`
+                                : `Monthly: ₹${Math.round(yearStartSip).toLocaleString('en-IN')} to ₹${Math.round(yearEndSip).toLocaleString('en-IN')}`;
+                            sipDisplay += `<div class="text-[10px] text-amber-600 font-black uppercase mt-1">${monthlyDetail}</div>`;
+                        }
                     } else {
                         sipDisplay += `<span class="text-slate-400 italic">₹-</span>`;
                     }
@@ -1376,7 +1513,7 @@
                 }
 
                 // 6. CALCULATE TOTALS FOR SUMMARY
-                const totalInvested = (acePrem * acePpt) + (mfSip * 12 * mfSipDuration) + totalLumpsums;
+                const totalInvested = (acePrem * acePpt) + totalMfSipInvested + totalLumpsums;
                 const totalAceBenefit = (aceInc * aceTerm) + aceMat;
 
                 // 7. UPDATE ALL UI ELEMENTS (Safely)
@@ -1387,6 +1524,16 @@
                 safeSet('footerClientName', name);
                 safeSet('pTable', ''); // Clear and then append is safer
                 document.getElementById('pTable').innerHTML = accumulationTableHtml;
+
+                const mfStepUpPreviewNote = document.getElementById('mfStepUpPreviewNote');
+                const mfStepUpPreviewText = document.getElementById('mfStepUpPreviewText');
+                if (mfStepUpPreviewNote && mfStepUpPreviewText) {
+                    const showMfStepUpPreview = mfStepUpConfig.enabled && mfStepUpConfig.hasValue;
+                    mfStepUpPreviewNote.classList.toggle('hidden', !showMfStepUpPreview);
+                    mfStepUpPreviewText.innerText = showMfStepUpPreview
+                        ? `Fresh MF SIP starts at ₹${Math.round(mfSip).toLocaleString('en-IN')} per month and increases by ${mfStepUpConfig.valueLabel} ${mfStepUpConfig.frequencyLabel} for ${mfSipDuration} years.`
+                        : '';
+                }
                 
                 safeSet('pAceTotal', formatINR(totalAceBenefit));
                 safeSet('pMfTotal', formatINR(currentCorpus));
@@ -1472,7 +1619,7 @@
                 updateLabelTax(acePrem);
                 updateFundPills();
                 updateMainChart(labels, growthPoints);
-                updateMixChart(acePrem, mfSip, totalLumpsums);
+                updateMixChart(acePrem, firstYearMfSipAverage, totalLumpsums);
 
             } catch (e) { 
                 console.error("Logic Error:", e); 

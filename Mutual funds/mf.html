@@ -179,10 +179,24 @@
                 </div>
 
                 <div id="stepUpInputs" class="hidden space-y-4 mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up Format</label>
+                        <select id="stepUpType" onchange="toggleStepUpMode(); runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200 bg-white">
+                            <option value="percent">% Percentage Increase</option>
+                            <option value="amount">Fixed Amount Increase</option>
+                        </select>
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up (%)</label>
-                            <input type="number" id="stepUpPerc" value="10" oninput="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200">
+                            <div id="stepUpPercentWrap">
+                                <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up (%)</label>
+                                <input type="number" id="stepUpPerc" value="10" min="0" step="0.5" oninput="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200">
+                            </div>
+                            <div id="stepUpAmountWrap" class="hidden">
+                                <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up Amount (₹)</label>
+                                <input type="number" id="stepUpAmount" value="5000" min="0" step="500" oninput="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200">
+                                <p id="stepUpAmountWords" class="amount-words mt-1 ml-1 text-[10px] font-semibold text-amber-600 leading-snug"></p>
+                            </div>
                         </div>
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Frequency</label>
@@ -333,6 +347,18 @@
                     <div class="stat-card p-6 rounded-2xl border-emerald-100 bg-emerald-50/30">
                         <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Estimated Gain</p>
                         <p class="text-xl font-black text-emerald-700" id="pGain">₹ 0</p>
+                    </div>
+                </div>
+
+                <div id="stepUpPreviewNote" class="hidden mb-10 p-5 bg-amber-50 border border-amber-100 rounded-2xl">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-white text-amber-600 flex items-center justify-center shadow-sm">
+                            <i class="fa fa-arrow-trend-up text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-amber-700 uppercase tracking-widest mb-1">Step-Up SIP Assumption</p>
+                            <p id="stepUpPreviewText" class="text-sm font-semibold text-slate-700 leading-relaxed"></p>
+                        </div>
                     </div>
                 </div>
 
@@ -596,6 +622,12 @@
             sipWords.innerText = numberToIndianWords(sipInput.value);
         }
 
+        const stepUpAmountInput = document.getElementById('stepUpAmount');
+        const stepUpAmountWords = document.getElementById('stepUpAmountWords');
+        if (stepUpAmountInput && stepUpAmountWords) {
+            stepUpAmountWords.innerText = numberToIndianWords(stepUpAmountInput.value);
+        }
+
         document.querySelectorAll('.transaction-row').forEach(function(row) {
             const amountInput = row.querySelector('.transaction-amount');
             const wordsOutput = row.querySelector('.transaction-amount-words');
@@ -696,7 +728,60 @@
         } else {
             container.classList.add('hidden');
         }
+        toggleStepUpMode();
         runLogic();
+    }
+
+    function toggleStepUpMode() {
+        const type = document.getElementById('stepUpType')?.value || 'percent';
+        const percentWrap = document.getElementById('stepUpPercentWrap');
+        const amountWrap = document.getElementById('stepUpAmountWrap');
+
+        if (percentWrap) percentWrap.classList.toggle('hidden', type !== 'percent');
+        if (amountWrap) amountWrap.classList.toggle('hidden', type !== 'amount');
+    }
+
+    function getFrequencyLabel(months) {
+        const labels = {
+            12: 'annually',
+            6: 'semi-annually',
+            3: 'quarterly',
+            1: 'monthly'
+        };
+        return labels[months] || `every ${months} months`;
+    }
+
+    function getStepUpConfig() {
+        const enabled = document.getElementById('stepUpEnabled')?.checked || false;
+        const type = document.getElementById('stepUpType')?.value || 'percent';
+        const percent = Math.max(0, parseFloat(document.getElementById('stepUpPerc')?.value) || 0);
+        const amount = Math.max(0, parseFloat(document.getElementById('stepUpAmount')?.value) || 0);
+        const frequency = Math.max(1, parseInt(document.getElementById('stepUpFreq')?.value) || 12);
+        const frequencyLabel = getFrequencyLabel(frequency);
+        const valueLabel = type === 'amount'
+            ? '₹' + formatIndianCurrency(amount)
+            : percent.toLocaleString('en-IN', { maximumFractionDigits: 2 }) + '%';
+
+        return {
+            enabled,
+            type,
+            percent,
+            amount,
+            frequency,
+            frequencyLabel,
+            valueLabel,
+            hasValue: type === 'amount' ? amount > 0 : percent > 0
+        };
+    }
+
+    function applySipStepUp(currentSip, stepUpConfig) {
+        if (!stepUpConfig.enabled || !stepUpConfig.hasValue) return currentSip;
+
+        if (stepUpConfig.type === 'amount') {
+            return currentSip + stepUpConfig.amount;
+        }
+
+        return currentSip * (1 + stepUpConfig.percent / 100);
     }
 
     function handleGoalDurationChange() {
@@ -738,9 +823,7 @@
             const monthlySip = parseFloat(document.getElementById('cSip').value) || 0;
             const rate = parseFloat(document.getElementById('cRet').value) || 12;
 
-            const stepUpEnabled = document.getElementById('stepUpEnabled').checked;
-            const stepUpPerc = parseFloat(document.getElementById('stepUpPerc').value) || 0;
-            const stepUpFreq = parseInt(document.getElementById('stepUpFreq').value) || 12;
+            const stepUpConfig = getStepUpConfig();
 
             if(document.getElementById('retVal')) document.getElementById('retVal').innerText = rate + '%';
             if(document.getElementById('pName')) document.getElementById('pName').innerText = name;
@@ -749,7 +832,7 @@
             if(document.getElementById('dyn_param_dur')) document.getElementById('dyn_param_dur').innerText = `${duration} Years`;
 
             let method = "Strategic Allocation";
-            if (stepUpEnabled) method = "Step-Up Systematic Strategy";
+            if (stepUpConfig.enabled && stepUpConfig.hasValue) method = "Step-Up Systematic Strategy";
             else if (monthlySip > 0) method = "Systematic Investment (SIP)";
 
             const methodElem = document.getElementById('dyn_intro_method');
@@ -855,8 +938,8 @@
                 for (let m = 1; m <= 12; m++) {
                     const totalMonthsPassed = ((i - 1) * 12) + m;
 
-                    if (isSipActive && stepUpEnabled && totalMonthsPassed > 1 && (totalMonthsPassed - 1) % stepUpFreq === 0) {
-                        runningSip = runningSip * (1 + stepUpPerc / 100);
+                    if (isSipActive && stepUpConfig.enabled && stepUpConfig.hasValue && totalMonthsPassed > 1 && (totalMonthsPassed - 1) % stepUpConfig.frequency === 0) {
+                        runningSip = applySipStepUp(runningSip, stepUpConfig);
                     }
 
                     const monthlyContribution = isSipActive ? runningSip : 0;
@@ -888,6 +971,16 @@
             document.getElementById('pCorpus').innerText = "₹" + formatIndianCurrency(currentCorpus);
             document.getElementById('pGain').innerText = "₹" + formatIndianCurrency(gain);
             document.getElementById('dyn_roi_display').innerText = rate + '%';
+
+            const stepUpPreviewNote = document.getElementById('stepUpPreviewNote');
+            const stepUpPreviewText = document.getElementById('stepUpPreviewText');
+            if (stepUpPreviewNote && stepUpPreviewText) {
+                const showStepUpPreview = stepUpConfig.enabled && stepUpConfig.hasValue;
+                stepUpPreviewNote.classList.toggle('hidden', !showStepUpPreview);
+                stepUpPreviewText.innerText = showStepUpPreview
+                    ? `Starting SIP of ₹${formatIndianCurrency(monthlySip)} increases by ${stepUpConfig.valueLabel} ${stepUpConfig.frequencyLabel} during the ${sipDurationYears}-year SIP contribution period.`
+                    : '';
+            }
 
             // Update the summary section with correct values
             const summarySection = document.getElementById('proposal_summary_section');
@@ -1453,6 +1546,7 @@
     }
     window.onload = function() {
         document.querySelectorAll('.transaction-type').forEach(toggleTransactionFields);
+        toggleStepUpMode();
         runLogic();
     };
     </script>
