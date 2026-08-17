@@ -348,6 +348,17 @@
                         <input type="number" id="swpStartAge" value="60" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
                     </div>
 
+                    <div class="flex items-center justify-between p-3 bg-white rounded-2xl border border-orange-100">
+                        <div>
+                            <p class="text-[12px] font-black text-orange-700 uppercase">Start SWP Before Policy Term</p>
+                            <p class="text-[11px] text-orange-600">Use corpus at selected age and keep adding ACE income</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="earlySwpEnabled" class="sr-only peer" onchange="runLogic()">
+                            <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                        </label>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase">Duration (Yrs)</label>
@@ -630,7 +641,7 @@
                                 <p class="text-2xl font-bold text-slate-800">Systematic Withdrawal Plan</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Maturity Corpus</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">SWP Starting Corpus</p>
                                 <p class="text-xl font-black text-emerald-600" id="dyn_maturity_corpus">₹ 0</p>
                             </div>
                         </div>
@@ -652,6 +663,7 @@
 
                         <p class="text-[12px] text-slate-600 italic mb-6">
                             *The SWP plan starts at age <span id="dyn_swp_start_age_text" class="font-bold text-slate-700">60</span>, providing inflation-adjusted monthly credits while keeping your principal capital invested.
+                            <span id="dyn_early_swp_note" class="hidden font-bold text-orange-600">ACE income received after SWP starts is added to the withdrawal corpus.</span>
                         </p>
 
                         <div class="bg-white p-4 rounded-2xl border border-emerald-100" style="height: 300px;">
@@ -669,6 +681,7 @@
                                 <thead class="bg-emerald-50/50">
                                     <tr>
                                         <th class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">Age</th>
+                                        <th class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">ACE Additions</th>
                                         <th class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">Monthly Income</th>
                                         <th class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">Annual Withdrawal</th>
                                         <th class="px-6 py-4 text-right text-[12px] font-black text-emerald-700 uppercase">Remaining Corpus (₹)</th>
@@ -1343,6 +1356,9 @@
 
                 const swpToggle = document.getElementById('swpToggle')?.checked;
                 const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
+                const earlySwpEnabled = document.getElementById('earlySwpEnabled')?.checked || false;
+                const termEndAge = projectionStartAge + aceTerm - 1;
+                const effectiveSwpStartAge = Math.min(Math.max(startAge, projectionStartAge), termEndAge);
                 
                 // Milestone Inputs
                 const milestoneActive = document.getElementById('milestoneToggle')?.checked || false;
@@ -1384,9 +1400,13 @@
                 let runningMfSip = mfSip;
                 let totalMfSipInvested = 0;
                 let firstYearMfSipAverage = mfSip;
+                const openingCorpusByAge = {};
+                const accumulationByAge = {};
+                const aceAdditionsByAge = {};
 
                 for (let yr = 1; yr <= totalYears; yr++) {
                     let currentAge = projectionStartAge + yr - 1;
+                    openingCorpusByAge[currentAge] = currentCorpus;
                     let yrLumpsum = plannedLumpsums[yr] || 0;
                     // let yrWithdrawal = plannedWithdrawals[yr] || 0;
                     let yrWithdrawal = 0;
@@ -1402,6 +1422,7 @@
                     
                     let yrAceIn = (yr <= aceTerm) ? aceInc : 0;
                     if (yr === aceTerm) yrAceIn += aceMat;
+                    aceAdditionsByAge[currentAge] = yrAceIn;
 
                     let annualSip = 0;
                     let yearStartSip = runningMfSip;
@@ -1431,6 +1452,7 @@
                     // Store Chart Data
                     labels.push("Age " + currentAge);
                     growthPoints.push(Math.round(currentCorpus));
+                    accumulationByAge[currentAge] = currentCorpus;
 
                     // Table Row Logic
                     let displayAceCell = `₹${yrAceIn.toLocaleString('en-IN')}`;
@@ -1475,7 +1497,9 @@
                             <span class="ml-1 text-[11px]">${withdrawalTags.join(", ")}</span>
                         </div>`;
                     }
-                    if (yr <= 35 || currentAge === startAge) {
+                    const showAccumulationRow = (!earlySwpEnabled || currentAge < effectiveSwpStartAge) &&
+                        (yr <= 35 || currentAge === startAge);
+                    if (showAccumulationRow) {
                         const sipStatusClass = yr <= mfSipDuration ? "font-bold text-slate-600" : "text-slate-300";
                         accumulationTableHtml += `
                             <tr class="border-b border-slate-50 transition-colors hover:bg-slate-50 ${yr === 1 ? 'bg-blue-50/40' : ''}">
@@ -1507,9 +1531,24 @@
                     document.getElementById('milestoneInputs')?.classList.add('hidden');
                 }
 
+                let selectedSwpCorpus = earlySwpEnabled
+                    ? (openingCorpusByAge[effectiveSwpStartAge] ?? accumulationByAge[termEndAge] ?? finalPhase1Corpus)
+                    : finalPhase1Corpus;
+                if (earlySwpEnabled && milestoneActive && milestoneVal > 0) {
+                    selectedSwpCorpus = Math.max(0, selectedSwpCorpus - milestoneVal);
+                }
+                const swpAceAdditions = earlySwpEnabled ? aceAdditionsByAge : {};
+
                 // 5. PHASE 2: HARVESTING (SWP)
                 if (swpToggle) {
-                    runSwpLogic(finalPhase1Corpus, mfRate);
+                    runSwpLogic(selectedSwpCorpus, mfRate, {
+                        aceAdditionsByAge: swpAceAdditions,
+                        aceIncome: aceInc,
+                        aceMaturityAmount: aceMat,
+                        earlyStart: earlySwpEnabled,
+                        startAgeOverride: earlySwpEnabled ? effectiveSwpStartAge : startAge,
+                        termEndAge
+                    });
                 }
 
                 // 6. CALCULATE TOTALS FOR SUMMARY
@@ -1583,7 +1622,7 @@
 
                     // UI updates
                     const swpRate = parseFloat(document.getElementById('swpRateInput')?.value) || 8;
-                    const startMonthly = (finalPhase1Corpus * (swpRate/100)) / 12;
+                    const startMonthly = (selectedSwpCorpus * (swpRate/100)) / 12;
 
                     safeSet('sum_start_income', formatINR(startMonthly));
                     safeSet('sum_total_payout', formatINR(rawPayout));
@@ -1629,21 +1668,31 @@
         /**
          * SWP LOGIC
          */
-        function runSwpLogic(peakCorpus, growthRate) {
-            const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
+        function runSwpLogic(peakCorpus, growthRate, options = {}) {
+            const inputStartAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
+            const startAge = options.startAgeOverride || inputStartAge;
             const duration = parseInt(document.getElementById('swpDuration')?.value) || 25;
             const swpRate = (parseFloat(document.getElementById('swpRateInput')?.value) || 8) / 100;
             const stepUp = (parseFloat(document.getElementById('swpStepPct')?.value) || 0) / 100;
             const interval = parseInt(document.getElementById('swpStepInterval')?.value) || 0;
+            const aceAdditionsByAge = options.aceAdditionsByAge || {};
+            const earlyStart = options.earlyStart || false;
+            const aceIncome = options.aceIncome || 0;
+            const aceMaturityAmount = options.aceMaturityAmount || 0;
+            const termEndAge = options.termEndAge || 0;
 
             let corpus = peakCorpus;
             let annualWithdrawal = peakCorpus * swpRate;
             let totalPaidOut = 0;
+            let totalAceAdded = 0;
             let swpHtml = "";
             let swpLabels = [], swpInc = [], swpCorp = [];
 
             for (let i = 1; i <= duration; i++) {
-                let age = startAge + i;
+                let age = startAge + i - 1;
+                const aceAddition = aceAdditionsByAge[age] || 0;
+                corpus += aceAddition;
+                totalAceAdded += aceAddition;
 
                 // Withdraw first, then grow
                 corpus = (corpus - annualWithdrawal) * (1 + (growthRate / 100));
@@ -1653,10 +1702,23 @@
                 swpInc.push(Math.round(annualWithdrawal));
                 swpCorp.push(Math.round(corpus));
                 totalPaidOut += annualWithdrawal;
+                const aceAdditionDisplay = aceAddition <= 0
+                    ? '-'
+                    : (age === termEndAge && aceMaturityAmount > 0)
+                        ? `<div class="font-black text-emerald-700">
+                                <span>&#8377;${Math.round(aceIncome).toLocaleString('en-IN')}</span>
+                                <span class="text-blue-500 mx-1">+</span>
+                                <span>&#8377;${Math.round(aceMaturityAmount).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div class="text-[9px] text-blue-600 font-black uppercase mt-1 tracking-tightest">Policy Maturity Added</div>`
+                        : '&#8377;' + Math.round(aceAddition).toLocaleString('en-IN');
 
                 swpHtml += `
                     <tr class="border-b border-emerald-50">
                         <td class="px-6 py-4 text-sm font-black text-center text-slate-800">${age}</td>
+                        <td class="px-6 py-4 text-sm font-bold text-center text-emerald-600">
+                            ${aceAdditionDisplay}
+                        </td>
                         <td class="px-6 py-4 text-sm font-bold text-center text-blue-600">
                             ₹${Math.round(annualWithdrawal / 12).toLocaleString('en-IN')}
                         </td>
@@ -1682,10 +1744,11 @@
             document.getElementById('dyn_total_withdrawal').innerText = "₹ " + Math.round(totalPaidOut).toLocaleString('en-IN');
             document.getElementById('dyn_legacy_swp').innerText = "₹ " + Math.round(corpus).toLocaleString('en-IN');
             document.getElementById('dyn_swp_start_age_text').innerText = startAge;
-            document.getElementById('dyn_swp_start_age_label').innerText = startAge + 1;
-            document.getElementById('dyn_final_age_label').innerText = startAge + duration;
+            document.getElementById('dyn_swp_start_age_label').innerText = startAge;
+            document.getElementById('dyn_final_age_label').innerText = startAge + duration - 1;
             document.getElementById('dyn_ret_age').innerText = startAge + " Years";
             document.getElementById('dyn_benefit_yrs').innerText = duration + "+ Years";
+            document.getElementById('dyn_early_swp_note')?.classList.toggle('hidden', !(earlyStart && totalAceAdded > 0));
 
             updateSwpChart(swpLabels, swpInc, swpCorp);
         }
