@@ -195,13 +195,13 @@
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">SIP Duration (Years)</label>
                         <div class="flex items-center gap-4">
-                            <input type="range" id="mfSipDuration" min="5" max="40" value="15" 
+                            <input type="range" id="mfSipDuration" min="5" max="60" value="15"
                                 oninput="this.nextElementSibling.value = this.value; runLogic()" 
                                 class="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                            <input type="number" id="mfSipDurationNum" value="15" oninput="this.previousElementSibling.value = this.value; runLogic()"
+                            <input type="number" id="mfSipDurationNum" value="15" min="5" max="60" oninput="this.previousElementSibling.value = this.value; runLogic()"
                                 class="w-12 text-sm font-bold text-slate-700 bg-slate-100 rounded-md px-1 py-1 text-md text-center">
                         </div>
-                        <p class="text-[12px] text-slate-400 mt-1 font-medium">Choose a Period between 5 and Policy Term-(<span id="polTerm" class="text-slate-500">20</span>)</p>
+                        <p class="text-[12px] text-slate-400 mt-1 font-medium">Choose a SIP period between 5 and 60 years. It can continue after the ACE policy term.</p>
                     </div>
                     <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
                         <div class="flex items-center justify-between">
@@ -1357,8 +1357,10 @@
                 const swpToggle = document.getElementById('swpToggle')?.checked;
                 const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
                 const earlySwpEnabled = document.getElementById('earlySwpEnabled')?.checked || false;
+                const totalYears = Math.max(aceTerm, mfSipDuration);
                 const termEndAge = projectionStartAge + aceTerm - 1;
-                const effectiveSwpStartAge = Math.min(Math.max(startAge, projectionStartAge), termEndAge);
+                const projectionEndAge = projectionStartAge + totalYears - 1;
+                const effectiveSwpStartAge = Math.min(Math.max(startAge, projectionStartAge), projectionEndAge);
                 
                 // Milestone Inputs
                 const milestoneActive = document.getElementById('milestoneToggle')?.checked || false;
@@ -1396,7 +1398,6 @@
                 let accumulationTableHtml = "";
                 let labels = [];
                 let growthPoints = [];
-                const totalYears = aceTerm;
                 let runningMfSip = mfSip;
                 let totalMfSipInvested = 0;
                 let firstYearMfSipAverage = mfSip;
@@ -1456,7 +1457,7 @@
 
                     // Table Row Logic
                     let displayAceCell = `₹${yrAceIn.toLocaleString('en-IN')}`;
-                    if (yr === totalYears && aceMat > 0) {
+                    if (yr === aceTerm && aceMat > 0) {
                         displayAceCell = `₹${aceInc.toLocaleString('en-IN')} <span class="text-blue-500 font-bold">+</span> ₹${aceMat.toLocaleString('en-IN')}`;
                     }
 
@@ -1506,8 +1507,8 @@
                                 <td class="px-6 py-4 text-sm font-black text-slate-900">${currentAge}</td>
                                 <td class="px-6 py-4 text-sm text-pink-600 font-bold">₹${yrPremium > 0 ? yrPremium.toLocaleString('en-IN') : '-'}</td>
                                 <td class="px-6 py-4 text-sm text-emerald-600 font-bold">
-                                    ${yrAceIn > 0 || (yr === totalYears && aceMat > 0) ? displayAceCell : '-'}
-                                    ${(yr === totalYears && aceMat > 0) ? '<div class="text-[9px] text-blue-600 font-black uppercase mt-1 tracking-tightest">Policy Maturity Added</div>' : ''}
+                                    ${yrAceIn > 0 || (yr === aceTerm && aceMat > 0) ? displayAceCell : '-'}
+                                    ${(yr === aceTerm && aceMat > 0) ? '<div class="text-[9px] text-blue-600 font-black uppercase mt-1 tracking-tightest">Policy Maturity Added</div>' : ''}
                                 </td>
                                 <td class="px-4 py-4 text-sm font-bold font-base text-slate-600 ${sipStatusClass}">
                                     ${sipDisplay}
