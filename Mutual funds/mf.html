@@ -86,7 +86,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Current Age</label>
-                            <input type="number" id="cAge" min="0" oninput="this.value < 0 ? this.value = 0 : runLogic()" value="30" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <input type="number" id="cAge" min="1" max="100" oninput="this.value < 1 ? this.value = 1 : this.value > 100 ? this.value = 100 : runLogic()" value="30" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                         </div>
                         <div>
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Goal Year</label>
@@ -350,18 +350,6 @@
                     </div>
                 </div>
 
-                <div id="stepUpPreviewNote" class="hidden mb-10 p-5 bg-amber-50 border border-amber-100 rounded-2xl">
-                    <div class="flex items-start gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-white text-amber-600 flex items-center justify-center shadow-sm">
-                            <i class="fa fa-arrow-trend-up text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-amber-700 uppercase tracking-widest mb-1">Step-Up SIP Assumption</p>
-                            <p id="stepUpPreviewText" class="text-sm font-semibold text-slate-700 leading-relaxed"></p>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="space-y-10 mb-12">
                     <div class="bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm transition-all hover:shadow-md">
                         <div class="flex justify-between items-center mb-8">
@@ -387,6 +375,30 @@
                         </div>
                         <div class="w-full" style="height: 300px;">
                             <canvas id="mixChart" style="height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stepUpPreviewNote" class="hidden mb-10 p-5 bg-amber-50 border border-amber-100 rounded-2xl">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-white text-amber-600 flex items-center justify-center shadow-sm">
+                            <i class="fa fa-arrow-trend-up text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-amber-700 uppercase tracking-widest mb-1">Step-Up SIP Assumption</p>
+                            <p id="stepUpPreviewText" class="text-sm font-semibold text-slate-700 leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="compoundingGapNote" class="hidden mb-10 p-5 bg-blue-50 border border-blue-100 rounded-2xl">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-white text-blue-600 flex items-center justify-center shadow-sm">
+                            <i class="fa fa-hourglass-half text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-blue-700 uppercase tracking-widest mb-1">No-Investment Compounding Phase</p>
+                            <p id="compoundingGapText" class="text-sm font-semibold text-slate-700 leading-relaxed"></p>
                         </div>
                     </div>
                 </div>
@@ -794,11 +806,16 @@
 
         const goalYears = Math.max(1, parseInt(goalInput.value) || 1);
         goalInput.value = goalYears;
-        sipDurationInput.max = goalYears;
+        const parsedStartAge = parseInt(document.getElementById('cAge')?.value);
+        const startAge = Number.isNaN(parsedStartAge) ? 30 : Math.min(Math.max(1, parsedStartAge), 100);
+        const swpEnabled = document.getElementById('swpEnabled')?.checked || false;
+        const retireAge = Math.max(startAge + 1, parseInt(document.getElementById('cRetireAge')?.value) || (startAge + goalYears));
+        const maxSipYears = swpEnabled ? Math.max(1, retireAge - startAge) : goalYears;
+        sipDurationInput.max = maxSipYears;
 
-        const sipYears = parseInt(sipDurationInput.value) || goalYears;
-        if (sipDurationInput.dataset.custom !== 'true' || sipYears > goalYears) {
-            sipDurationInput.value = goalYears;
+        const sipYears = parseInt(sipDurationInput.value) || maxSipYears;
+        if (sipDurationInput.dataset.custom !== 'true' || sipYears > maxSipYears) {
+            sipDurationInput.value = maxSipYears;
         }
 
         runLogic();
@@ -809,8 +826,18 @@
             updateSidebarAmountWords();
 
             const name = document.getElementById('cName').value || "Aditya Vikram";
-            const age = parseInt(document.getElementById('cAge').value) || 0;
-            const duration = Math.max(1, parseInt(document.getElementById('cDur').value) || 15);
+            const parsedStartAge = parseInt(document.getElementById('cAge').value);
+            const age = Number.isNaN(parsedStartAge) ? 30 : Math.min(Math.max(1, parsedStartAge), 100);
+            if (document.getElementById('cAge').value !== String(age)) {
+                document.getElementById('cAge').value = age;
+            }
+            const goalDuration = Math.max(1, parseInt(document.getElementById('cDur').value) || 15);
+            const swpEnabled = document.getElementById('swpEnabled').checked;
+            const retireAge = Math.max(age + 1, parseInt(document.getElementById('cRetireAge').value) || (age + goalDuration));
+            if (swpEnabled && parseInt(document.getElementById('cRetireAge').value) !== retireAge) {
+                document.getElementById('cRetireAge').value = retireAge;
+            }
+            const duration = swpEnabled ? Math.max(1, retireAge - age) : goalDuration;
             const sipDurationInput = document.getElementById('cSipDur');
             if (sipDurationInput) {
                 sipDurationInput.max = duration;
@@ -982,6 +1009,16 @@
                     : '';
             }
 
+            const compoundingGapNote = document.getElementById('compoundingGapNote');
+            const compoundingGapText = document.getElementById('compoundingGapText');
+            if (compoundingGapNote && compoundingGapText) {
+                const compoundingGapYears = swpEnabled ? Math.max(0, duration - sipDurationYears) : 0;
+                compoundingGapNote.classList.toggle('hidden', compoundingGapYears <= 0);
+                compoundingGapText.innerText = compoundingGapYears > 0
+                    ? `SIP contributions stop at age ${age + sipDurationYears}, but withdrawals start at age ${retireAge}. During these ${compoundingGapYears} years, no fresh investment or withdrawal is planned and the corpus continues compounding.`
+                    : '';
+            }
+
             // Update the summary section with correct values
             const summarySection = document.getElementById('proposal_summary_section');
             if (summarySection) {
@@ -1076,7 +1113,6 @@
             document.getElementById('lumpsumDisplay').innerHTML = lumpsumHtml;
 
             // SWP Logic
-            const swpEnabled = document.getElementById('swpEnabled').checked;
             const swpInputContainer = document.getElementById('swpInputs');
             const swpProposalSection = document.getElementById('proposal_swp_section');
             const summaryPhaseGrid = document.getElementById('summary_phase_grid');
@@ -1111,12 +1147,9 @@
                 document.getElementById('bar_distribution').style.width = '0%';
             }
 
-            const parsedStartAge = parseInt(document.getElementById('cAge').value);
-            const startAge = Number.isNaN(parsedStartAge) ? 30 : parsedStartAge;
-            const goalDuration = parseInt(document.getElementById('cDur').value) || 0;
-            const sipInvestmentEndAge = startAge + sipDurationYears - 1;
-            const mfCorpusAge = startAge + goalDuration;
-            const retireAge = parseInt(document.getElementById('cRetireAge').value) || 60;
+            const startAge = age;
+            const sipInvestmentEndAge = startAge + sipDurationYears;
+            const mfCorpusAge = swpEnabled ? retireAge : startAge + duration;
             const swpDurationVal = parseInt(document.getElementById('cSwpDur').value) || 25;
             const finalAge = retireAge + swpDurationVal;
 
@@ -1171,9 +1204,9 @@
             }
 
             if (swpEnabled) {
-                const totalCycle = goalDuration + swpDurationVal;
+                const totalCycle = duration + swpDurationVal;
                 if (totalCycle > 0) {
-                    document.getElementById('bar_accumulation').style.width = ((goalDuration / totalCycle) * 100) + '%';
+                    document.getElementById('bar_accumulation').style.width = ((duration / totalCycle) * 100) + '%';
                     document.getElementById('bar_distribution').style.width = ((swpDurationVal / totalCycle) * 100) + '%';
                 }
             } else {
