@@ -181,7 +181,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-12 gap-8 mb-10 pb-10 border-b border-slate-100">
+                <div class="grid grid-cols-12 gap-8 mb-10 p-6 rounded-[28px] bg-white border border-slate-200 shadow-sm">
                     <div class="col-span-7">
                         <h4 class="text-[13px] font-black text-blue-600 uppercase tracking-[0.2em] mb-3">Executive Summary</h4>
                         <p class="text-slate-600 text-sm leading-relaxed mb-4">
@@ -234,23 +234,35 @@
                     </div>
                 </div>
 
-                <div class="mb-12">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="h-[2px] w-8 bg-teal-700"></div>
-                        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Core SIF Positioning</h4>
+                <div class="mb-12 rounded-[32px] bg-slate-900 p-8 text-white shadow-xl">
+                    <div class="flex items-center justify-between gap-6 mb-8">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.35em] text-teal-300 mb-2">Core SIF Positioning</p>
+                            <h4 class="text-2xl font-black tracking-tight">A focused route to emerging Indian wealth creators</h4>
+                        </div>
+                        <span class="shrink-0 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-200">PMS-style strategy</span>
                     </div>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="p-5 rounded-2xl bg-teal-50 border border-teal-100">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-teal-700 mb-2">Like PMS, Easier Access</p>
-                            <p class="text-[12px] text-slate-600 leading-relaxed font-medium">A focused equity strategy with the convenience and structure of a mutual fund.</p>
+                    <div class="grid grid-cols-3 divide-x divide-white/10 border-y border-white/10">
+                        <div class="py-6 pr-6">
+                            <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-400 text-slate-950 shadow-lg">
+                                <i class="fa fa-layer-group text-base"></i>
+                            </div>
+                            <p class="text-[11px] font-black uppercase tracking-widest text-teal-200 mb-2">Focused Portfolio</p>
+                            <p class="text-[12px] text-slate-300 leading-relaxed font-medium">A concentrated equity approach with mutual-fund convenience and PMS-style selectivity.</p>
                         </div>
-                        <div class="p-5 rounded-2xl bg-blue-50 border border-blue-100">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-blue-700 mb-2">Looks Beyond Top 100</p>
-                            <p class="text-[12px] text-slate-600 leading-relaxed font-medium">The fund searches for growing businesses outside the usual large-company basket.</p>
+                        <div class="py-6 px-6">
+                            <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-400 text-slate-950 shadow-lg">
+                                <i class="fa fa-magnifying-glass-chart text-base"></i>
+                            </div>
+                            <p class="text-[11px] font-black uppercase tracking-widest text-blue-200 mb-2">Beyond Top 100</p>
+                            <p class="text-[12px] text-slate-300 leading-relaxed font-medium">The strategy looks past the largest companies to find promising mid, small, and select micro-cap businesses.</p>
                         </div>
-                        <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-100">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-emerald-700 mb-2">Stock Merit First</p>
-                            <p class="text-[12px] text-slate-600 leading-relaxed font-medium">Stocks are selected for their own potential, not because they carry index weight.</p>
+                        <div class="py-6 pl-6">
+                            <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400 text-slate-950 shadow-lg">
+                                <i class="fa fa-bullseye text-base"></i>
+                            </div>
+                            <p class="text-[11px] font-black uppercase tracking-widest text-emerald-200 mb-2">Merit First</p>
+                            <p class="text-[12px] text-slate-300 leading-relaxed font-medium">Every stock is selected for business potential, not simply because it holds benchmark weight.</p>
                         </div>
                     </div>
                 </div>
@@ -360,7 +372,7 @@
                     </div>
                 </div>
 
-                <section id="summarySection" class="mt-8">
+                <section id="summarySection" class="mt-8 p-8 rounded-[40px] bg-white border-2 border-slate-600 text-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.15)]" style="break-before: page;">
                     <h3 class="mx-auto w-fit bg-teal-100 px-6 py-1 rounded-full text-center text-[13px] font-black text-teal-700 uppercase tracking-[0.3em] mb-6">Executive Summary</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="p-6 rounded-3xl bg-slate-50/50 border border-teal-200 shadow-md">
@@ -389,6 +401,16 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="mb-6 rounded-[32px] bg-slate-900 p-6 text-center text-white shadow-xl">
+                        <p class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300">
+                            Total Wealth Created (Age <span id="totalWealthAgeStart">30</span> - <span id="totalWealthAgeEnd">65</span>)
+                        </p>
+                        <p class="mt-3 text-3xl font-black text-white" id="totalWealthCreated">₹0</p>
+                        <p class="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                            Total SIF Investment:
+                            <span class="text-sm text-emerald-300" id="totalWealthInvestment">₹0</span>
+                        </p>
                     </div>
                 </section>
             </div>
@@ -504,8 +526,8 @@
             const retireAgeInput = parseInt(document.getElementById('retireAge').value) || (currentAge + horizonYears);
             const retireAge = Math.max(currentAge + 1, retireAgeInput);
             const accumulationYears = swpEnabled ? Math.max(1, retireAge - currentAge) : horizonYears;
-            const sipDuration = Math.min(rawSipDuration, accumulationYears);
-            if (parseInt(document.getElementById('sipDuration').value) !== sipDuration) {
+            const sipDuration = monthlySip > 0 ? Math.min(rawSipDuration, accumulationYears) : 0;
+            if (monthlySip > 0 && parseInt(document.getElementById('sipDuration').value) !== sipDuration) {
                 document.getElementById('sipDuration').value = sipDuration;
             }
             const additionalLumpsums = [];
@@ -645,6 +667,13 @@
             }
 
             document.getElementById('summaryFinalWealth').innerText = formatCurrency(swpEnabled ? swpSummary.totalPaidOut + swpSummary.finalCorpus : corpus);
+            const totalWealthCreated = swpEnabled ? swpSummary.totalPaidOut + swpSummary.finalCorpus : corpus;
+            document.getElementById('totalWealthCreated').innerText = formatCurrency(totalWealthCreated);
+            document.getElementById('totalWealthInvestment').innerText = formatCurrency(totalInvested);
+            document.getElementById('totalWealthAgeStart').innerText = currentAge;
+            document.getElementById('totalWealthAgeEnd').innerText = swpEnabled
+                ? retireAge + (Math.max(1, parseInt(document.getElementById('swpDuration').value) || 25)) - 1
+                : currentAge + accumulationYears;
             renderMixChart(lumpsum, totalSipInvested, totalAdditionalLumpsum);
             renderBuildUpChart(labels, investedData, gainData);
         }
@@ -692,6 +721,13 @@
 
             let html = '';
             if (initialLumpsum > 0 || monthlySip > 0) {
+                const hasSip = monthlySip > 0 && sipDuration > 0;
+                const planAmount = hasSip
+                    ? `${formatCurrency(initialLumpsum)} + ${formatCurrency(monthlySip)}/mo`
+                    : formatCurrency(initialLumpsum);
+                const planDuration = hasSip
+                    ? `<p class="text-[10px] font-bold text-slate-400">${sipDuration} year SIP</p>`
+                    : '<p class="text-[10px] font-bold text-slate-400">Initial lumpsum allocation</p>';
                 html += `
                     <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
                         <div class="flex items-center gap-4">
@@ -708,8 +744,8 @@
                         </div>
                         <div class="text-right">
                             <p class="text-[10px] font-bold text-slate-400 uppercase">Plan</p>
-                            <p class="text-sm font-black text-teal-700">${formatCurrency(initialLumpsum)} + ${formatCurrency(monthlySip)}/mo</p>
-                            <p class="text-[10px] font-bold text-slate-400">${sipDuration} year SIP</p>
+                            <p class="text-sm font-black text-teal-700">${planAmount}</p>
+                            ${planDuration}
                         </div>
                     </div>`;
             }

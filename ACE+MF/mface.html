@@ -681,7 +681,7 @@
                                 <thead class="bg-emerald-50/50">
                                     <tr>
                                         <th class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">Age</th>
-                                        <th class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">ACE Additions</th>
+                                        <th id="swpAceAdditionsHeader" class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">ACE Additions</th>
                                         <th class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">Monthly Income</th>
                                         <th class="px-6 py-4 text-[12px] font-black text-emerald-700 uppercase">Annual Withdrawal</th>
                                         <th class="px-6 py-4 text-right text-[12px] font-black text-emerald-700 uppercase">Remaining Corpus (₹)</th>
@@ -1681,6 +1681,8 @@
             const aceIncome = options.aceIncome || 0;
             const aceMaturityAmount = options.aceMaturityAmount || 0;
             const termEndAge = options.termEndAge || 0;
+            const showAceAdditionsColumn = earlyStart;
+            document.getElementById('swpAceAdditionsHeader')?.classList.toggle('hidden', !showAceAdditionsColumn);
 
             let corpus = peakCorpus;
             let annualWithdrawal = peakCorpus * swpRate;
@@ -1717,9 +1719,9 @@
                 swpHtml += `
                     <tr class="border-b border-emerald-50">
                         <td class="px-6 py-4 text-sm font-black text-center text-slate-800">${age}</td>
-                        <td class="px-6 py-4 text-sm font-bold text-center text-emerald-600">
+                        ${showAceAdditionsColumn ? `<td class="px-6 py-4 text-sm font-bold text-center text-emerald-600">
                             ${aceAdditionDisplay}
-                        </td>
+                        </td>` : ''}
                         <td class="px-6 py-4 text-sm font-bold text-center text-blue-600">
                             ₹${Math.round(annualWithdrawal / 12).toLocaleString('en-IN')}
                         </td>
