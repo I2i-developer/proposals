@@ -100,7 +100,25 @@
                 </div>
             </div>
 
-            <div onclick="navigateTo('swp')" class="proposal-card order-2 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+            <div onclick="navigateTo('sif')" class="proposal-card order-2 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="icon-box w-16 h-16 bg-teal-50 text-teal-700 rounded-2xl flex items-center justify-center group-hover:bg-teal-700 group-hover:text-white">
+                        <i class="fa-solid fa-gem text-3xl"></i>
+                    </div>
+                    <span class="bg-teal-50 text-teal-700 text-[12px] font-bold px-3 py-2 mt-5 rounded-full uppercase tracking-wider">High Conviction</span>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-3 tracking-tight">SIF</h3>
+                <p class="text-slate-500 mb-8 leading-relaxed">Specialised Investment Fund proposal for lumpsum and SIP allocation, high-alpha positioning, growth projection, and optional SWP planning.</p>
+
+                <div class="pt-6 border-t border-slate-50 flex justify-between items-center">
+                    <span class="text-base font-medium text-slate-400">Setup time: ~3 mins</span>
+                    <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-teal-700 group-hover:text-white transition-all">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div onclick="navigateTo('swp')" class="proposal-card order-7 bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-5 transition-all duration-300 group cursor-pointer">
                 <div class="flex justify-between items-start mb-8">
                     <div class="icon-box w-16 h-16 bg-fuchsia-50 text-fuchsia-600 rounded-2xl flex items-center justify-center group-hover:bg-fuchsia-600 group-hover:text-white transition-all duration-300">
                         <!-- <i class="fa-solid fa-calendar-check text-3xl"></i> -->
@@ -219,6 +237,8 @@
             setTimeout(() => {
                 if (type === 'mf') {
                     window.location.href = 'Mutual funds/mf.html';
+                } else if (type === 'sif') {
+                    window.location.href = 'SIF/sif.html';
                 } else if (type === 'swp') {
                     window.location.href = 'Systematic Withdrawal/swp.html';
                 } else if (type === 'child') {

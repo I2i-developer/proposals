@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIF Proposal Builder | Ideas2Invest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .input-sidebar { height: calc(100vh - 64px); background: #ffffff; }
+        .preview-area {
+            height: calc(100vh - 64px);
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 25mm 20mm;
+            background: white;
+            margin: 40px auto;
+            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        .floating-input {
+            transition: all 0.2s ease;
+            border: 1.5px solid #e2e8f0;
+        }
+        .floating-input:focus {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .preview-area { background: white; overflow: visible; height: auto; }
+            .a4-container { margin: 0; box-shadow: none; width: 100%; padding: 15mm; }
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+    <nav class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-8 z-50 relative no-print">
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='../index.html'" class="text-slate-400 hover:text-teal-700 transition-colors">
+                <i class="fa fa-home fa-sm mr-1"></i> Dashboard
+            </button>
+            <div class="h-4 w-[1px] bg-slate-300"></div>
+            <h1 class="font-bold text-slate-700 uppercase text-xs tracking-widest">SIF Proposal / <span class="text-teal-700">Draft #Ideas2invest</span></h1>
+        </div>
+        <button onclick="window.print()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-teal-700 transition-all shadow-lg shadow-slate-200">
+            <i class="fas fa-download mr-2 text-xs"></i> Export PDF
+        </button>
+    </nav>
+
+    <div class="flex">
+        <aside class="w-[400px] input-sidebar no-print p-8 overflow-y-auto shadow-2xl z-40">
+            <section class="mb-10">
+                <h3 class="text-sm font-black text-teal-700 uppercase tracking-widest mb-6">1. Client Profile</h3>
+                <div class="space-y-5">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Client Name</label>
+                        <input type="text" id="clientName" oninput="runLogic()" value="Aditya Vikram" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Current Age</label>
+                            <input type="number" id="currentAge" min="1" max="100" oninput="runLogic()" value="35" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Investment Horizon</label>
+                            <input type="number" id="horizonYears" min="1" max="80" oninput="runLogic()" value="15" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10">
+                <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-6">2. SIF Allocation</h3>
+                <div class="space-y-5">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">SIF Product Name</label>
+                        <input type="text" id="sifName" oninput="runLogic()" value="Magnum Equity Ex Top 100 (SIF)" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Initial Lumpsum Investment (₹)</label>
+                        <input type="number" id="lumpsumAmount" min="0" step="50000" oninput="updateAmountWords(); runLogic()" value="1000000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <p id="lumpsumWords" class="mt-1 ml-1 text-[11px] font-semibold text-emerald-600 leading-snug"></p>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Monthly SIP Amount (₹)</label>
+                        <input type="number" id="sipAmount" min="0" step="5000" oninput="updateAmountWords(); runLogic()" value="25000" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <p id="sipWords" class="mt-1 ml-1 text-[11px] font-semibold text-emerald-600 leading-snug"></p>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">SIP Duration (Years)</label>
+                        <input type="number" id="sipDuration" min="1" max="80" oninput="runLogic()" value="15" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
+                        <p class="mt-1 ml-1 text-[11px] font-semibold text-slate-400 leading-snug">SIP can continue for part or all of the accumulation phase.</p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Additional Lumpsums</label>
+                            <button onclick="addLumpsumRow()" class="bg-emerald-100 text-emerald-700 p-2 rounded-xl hover:bg-emerald-200 text-[11px] font-black uppercase flex items-center gap-1">
+                                <i class="fas fa-plus-circle"></i> Add Lumpsum
+                            </button>
+                        </div>
+                        <div id="additionalLumpsumRows" class="space-y-2"></div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Return Expectation (% p.a.)</label>
+                        <input type="range" id="returnRate" oninput="runLogic()" min="8" max="24" step="0.5" value="14" class="w-full mt-2 accent-teal-700">
+                        <div class="flex justify-between text-[12px] font-bold text-slate-400 mt-1">
+                            <span>8% Conservative</span>
+                            <span class="text-teal-700 text-base" id="returnRateValue">14%</span>
+                            <span>24% High Alpha</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10 border-t border-slate-200 pt-8">
+                <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-2xl mb-6 border border-emerald-100">
+                    <div>
+                        <p class="text-[14px] font-black text-emerald-700 uppercase">Enable SWP Phase</p>
+                        <p class="text-[13px] text-emerald-600">Plan withdrawals after accumulation</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="swpEnabled" class="sr-only peer" onchange="runLogic()">
+                        <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+                <div id="swpInputs" class="hidden space-y-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase">Withdrawal Start Age</label>
+                        <input type="number" id="retireAge" value="60" min="1" max="100" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase">SWP Duration</label>
+                            <input type="number" id="swpDuration" value="25" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Initial Rate (%)</label>
+                            <input type="number" id="swpRate" value="8" min="0" step="0.5" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase">Step-up Rate %</label>
+                            <input type="number" id="swpStepRate" value="5" min="0" step="0.5" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase">Step-up Interval</label>
+                            <input type="number" id="swpStepInterval" value="5" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1" oninput="runLogic()">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </aside>
+
+        <main class="flex-1 preview-area">
+            <div class="a4-container" id="capture">
+                <div class="flex justify-between items-start mb-12">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 leading-tight mb-5">Specialised Investment Fund <br>& Wealth Projection</h2>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Specially Prepared For</p>
+                        <p class="text-lg font-bold text-slate-800" id="pClientName">Aditya Vikram</p>
+                    </div>
+                    <div class="text-right">
+                        <img src="https://www.ideas2invest.com/assets/images/logo/logo.png" alt="Ideas2invest Logo" class="w-40 mb-6">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-8 mb-10 pb-10 border-b border-slate-100">
+                    <div class="col-span-7">
+                        <h4 class="text-[13px] font-black text-blue-600 uppercase tracking-[0.2em] mb-3">Executive Summary</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                            Dear <span id="introName" class="font-bold text-slate-800 underline decoration-blue-200">Aditya Vikram</span>,
+                            this proposal outlines a strategic roadmap designed to participate in high-conviction SIF opportunities.
+                            By leveraging a disciplined <span id="introMethod" class="font-bold text-slate-800 uppercase text-[12px]">Lumpsum + SIP</span>
+                            approach into <span id="introSifName" class="font-bold text-slate-800">Magnum Equity Ex Top 100 (SIF)</span>,
+                            we aim to harness long-term equity compounding over a
+                            <span id="introDuration" class="font-bold text-slate-800">15-year</span> horizon.
+                        </p>
+                        <div class="mt-6 p-5 bg-blue-50/30 border-l-4 border-blue-600 rounded-r-2xl">
+                            <p id="introQuote" class="text-slate-600 text-[13px] leading-relaxed italic font-medium"></p>
+                        </div>
+                    </div>
+
+                    <div class="col-span-5 bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
+                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-5">Financial Roadmap Summary</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 font-medium">Risk Profile</span>
+                                <span id="riskBadge" class="text-[9px] font-black px-2 py-0.5 rounded transition-all duration-500 uppercase">High Risk</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 font-medium">Strategy</span>
+                                <span id="strategyLabel" class="text-xs font-bold text-slate-700 uppercase">High Alpha SIF</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 font-medium">Planning Horizon</span>
+                                <span id="summaryHorizon" class="text-xs font-bold text-slate-700">15 Years</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 font-medium">Wealth Multiplier</span>
+                                <span id="wealthMultiplier" class="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">1.0x</span>
+                            </div>
+
+                            <div class="pt-3 mt-3 border-t border-slate-200 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Target Maturity</p>
+                                    <span class="text-sm font-black text-blue-600" id="targetYear">2041</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Projected ROI</p>
+                                    <span class="text-sm font-black text-slate-700" id="summaryReturn">14%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-12">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="h-[2px] w-8 bg-teal-700"></div>
+                        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Core SIF Positioning</h4>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="p-5 rounded-2xl bg-teal-50 border border-teal-100">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-teal-700 mb-2">Like PMS, Easier Access</p>
+                            <p class="text-[12px] text-slate-600 leading-relaxed font-medium">A focused equity strategy with the convenience and structure of a mutual fund.</p>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-blue-50 border border-blue-100">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-blue-700 mb-2">Looks Beyond Top 100</p>
+                            <p class="text-[12px] text-slate-600 leading-relaxed font-medium">The fund searches for growing businesses outside the usual large-company basket.</p>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-100">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-emerald-700 mb-2">Stock Merit First</p>
+                            <p class="text-[12px] text-slate-600 leading-relaxed font-medium">Stocks are selected for their own potential, not because they carry index weight.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-12">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="h-[2px] w-8 bg-emerald-600"></div>
+                        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Recommended SIF Allocation</h4>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4" id="fundListDisplay"></div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-10">
+                    <div class="stat-card p-6 rounded-2xl">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Investment</p>
+                        <p class="text-xl font-black text-slate-800" id="pInvestment">₹0</p>
+                    </div>
+                    <div class="stat-card p-6 rounded-2xl border-teal-100 bg-teal-50/30">
+                        <p class="text-[10px] font-bold text-teal-500 uppercase tracking-widest mb-1">Projected Corpus</p>
+                        <p class="text-xl font-black text-teal-700" id="pCorpus">₹0</p>
+                    </div>
+                    <div class="stat-card p-6 rounded-2xl border-emerald-100 bg-emerald-50/30">
+                        <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Estimated Gain</p>
+                        <p class="text-xl font-black text-emerald-700" id="pGain">₹0</p>
+                    </div>
+                </div>
+
+                <div class="space-y-10 mb-12">
+                    <div class="bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Growth Projection</h4>
+                                <p class="text-xl font-bold text-slate-800">Investment vs Growth</p>
+                            </div>
+                            <span class="text-[10px] bg-teal-50 text-teal-700 font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">Value Build-Up</span>
+                        </div>
+                        <div class="w-full" style="height: 350px;">
+                            <canvas id="buildUpChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-8">
+                        <div class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
+                            <div class="mb-6">
+                                <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Contribution Mix</h4>
+                                <p class="text-lg font-bold text-slate-800">SIP vs Lumpsum Split</p>
+                            </div>
+                            <div class="w-full" style="height: 280px;">
+                                <canvas id="mixChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl border border-slate-100 shadow-sm max-w-none w-full mb-12">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-900 text-[10px] text-white uppercase tracking-widest text-center">
+                                <th class="px-6 py-4 font-black">Age</th>
+                                <th class="px-6 py-4 font-black">Opening Corpus</th>
+                                <th class="px-6 py-4 font-black">Investment</th>
+                                <th class="px-6 py-4 font-black">Growth</th>
+                                <th class="px-6 py-4 font-black text-right">Year-End Corpus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectionTable" class="text-xs text-slate-600"></tbody>
+                    </table>
+                </div>
+
+                <div id="swpSection" class="hidden mb-12 bg-emerald-50/30 border border-emerald-100 rounded-[32px] p-8">
+                    <div class="flex justify-between items-end mb-8">
+                        <div>
+                            <h4 class="text-[11px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-2">Distribution Phase</h4>
+                            <p class="text-2xl font-bold text-slate-800">Systematic Withdrawal Plan</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Corpus at SWP Start</p>
+                            <p class="text-xl font-black text-emerald-600" id="swpStartCorpus">₹0</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-50">
+                            <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">Starting Annual Withdrawal</p>
+                            <p class="text-lg font-black text-slate-800" id="swpStartWithdrawal">₹0</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-50">
+                            <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">Total Withdrawal Received</p>
+                            <p class="text-lg font-black text-blue-700" id="swpTotalPaid">₹0</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-50">
+                            <p class="text-[11px] font-bold text-slate-400 uppercase mb-1">Final Corpus Remaining</p>
+                            <p class="text-lg font-black text-emerald-500" id="swpFinalCorpus">₹0</p>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden rounded-2xl border border-emerald-100 shadow-sm">
+                        <table class="w-full text-left border-collapse bg-white">
+                            <thead class="bg-emerald-50/50">
+                                <tr>
+                                    <th class="px-6 py-4 text-[10px] font-black text-emerald-700 uppercase">Age</th>
+                                    <th class="px-6 py-4 text-[10px] font-black text-emerald-700 uppercase">Monthly Income</th>
+                                    <th class="px-6 py-4 text-[10px] font-black text-emerald-700 uppercase">Annual Withdrawal</th>
+                                    <th class="px-6 py-4 text-right text-[10px] font-black text-emerald-700 uppercase">Remaining Corpus</th>
+                                </tr>
+                            </thead>
+                            <tbody id="swpTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <section id="summarySection" class="mt-8">
+                    <h3 class="mx-auto w-fit bg-teal-100 px-6 py-1 rounded-full text-center text-[13px] font-black text-teal-700 uppercase tracking-[0.3em] mb-6">Executive Summary</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="p-6 rounded-3xl bg-slate-50/50 border border-teal-200 shadow-md">
+                            <p class="text-base font-bold text-teal-700 mb-6">Phase I: Wealth Creation</p>
+                            <div class="space-y-5">
+                                <div>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total SIF Investment</p>
+                                    <p class="text-2xl font-black text-slate-900" id="summaryInvestment">₹0</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Corpus at Age <span id="summaryCorpusAge">50</span></p>
+                                    <p class="text-2xl font-black text-teal-700" id="summaryCorpus">₹0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 rounded-3xl bg-emerald-50/30 border border-emerald-300/50 shadow-md">
+                            <p class="text-base font-bold text-emerald-700 mb-6">Phase II: Optional Income</p>
+                            <div class="space-y-5">
+                                <div>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total Withdrawal</p>
+                                    <p class="text-2xl font-black text-slate-900" id="summaryWithdrawal">₹0</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Final Wealth Value</p>
+                                    <p class="text-2xl font-black text-emerald-600" id="summaryFinalWealth">₹0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let mixChart = null;
+        let buildUpChart = null;
+
+        function formatIndianCurrency(value) {
+            return Math.round(value || 0).toLocaleString('en-IN');
+        }
+
+        function formatCurrency(value) {
+            return '₹' + formatIndianCurrency(value);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function numberToIndianWords(num) {
+            const value = Math.round(parseFloat(num) || 0);
+            if (value <= 0) return '';
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            function twoDigitWords(n) {
+                if (n < 20) return ones[n];
+                return (tens[Math.floor(n / 10)] + ' ' + ones[n % 10]).trim();
+            }
+            function threeDigitWords(n) {
+                const hundred = Math.floor(n / 100);
+                const rest = n % 100;
+                const parts = [];
+                if (hundred) parts.push(ones[hundred] + ' Hundred');
+                if (rest) parts.push(twoDigitWords(rest));
+                return parts.join(' ');
+            }
+            const crore = Math.floor(value / 10000000);
+            const lakh = Math.floor((value % 10000000) / 100000);
+            const thousand = Math.floor((value % 100000) / 1000);
+            const hundred = value % 1000;
+            const parts = [];
+            if (crore) parts.push(threeDigitWords(crore) + ' Crore');
+            if (lakh) parts.push(threeDigitWords(lakh) + ' Lakh');
+            if (thousand) parts.push(threeDigitWords(thousand) + ' Thousand');
+            if (hundred) parts.push(threeDigitWords(hundred));
+            return parts.join(' ') + ' Rupees';
+        }
+
+        function updateAmountWords() {
+            const amountInput = document.getElementById('lumpsumAmount');
+            const words = document.getElementById('lumpsumWords');
+            if (amountInput && words) words.innerText = numberToIndianWords(amountInput.value);
+
+            const sipInput = document.getElementById('sipAmount');
+            const sipWords = document.getElementById('sipWords');
+            if (sipInput && sipWords) sipWords.innerText = numberToIndianWords(sipInput.value);
+
+            document.querySelectorAll('.additional-lumpsum-row').forEach(function(row) {
+                const input = row.querySelector('.additional-lumpsum-amount');
+                const output = row.querySelector('.additional-lumpsum-words');
+                if (input && output) output.innerText = numberToIndianWords(input.value);
+            });
+        }
+
+        function addLumpsumRow() {
+            const container = document.getElementById('additionalLumpsumRows');
+            const row = document.createElement('div');
+            row.className = 'additional-lumpsum-row grid grid-cols-12 gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100';
+            row.innerHTML = `
+                <input type="number" placeholder="Age" min="1" max="100" class="additional-lumpsum-age floating-input col-span-3 rounded-xl px-3 py-2 text-sm outline-none bg-white" oninput="runLogic()" value="40">
+                <input type="text" placeholder="Fund Name" class="additional-lumpsum-fund floating-input col-span-8 rounded-xl px-3 py-2 text-sm outline-none bg-white" oninput="runLogic()" value="Magnum Equity Ex Top 100 (SIF)">
+                <div class="col-span-11">
+                    <input type="number" placeholder="Amount (₹)" min="0" class="additional-lumpsum-amount floating-input w-full rounded-xl px-3 py-2 text-sm outline-none bg-white" oninput="updateAmountWords(); runLogic()" value="500000">
+                    <p class="additional-lumpsum-words mt-1 px-1 text-[10px] font-semibold text-emerald-600 leading-snug"></p>
+                </div>
+                <button onclick="this.parentElement.remove(); runLogic()" class="col-span-1 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                    <i class="fa fa-trash text-sm"></i>
+                </button>`;
+            container.appendChild(row);
+            updateAmountWords();
+            runLogic();
+        }
+
+        function clampInput(id, min, max) {
+            const input = document.getElementById(id);
+            const value = parseInt(input.value);
+            const fallback = min;
+            const clamped = Math.min(Math.max(Number.isNaN(value) ? fallback : value, min), max);
+            input.value = clamped;
+            return clamped;
+        }
+
+        function runLogic() {
+            const clientName = document.getElementById('clientName').value || 'Valuable Client';
+            const sifName = document.getElementById('sifName').value || 'Magnum Equity Ex Top 100 (SIF)';
+            const currentAge = clampInput('currentAge', 1, 100);
+            const horizonYears = clampInput('horizonYears', 1, 80);
+            const lumpsum = Math.max(0, parseFloat(document.getElementById('lumpsumAmount').value) || 0);
+            const monthlySip = Math.max(0, parseFloat(document.getElementById('sipAmount').value) || 0);
+            const rawSipDuration = clampInput('sipDuration', 1, 80);
+            const returnRate = parseFloat(document.getElementById('returnRate').value) || 14;
+            const annualRate = returnRate / 100;
+            const monthlyRate = annualRate / 12;
+            const swpEnabled = document.getElementById('swpEnabled').checked;
+            const retireAgeInput = parseInt(document.getElementById('retireAge').value) || (currentAge + horizonYears);
+            const retireAge = Math.max(currentAge + 1, retireAgeInput);
+            const accumulationYears = swpEnabled ? Math.max(1, retireAge - currentAge) : horizonYears;
+            const sipDuration = Math.min(rawSipDuration, accumulationYears);
+            if (parseInt(document.getElementById('sipDuration').value) !== sipDuration) {
+                document.getElementById('sipDuration').value = sipDuration;
+            }
+            const additionalLumpsums = [];
+            document.querySelectorAll('.additional-lumpsum-row').forEach(function(row) {
+                const age = parseInt(row.querySelector('.additional-lumpsum-age')?.value);
+                const amount = parseFloat(row.querySelector('.additional-lumpsum-amount')?.value) || 0;
+                const fundName = row.querySelector('.additional-lumpsum-fund')?.value.trim() || sifName;
+                if (!Number.isNaN(age) && amount > 0) {
+                    additionalLumpsums.push({ age, amount, fundName });
+                }
+            });
+
+            document.getElementById('swpInputs').classList.toggle('hidden', !swpEnabled);
+            document.getElementById('swpSection').classList.toggle('hidden', !swpEnabled);
+            document.getElementById('returnRateValue').innerText = returnRate + '%';
+            document.getElementById('summaryReturn').innerText = returnRate + '%';
+            document.getElementById('summaryHorizon').innerText = accumulationYears + ' Years';
+            document.getElementById('targetYear').innerText = new Date().getFullYear() + accumulationYears;
+            document.getElementById('pClientName').innerText = clientName;
+            document.getElementById('introName').innerText = clientName;
+            document.getElementById('introSifName').innerText = sifName;
+            document.getElementById('introDuration').innerText = accumulationYears + '-year';
+            const introMethod = document.getElementById('introMethod');
+            if (introMethod) {
+                if (lumpsum > 0 && monthlySip > 0) introMethod.innerText = 'Lumpsum + SIP';
+                else if (monthlySip > 0) introMethod.innerText = 'SIP';
+                else introMethod.innerText = 'Lumpsum';
+            }
+            const introQuote = document.getElementById('introQuote');
+            if (introQuote) {
+                introQuote.innerHTML = `"This proposal positions <span class="text-teal-700 font-bold">${escapeHtml(sifName)}</span> as a focused route to access emerging Indian businesses through a PMS-style strategy in a mutual fund format."`;
+            }
+
+            const riskBadge = document.getElementById('riskBadge');
+            if (returnRate > 16) {
+                riskBadge.innerText = 'HIGH RISK';
+                riskBadge.className = 'text-[10px] font-black px-2 py-1 rounded bg-red-50 text-red-600';
+            } else if (returnRate > 11) {
+                riskBadge.innerText = 'MODERATE-HIGH';
+                riskBadge.className = 'text-[10px] font-black px-2 py-1 rounded bg-orange-50 text-orange-600';
+            } else {
+                riskBadge.innerText = 'CONSERVATIVE';
+                riskBadge.className = 'text-[10px] font-black px-2 py-1 rounded bg-emerald-50 text-emerald-600';
+            }
+
+            let corpus = lumpsum;
+            let totalInvested = lumpsum;
+            let totalSipInvested = 0;
+            let totalAdditionalLumpsum = 0;
+            const labels = [];
+            const investedData = [];
+            const gainData = [];
+            let tableHtml = '';
+
+            for (let year = 1; year <= accumulationYears; year++) {
+                const age = currentAge + year - 1;
+                const openingCorpus = corpus;
+                const yearlyLumpsumItems = additionalLumpsums.filter(item => item.age === age);
+                const yearlyLumpsum = yearlyLumpsumItems.reduce((sum, item) => sum + item.amount, 0);
+                if (yearlyLumpsum > 0) {
+                    corpus += yearlyLumpsum;
+                    totalInvested += yearlyLumpsum;
+                    totalAdditionalLumpsum += yearlyLumpsum;
+                }
+
+                let annualSipInvested = 0;
+                if (year <= sipDuration) {
+                    for (let month = 1; month <= 12; month++) {
+                        corpus += monthlySip;
+                        annualSipInvested += monthlySip;
+                        totalSipInvested += monthlySip;
+                        totalInvested += monthlySip;
+                        corpus *= (1 + monthlyRate);
+                    }
+                } else {
+                    for (let month = 1; month <= 12; month++) {
+                        corpus *= (1 + monthlyRate);
+                    }
+                }
+
+                const yearlyInvestment = yearlyLumpsum + annualSipInvested;
+                const growth = corpus - openingCorpus - yearlyInvestment;
+                const cumulativeGain = corpus - totalInvested;
+                const investmentDetails = [];
+                if (annualSipInvested > 0) {
+                    investmentDetails.push(`<div class="text-[10px] text-blue-600 font-black uppercase mt-1">SIP: ${formatCurrency(annualSipInvested)}</div>`);
+                }
+                yearlyLumpsumItems.forEach(function(item) {
+                    investmentDetails.push(`
+                        <div class="mt-1 rounded-lg bg-emerald-50 px-2 py-1 text-left">
+                            <p class="text-[10px] font-black uppercase text-emerald-700">${escapeHtml(item.fundName)}</p>
+                            <p class="text-[11px] font-bold text-slate-700">${formatCurrency(item.amount)} Lumpsum</p>
+                        </div>`);
+                });
+                labels.push('Age ' + age);
+                investedData.push(Math.round(totalInvested));
+                gainData.push(Math.max(0, Math.round(cumulativeGain)));
+                tableHtml += `
+                    <tr class="border-b border-slate-50 hover:bg-teal-50/50 transition-colors text-sm text-center">
+                        <td class="px-6 py-4 font-bold text-slate-900">${age} yrs</td>
+                        <td class="px-6 py-4 font-bold text-slate-500">${formatCurrency(openingCorpus)}</td>
+                        <td class="px-6 py-4 font-bold text-slate-700">
+                            ${formatCurrency(yearlyInvestment)}
+                            ${investmentDetails.join('')}
+                        </td>
+                        <td class="px-6 py-4 font-bold text-emerald-600">${formatCurrency(growth)}</td>
+                        <td class="px-6 py-4 text-right font-black text-teal-700">${formatCurrency(corpus)}</td>
+                    </tr>`;
+            }
+
+            const gain = corpus - totalInvested;
+            renderFundList(sifName, lumpsum, monthlySip, sipDuration, additionalLumpsums);
+            document.getElementById('projectionTable').innerHTML = tableHtml;
+            document.getElementById('pInvestment').innerText = formatCurrency(totalInvested);
+            document.getElementById('pCorpus').innerText = formatCurrency(corpus);
+            document.getElementById('pGain').innerText = formatCurrency(gain);
+            document.getElementById('summaryInvestment').innerText = formatCurrency(totalInvested);
+            document.getElementById('summaryCorpus').innerText = formatCurrency(corpus);
+            document.getElementById('summaryCorpusAge').innerText = currentAge + accumulationYears;
+
+            const multiplier = totalInvested > 0 ? (corpus / totalInvested).toFixed(2) : '0.00';
+            const multiplierElement = document.getElementById('wealthMultiplier');
+            multiplierElement.innerText = multiplier + 'x';
+            if (parseFloat(multiplier) >= 3) {
+                multiplierElement.className = 'text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded';
+            } else if (parseFloat(multiplier) >= 2) {
+                multiplierElement.className = 'text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded';
+            } else {
+                multiplierElement.className = 'text-[11px] font-black text-slate-600 bg-slate-50 px-2 py-0.5 rounded';
+            }
+
+            let swpSummary = { totalPaidOut: 0, finalCorpus: corpus };
+            if (swpEnabled) {
+                swpSummary = calculateSWP(corpus, retireAge, returnRate);
+            } else {
+                document.getElementById('summaryWithdrawal').innerText = formatCurrency(0);
+            }
+
+            document.getElementById('summaryFinalWealth').innerText = formatCurrency(swpEnabled ? swpSummary.totalPaidOut + swpSummary.finalCorpus : corpus);
+            renderMixChart(lumpsum, totalSipInvested, totalAdditionalLumpsum);
+            renderBuildUpChart(labels, investedData, gainData);
+        }
+
+        function calculateSWP(startCorpus, startAge, growthRate) {
+            const duration = Math.max(1, parseInt(document.getElementById('swpDuration').value) || 25);
+            const swpRate = (parseFloat(document.getElementById('swpRate').value) || 8) / 100;
+            const stepRate = (parseFloat(document.getElementById('swpStepRate').value) || 0) / 100;
+            const interval = Math.max(1, parseInt(document.getElementById('swpStepInterval').value) || 5);
+            const annualGrowth = growthRate / 100;
+            let corpus = startCorpus;
+            let annualWithdrawal = startCorpus * swpRate;
+            let totalPaidOut = 0;
+            let tableHtml = '';
+
+            for (let year = 1; year <= duration; year++) {
+                const age = startAge + year - 1;
+                if (year > 1 && stepRate > 0 && (year - 1) % interval === 0) {
+                    annualWithdrawal *= (1 + stepRate);
+                }
+                totalPaidOut += annualWithdrawal;
+                corpus = Math.max(0, (corpus - annualWithdrawal) * (1 + annualGrowth));
+                tableHtml += `
+                    <tr class="border-b border-emerald-50 text-sm hover:bg-emerald-50/50">
+                        <td class="px-6 py-3 font-bold text-slate-900">${age} yrs</td>
+                        <td class="px-6 py-3 text-emerald-700 font-bold">${formatCurrency(annualWithdrawal / 12)}</td>
+                        <td class="px-6 py-3 font-bold text-slate-500">${formatCurrency(annualWithdrawal)}</td>
+                        <td class="px-6 py-3 text-right font-black text-slate-700">${formatCurrency(corpus)}</td>
+                    </tr>`;
+                if (corpus <= 0) break;
+            }
+
+            document.getElementById('swpTable').innerHTML = tableHtml;
+            document.getElementById('swpStartCorpus').innerText = formatCurrency(startCorpus);
+            document.getElementById('swpStartWithdrawal').innerText = formatCurrency(startCorpus * swpRate);
+            document.getElementById('swpTotalPaid').innerText = formatCurrency(totalPaidOut);
+            document.getElementById('swpFinalCorpus').innerText = formatCurrency(corpus);
+            document.getElementById('summaryWithdrawal').innerText = formatCurrency(totalPaidOut);
+            return { totalPaidOut, finalCorpus: corpus };
+        }
+
+        function renderFundList(sifName, initialLumpsum, monthlySip, sipDuration, additionalLumpsums) {
+            const container = document.getElementById('fundListDisplay');
+            if (!container) return;
+
+            let html = '';
+            if (initialLumpsum > 0 || monthlySip > 0) {
+                html += `
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-teal-700">
+                                <i class="fa fa-layer-group text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">${escapeHtml(sifName)}</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[9px] bg-teal-600 text-white px-1.5 py-0.5 rounded-sm font-black uppercase tracking-widest">SIF</span>
+                                    <p class="text-[10px] text-slate-700 font-medium uppercase tracking-normal">Primary Allocation</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Plan</p>
+                            <p class="text-sm font-black text-teal-700">${formatCurrency(initialLumpsum)} + ${formatCurrency(monthlySip)}/mo</p>
+                            <p class="text-[10px] font-bold text-slate-400">${sipDuration} year SIP</p>
+                        </div>
+                    </div>`;
+            }
+
+            additionalLumpsums.forEach(function(item) {
+                html += `
+                    <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-emerald-700">
+                                <i class="fa fa-plus text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">${escapeHtml(item.fundName)}</p>
+                                <p class="text-[10px] text-slate-700 font-medium uppercase tracking-normal">Additional Lumpsum at Age ${item.age}</p>
+                            </div>
+                        </div>
+                        <p class="text-sm font-black text-emerald-700">${formatCurrency(item.amount)}</p>
+                    </div>`;
+            });
+
+            container.innerHTML = html || '<div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-center text-sm font-bold text-slate-400">No SIF allocation selected</div>';
+        }
+
+        function renderMixChart(initialLumpsum, sipTotal, additionalLumpsumTotal) {
+            const canvas = document.getElementById('mixChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (mixChart) mixChart.destroy();
+            mixChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Initial Lumpsum', 'SIP Investment', 'Additional Lumpsums'],
+                    datasets: [{
+                        data: [initialLumpsum, sipTotal, additionalLumpsumTotal],
+                        backgroundColor: ['#0f766e', '#2563eb', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 16
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, padding: 16, font: { size: 11, weight: 'bold' } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.label}: ${formatCurrency(context.parsed)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderBuildUpChart(labels, investedData, gainData) {
+            const canvas = document.getElementById('buildUpChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (buildUpChart) buildUpChart.destroy();
+            buildUpChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Total Investment',
+                            data: investedData,
+                            backgroundColor: '#0f766e'
+                        },
+                        {
+                            label: 'Growth',
+                            data: gainData,
+                            backgroundColor: '#10b981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { maxTicksLimit: 6 } },
+                        y: {
+                            stacked: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 10000000) return '₹' + (value / 10000000).toFixed(1) + ' Cr';
+                                    if (value >= 100000) return '₹' + (value / 100000).toFixed(1) + ' L';
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, padding: 16, font: { size: 11, weight: 'bold' } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.dataset.label}: ${formatCurrency(context.raw)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            updateAmountWords();
+            runLogic();
+        };
+    </script>
+</body>
+</html>
