@@ -234,7 +234,7 @@
                     </div>
                 </div>
 
-                <div class="mb-12 rounded-[32px] bg-slate-900 p-8 text-white shadow-xl">
+                <div class="mb-12 rounded-[32px] bg-slate-900 p-8 pb-5 text-white shadow-xl">
                     <div class="flex items-center justify-between gap-6 mb-8">
                         <div>
                             <p class="text-[10px] font-black uppercase tracking-[0.35em] text-teal-300 mb-2">Core SIF Positioning</p>
@@ -245,21 +245,21 @@
                     <div class="grid grid-cols-3 divide-x divide-white/10 border-y border-white/10">
                         <div class="py-6 pr-6">
                             <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-400 text-slate-950 shadow-lg">
-                                <i class="fa fa-layer-group text-base"></i>
+                                <i class="fa-solid fa-crosshairs fa-lg" style="color: rgb(30, 48, 80);"></i>
                             </div>
                             <p class="text-[11px] font-black uppercase tracking-widest text-teal-200 mb-2">Focused Portfolio</p>
                             <p class="text-[12px] text-slate-300 leading-relaxed font-medium">A concentrated equity approach with mutual-fund convenience and PMS-style selectivity.</p>
                         </div>
                         <div class="py-6 px-6">
                             <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-400 text-slate-950 shadow-lg">
-                                <i class="fa fa-magnifying-glass-chart text-base"></i>
+                                <i class="fa-solid fa-gem fa-lg" style="color: rgb(30, 48, 80);"></i>
                             </div>
                             <p class="text-[11px] font-black uppercase tracking-widest text-blue-200 mb-2">Beyond Top 100</p>
                             <p class="text-[12px] text-slate-300 leading-relaxed font-medium">The strategy looks past the largest companies to find promising mid, small, and select micro-cap businesses.</p>
                         </div>
                         <div class="py-6 pl-6">
                             <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400 text-slate-950 shadow-lg">
-                                <i class="fa fa-bullseye text-base"></i>
+                                <i class="fa-solid fa-medal fa-lg" style="color: rgb(30, 48, 80);"></i>
                             </div>
                             <p class="text-[11px] font-black uppercase tracking-widest text-emerald-200 mb-2">Merit First</p>
                             <p class="text-[12px] text-slate-300 leading-relaxed font-medium">Every stock is selected for business potential, not simply because it holds benchmark weight.</p>
@@ -374,7 +374,7 @@
 
                 <section id="summarySection" class="mt-8 p-8 rounded-[40px] bg-white border-2 border-slate-600 text-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.15)]" style="break-before: page;">
                     <h3 class="mx-auto w-fit bg-teal-100 px-6 py-1 rounded-full text-center text-[13px] font-black text-teal-700 uppercase tracking-[0.3em] mb-6">Executive Summary</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div id="summaryPhaseGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="p-6 rounded-3xl bg-slate-50/50 border border-teal-200 shadow-md">
                             <p class="text-base font-bold text-teal-700 mb-6">Phase I: Wealth Creation</p>
                             <div class="space-y-5">
@@ -388,7 +388,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="p-6 rounded-3xl bg-emerald-50/30 border border-emerald-300/50 shadow-md">
+                        <div id="summaryOptionalIncomePhase" class="p-6 rounded-3xl bg-emerald-50/30 border border-emerald-300/50 shadow-md">
                             <p class="text-base font-bold text-emerald-700 mb-6">Phase II: Optional Income</p>
                             <div class="space-y-5">
                                 <div>
@@ -542,6 +542,9 @@
 
             document.getElementById('swpInputs').classList.toggle('hidden', !swpEnabled);
             document.getElementById('swpSection').classList.toggle('hidden', !swpEnabled);
+            document.getElementById('summaryOptionalIncomePhase')?.classList.toggle('hidden', !swpEnabled);
+            document.getElementById('summaryPhaseGrid')?.classList.toggle('md:grid-cols-2', swpEnabled);
+            document.getElementById('summaryPhaseGrid')?.classList.toggle('md:grid-cols-1', !swpEnabled);
             document.getElementById('returnRateValue').innerText = returnRate + '%';
             document.getElementById('summaryReturn').innerText = returnRate + '%';
             document.getElementById('summaryHorizon').innerText = accumulationYears + ' Years';
@@ -780,8 +783,9 @@
                     labels: ['Initial Lumpsum', 'SIP Investment', 'Additional Lumpsums'],
                     datasets: [{
                         data: [initialLumpsum, sipTotal, additionalLumpsumTotal],
-                        backgroundColor: ['#0f766e', '#2563eb', '#10b981'],
-                        borderWidth: 0,
+                        backgroundColor: ['#ff9933', '#2563eb', '#10b981'],
+                        // borderColor: '#000080',
+                        borderWidth: 2,
                         hoverOffset: 16
                     }]
                 },
@@ -817,12 +821,16 @@
                         {
                             label: 'Total Investment',
                             data: investedData,
-                            backgroundColor: '#0f766e'
+                            backgroundColor: '#2563eb',
+                            borderRadius: 8,
+                            borderSkipped: false
                         },
                         {
                             label: 'Growth',
                             data: gainData,
-                            backgroundColor: '#10b981'
+                            backgroundColor: '#10b981',
+                            borderRadius: 8,
+                            borderSkipped: false
                         }
                     ]
                 },
