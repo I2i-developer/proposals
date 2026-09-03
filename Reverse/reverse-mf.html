@@ -309,6 +309,13 @@
         return '₹ ' + formatIndianCurrency(num);
     }
 
+    function stripClientHonorific(name) {
+        return String(name || '')
+            .trim()
+            .replace(/^(mr|mrs|ms|miss|dr|shri|smt)\.?\s+/i, '')
+            .trim();
+    }
+
     function numberToIndianWords(num) {
         const value = Math.floor(Math.abs(Number(num) || 0));
         if (!value) return '';
@@ -617,13 +624,14 @@
     function updateCommonProposal(inputs, primaryText) {
         const duration = durationLabel(inputs);
         const clientName = document.getElementById('clientName').value.trim() || 'Client';
+        const inlineClientName = stripClientHonorific(clientName) || clientName;
         document.getElementById('targetWords').innerText = numberToIndianWords(inputs.target);
         document.getElementById('inflationInputWrap').classList.toggle('hidden', !inputs.inflationEnabled);
         document.getElementById('inflationResult').classList.toggle('hidden', !inputs.inflationEnabled);
         document.getElementById('inflatedTarget').innerText = money(inputs.adjustedTarget);
 
         document.getElementById('pClientName').innerText = clientName;
-        document.getElementById('pClientInline').innerText = clientName;
+        document.getElementById('pClientInline').innerText = inlineClientName;
         document.getElementById('pReturnText').innerText = (inputs.annualReturn * 100).toLocaleString('en-IN') + '%';
         document.getElementById('pReturnSmall').innerText = (inputs.annualReturn * 100).toLocaleString('en-IN') + '%';
         document.getElementById('pDurationText').innerText = duration;

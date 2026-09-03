@@ -129,14 +129,14 @@
             </section>
 
             <section class="mb-10 border-t border-slate-200 pt-8">
-                <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-2xl mb-6 border border-emerald-100">
+                <div class="flex items-center justify-between p-4 bg-amber-50 rounded-2xl mb-6 border border-amber-100">
                     <div>
-                        <p class="text-[14px] font-black text-emerald-700 uppercase">Enable SWP Phase</p>
-                        <p class="text-[13px] text-emerald-600">Plan withdrawals after accumulation</p>
+                        <p class="text-[14px] font-black text-amber-700 uppercase">Enable SWP Phase</p>
+                        <p class="text-[13px] text-amber-600">Plan withdrawals after accumulation</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="swpEnabled" class="sr-only peer" onchange="runLogic()">
-                        <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                     </label>
                 </div>
                 <div id="swpInputs" class="hidden space-y-4">
@@ -172,7 +172,7 @@
             <div class="a4-container" id="capture">
                 <div class="flex justify-between items-start mb-12">
                     <div>
-                        <h2 class="text-3xl font-extrabold text-slate-900 leading-tight mb-5">Specialised Investment Fund <br>& Wealth Projection</h2>
+                        <h2 class="text-3xl font-extrabold text-slate-900 leading-tight mb-5">Specialised Investment Fund <br> (SIF) & Wealth Projection</h2>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Specially Prepared For</p>
                         <p class="text-lg font-bold text-slate-800" id="pClientName">Aditya Vikram</p>
                     </div>
@@ -322,8 +322,8 @@
                         <thead>
                             <tr class="bg-slate-900 text-[10px] text-white uppercase tracking-widest text-center">
                                 <th class="px-6 py-4 font-black">Age</th>
-                                <th class="px-6 py-4 font-black">Opening Corpus</th>
-                                <th class="px-6 py-4 font-black">Investment</th>
+                                <th class="px-6 py-4 font-black">SIF Investment</th>
+                                <th class="px-6 py-4 font-black">SIP / Lumpsum Investment</th>
                                 <th class="px-6 py-4 font-black">Growth</th>
                                 <th class="px-6 py-4 font-black text-right">Year-End Corpus</th>
                             </tr>
@@ -379,7 +379,7 @@
                             <p class="text-base font-bold text-teal-700 mb-6">Phase I: Wealth Creation</p>
                             <div class="space-y-5">
                                 <div>
-                                    <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total SIF Investment</p>
+                                    <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total Investment</p>
                                     <p class="text-2xl font-black text-slate-900" id="summaryInvestment">₹0</p>
                                 </div>
                                 <div>
@@ -389,7 +389,7 @@
                             </div>
                         </div>
                         <div id="summaryOptionalIncomePhase" class="p-6 rounded-3xl bg-emerald-50/30 border border-emerald-300/50 shadow-md">
-                            <p class="text-base font-bold text-emerald-700 mb-6">Phase II: Optional Income</p>
+                            <p class="text-base font-bold text-emerald-700 mb-6">Phase II: Financial Freedom</p>
                             <div class="space-y-5">
                                 <div>
                                     <p class="text-[11px] uppercase text-slate-500 font-bold tracking-wider">Total Withdrawal</p>
@@ -407,9 +407,8 @@
                             Total Wealth Created (Age <span id="totalWealthAgeStart">30</span> - <span id="totalWealthAgeEnd">65</span>)
                         </p>
                         <p class="mt-3 text-3xl font-black text-white" id="totalWealthCreated">₹0</p>
-                        <p class="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                            Total SIF Investment:
-                            <span class="text-sm text-emerald-300" id="totalWealthInvestment">₹0</span>
+                        <p id="totalWealthContext" class="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                            Projected corpus at the end of accumulation
                         </p>
                     </div>
                 </section>
@@ -436,6 +435,13 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
+        }
+
+        function stripClientHonorific(name) {
+            return String(name || '')
+                .trim()
+                .replace(/^(mr|mrs|ms|miss|dr|shri|smt)\.?\s+/i, '')
+                .trim();
         }
 
         function numberToIndianWords(num) {
@@ -504,6 +510,7 @@
 
         function clampInput(id, min, max) {
             const input = document.getElementById(id);
+            if (!input || input.value.trim() === '') return min;
             const value = parseInt(input.value);
             const fallback = min;
             const clamped = Math.min(Math.max(Number.isNaN(value) ? fallback : value, min), max);
@@ -513,6 +520,7 @@
 
         function runLogic() {
             const clientName = document.getElementById('clientName').value || 'Valuable Client';
+            const greetingName = stripClientHonorific(clientName) || clientName;
             const sifName = document.getElementById('sifName').value || 'Magnum Equity Ex Top 100 (SIF)';
             const currentAge = clampInput('currentAge', 1, 100);
             const horizonYears = clampInput('horizonYears', 1, 80);
@@ -527,8 +535,9 @@
             const retireAge = Math.max(currentAge + 1, retireAgeInput);
             const accumulationYears = swpEnabled ? Math.max(1, retireAge - currentAge) : horizonYears;
             const sipDuration = monthlySip > 0 ? Math.min(rawSipDuration, accumulationYears) : 0;
-            if (monthlySip > 0 && parseInt(document.getElementById('sipDuration').value) !== sipDuration) {
-                document.getElementById('sipDuration').value = sipDuration;
+            const sipDurationInput = document.getElementById('sipDuration');
+            if (monthlySip > 0 && sipDurationInput.value.trim() !== '' && parseInt(sipDurationInput.value) !== sipDuration) {
+                sipDurationInput.value = sipDuration;
             }
             const additionalLumpsums = [];
             document.querySelectorAll('.additional-lumpsum-row').forEach(function(row) {
@@ -550,7 +559,7 @@
             document.getElementById('summaryHorizon').innerText = accumulationYears + ' Years';
             document.getElementById('targetYear').innerText = new Date().getFullYear() + accumulationYears;
             document.getElementById('pClientName').innerText = clientName;
-            document.getElementById('introName').innerText = clientName;
+            document.getElementById('introName').innerText = greetingName;
             document.getElementById('introSifName').innerText = sifName;
             document.getElementById('introDuration').innerText = accumulationYears + '-year';
             const introMethod = document.getElementById('introMethod');
@@ -669,10 +678,12 @@
                 document.getElementById('summaryWithdrawal').innerText = formatCurrency(0);
             }
 
-            document.getElementById('summaryFinalWealth').innerText = formatCurrency(swpEnabled ? swpSummary.totalPaidOut + swpSummary.finalCorpus : corpus);
+            document.getElementById('summaryFinalWealth').innerText = formatCurrency(swpEnabled ? swpSummary.finalCorpus : corpus);
             const totalWealthCreated = swpEnabled ? swpSummary.totalPaidOut + swpSummary.finalCorpus : corpus;
             document.getElementById('totalWealthCreated').innerText = formatCurrency(totalWealthCreated);
-            document.getElementById('totalWealthInvestment').innerText = formatCurrency(totalInvested);
+            document.getElementById('totalWealthContext').innerText = swpEnabled
+                ? 'Total withdrawal received + final wealth value'
+                : 'Projected corpus at the end of accumulation';
             document.getElementById('totalWealthAgeStart').innerText = currentAge;
             document.getElementById('totalWealthAgeEnd').innerText = swpEnabled
                 ? retireAge + (Math.max(1, parseInt(document.getElementById('swpDuration').value) || 25)) - 1

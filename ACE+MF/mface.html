@@ -815,6 +815,13 @@
             return "₹ " + Math.round(amount).toLocaleString('en-IN');
         }
 
+        function stripClientHonorific(name) {
+            return String(name || '')
+                .trim()
+                .replace(/^(mr|mrs|ms|miss|dr|shri|smt)\.?\s+/i, '')
+                .trim();
+        }
+
         function numberToIndianWords(num) {
             if (num === 0) return 'Zero';
             if (isNaN(num)) return '';
@@ -1338,6 +1345,7 @@
             try {
                 // 1. BASIC INPUTS
                 const name = document.getElementById('cName')?.value || "Valuable Client";
+                const greetingName = stripClientHonorific(name) || name;
                 const parsedAge = parseInt(document.getElementById('cAge')?.value);
                 const age = Number.isNaN(parsedAge) ? 30 : Math.max(0, parsedAge);
                 const projectionStartAge = Math.max(1, age);
@@ -1560,7 +1568,7 @@
                 const safeSet = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
 
                 safeSet('pName', name);
-                safeSet('dyn_intro_name', name);
+                safeSet('dyn_intro_name', greetingName);
                 safeSet('footerClientName', name);
                 safeSet('pTable', ''); // Clear and then append is safer
                 document.getElementById('pTable').innerHTML = accumulationTableHtml;

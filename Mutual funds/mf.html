@@ -732,6 +732,13 @@
             .replace(/'/g, '&#039;');
     }
 
+    function stripClientHonorific(name) {
+        return String(name || '')
+            .trim()
+            .replace(/^(mr|mrs|ms|miss|dr|shri|smt)\.?\s+/i, '')
+            .trim();
+    }
+
     function toggleStepUp() {
         const container = document.getElementById('stepUpInputs');
         const isEnabled = document.getElementById('stepUpEnabled').checked;
@@ -826,6 +833,7 @@
             updateSidebarAmountWords();
 
             const name = document.getElementById('cName').value || "Aditya Vikram";
+            const greetingName = stripClientHonorific(name) || name;
             const parsedStartAge = parseInt(document.getElementById('cAge').value);
             const age = Number.isNaN(parsedStartAge) ? 30 : Math.min(Math.max(1, parsedStartAge), 100);
             if (document.getElementById('cAge').value !== String(age)) {
@@ -854,7 +862,7 @@
 
             if(document.getElementById('retVal')) document.getElementById('retVal').innerText = rate + '%';
             if(document.getElementById('pName')) document.getElementById('pName').innerText = name;
-            if(document.getElementById('dyn_intro_name')) document.getElementById('dyn_intro_name').innerText = name;
+            if(document.getElementById('dyn_intro_name')) document.getElementById('dyn_intro_name').innerText = greetingName;
             if(document.getElementById('dyn_intro_duration')) document.getElementById('dyn_intro_duration').innerText = `${duration}-year`;
             if(document.getElementById('dyn_param_dur')) document.getElementById('dyn_param_dur').innerText = `${duration} Years`;
 
