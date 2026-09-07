@@ -107,6 +107,61 @@
                         <input type="number" id="sipDuration" min="1" max="80" oninput="runLogic()" value="15" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1">
                         <p class="mt-1 ml-1 text-[11px] font-semibold text-slate-400 leading-snug">SIP can continue for part or all of the accumulation phase.</p>
                     </div>
+                    <div class="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[14px] font-black text-amber-700 uppercase">Enable Step-Up SIP</p>
+                                <p class="text-[13px] text-amber-600">Increase SIP amount periodically</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="stepUpEnabled" class="sr-only peer" onchange="toggleStepUp()">
+                                <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                            </label>
+                        </div>
+                        <div id="stepUpInputs" class="hidden mt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up Format</label>
+                                <select id="stepUpType" onchange="toggleStepUpMode(); runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200 bg-white">
+                                    <option value="percent">% Percentage Increase</option>
+                                    <option value="amount">Fixed Amount Increase</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <div id="stepUpPercentWrap">
+                                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up (%)</label>
+                                        <input type="number" id="stepUpPerc" value="10" min="0" step="0.5" oninput="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200 bg-white">
+                                    </div>
+                                    <div id="stepUpAmountWrap" class="hidden">
+                                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Step-Up Amount (₹)</label>
+                                        <input type="number" id="stepUpAmount" value="5000" min="0" step="500" oninput="updateAmountWords(); runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200 bg-white">
+                                        <p id="stepUpAmountWords" class="mt-1 ml-1 text-[10px] font-semibold text-amber-600 leading-snug"></p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Frequency</label>
+                                    <select id="stepUpFreq" onchange="runLogic()" class="floating-input w-full rounded-xl px-4 py-3 text-sm outline-none mt-1 border border-slate-200 bg-white">
+                                        <option value="12">Annually</option>
+                                        <option value="6">Semi-Annually</option>
+                                        <option value="3">Quarterly</option>
+                                        <option value="1">Monthly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-200 pt-5">
+                        <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4">SIP Fund Selection</h3>
+                        <div id="fundInputs" class="space-y-3">
+                            <div class="flex gap-2 text-base">
+                                <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="Magnum Equity Ex Top 100 (SIF)">
+                                <input type="number" placeholder="%" class="fund-perc floating-input w-20 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()" value="100">
+                            </div>
+                        </div>
+                        <button onclick="addFundRow()" class="w-full mt-4 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                            <i class="fa fa-plus-circle text-xs"></i> Add Fund
+                        </button>
+                    </div>
                     <div class="space-y-3">
                         <div class="flex justify-between items-center mb-1">
                             <label class="text-[11px] font-bold text-slate-400 uppercase ml-1">Additional Lumpsums</label>
@@ -273,6 +328,18 @@
                         <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Recommended SIF Allocation</h4>
                     </div>
                     <div class="grid grid-cols-1 gap-4" id="fundListDisplay"></div>
+                </div>
+
+                <div id="stepUpPreviewNote" class="hidden mb-10 p-5 bg-amber-50 border border-amber-100 rounded-2xl">
+                    <div class="flex items-start gap-3">
+                        <div class="mt-0.5 w-8 h-8 rounded-xl bg-white text-amber-600 flex items-center justify-center shadow-sm">
+                            <i class="fa fa-arrow-trend-up text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-amber-700 uppercase tracking-[0.24em] mb-1">Step-Up SIP Applied</p>
+                            <p id="stepUpPreviewText" class="text-sm font-semibold text-slate-700 leading-relaxed"></p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-4 mb-10">
@@ -444,6 +511,58 @@
                 .trim();
         }
 
+        function toggleStepUp() {
+            const container = document.getElementById('stepUpInputs');
+            const isEnabled = document.getElementById('stepUpEnabled')?.checked || false;
+            if (container) container.classList.toggle('hidden', !isEnabled);
+            toggleStepUpMode();
+            runLogic();
+        }
+
+        function toggleStepUpMode() {
+            const type = document.getElementById('stepUpType')?.value || 'percent';
+            document.getElementById('stepUpPercentWrap')?.classList.toggle('hidden', type !== 'percent');
+            document.getElementById('stepUpAmountWrap')?.classList.toggle('hidden', type !== 'amount');
+        }
+
+        function getFrequencyLabel(months) {
+            const labels = {
+                12: 'annually',
+                6: 'semi-annually',
+                3: 'quarterly',
+                1: 'monthly'
+            };
+            return labels[months] || `every ${months} months`;
+        }
+
+        function getStepUpConfig() {
+            const enabled = document.getElementById('stepUpEnabled')?.checked || false;
+            const type = document.getElementById('stepUpType')?.value || 'percent';
+            const percent = Math.max(0, parseFloat(document.getElementById('stepUpPerc')?.value) || 0);
+            const amount = Math.max(0, parseFloat(document.getElementById('stepUpAmount')?.value) || 0);
+            const frequency = Math.max(1, parseInt(document.getElementById('stepUpFreq')?.value) || 12);
+            const valueLabel = type === 'amount'
+                ? formatCurrency(amount)
+                : percent.toLocaleString('en-IN', { maximumFractionDigits: 2 }) + '%';
+
+            return {
+                enabled,
+                type,
+                percent,
+                amount,
+                frequency,
+                frequencyLabel: getFrequencyLabel(frequency),
+                valueLabel,
+                hasValue: type === 'amount' ? amount > 0 : percent > 0
+            };
+        }
+
+        function applySipStepUp(currentSip, stepUpConfig) {
+            if (!stepUpConfig.enabled || !stepUpConfig.hasValue) return currentSip;
+            if (stepUpConfig.type === 'amount') return currentSip + stepUpConfig.amount;
+            return currentSip * (1 + stepUpConfig.percent / 100);
+        }
+
         function numberToIndianWords(num) {
             const value = Math.round(parseFloat(num) || 0);
             if (value <= 0) return '';
@@ -482,6 +601,12 @@
             const sipWords = document.getElementById('sipWords');
             if (sipInput && sipWords) sipWords.innerText = numberToIndianWords(sipInput.value);
 
+            const stepUpAmountInput = document.getElementById('stepUpAmount');
+            const stepUpAmountWords = document.getElementById('stepUpAmountWords');
+            if (stepUpAmountInput && stepUpAmountWords) {
+                stepUpAmountWords.innerText = numberToIndianWords(stepUpAmountInput.value);
+            }
+
             document.querySelectorAll('.additional-lumpsum-row').forEach(function(row) {
                 const input = row.querySelector('.additional-lumpsum-amount');
                 const output = row.querySelector('.additional-lumpsum-words');
@@ -508,6 +633,21 @@
             runLogic();
         }
 
+        function addFundRow() {
+            const container = document.getElementById('fundInputs');
+            if (!container) return;
+            const row = document.createElement('div');
+            row.className = 'flex gap-2 text-base';
+            row.innerHTML = `
+                <input type="text" placeholder="Fund Name" class="fund-name floating-input flex-1 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
+                <input type="number" placeholder="%" class="fund-perc floating-input w-16 rounded-xl px-3 py-2 text-sm outline-none" oninput="runLogic()">
+                <button onclick="this.parentElement.remove(); runLogic()" class="w-9 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                    <i class="fa fa-trash text-sm"></i>
+                </button>`;
+            container.appendChild(row);
+            runLogic();
+        }
+
         function clampInput(id, min, max) {
             const input = document.getElementById(id);
             if (!input || input.value.trim() === '') return min;
@@ -527,6 +667,7 @@
             const lumpsum = Math.max(0, parseFloat(document.getElementById('lumpsumAmount').value) || 0);
             const monthlySip = Math.max(0, parseFloat(document.getElementById('sipAmount').value) || 0);
             const rawSipDuration = clampInput('sipDuration', 1, 80);
+            const stepUpConfig = getStepUpConfig();
             const returnRate = parseFloat(document.getElementById('returnRate').value) || 14;
             const annualRate = returnRate / 100;
             const monthlyRate = annualRate / 12;
@@ -548,6 +689,16 @@
                     additionalLumpsums.push({ age, amount, fundName });
                 }
             });
+            const sipFunds = [];
+            document.querySelectorAll('#fundInputs .fund-name').forEach(function(nameInput) {
+                const fundRow = nameInput.parentElement;
+                const percInput = fundRow.querySelector('.fund-perc');
+                const fundName = nameInput.value.trim();
+                const percent = Math.max(0, parseFloat(percInput?.value) || 0);
+                if (fundName && percent > 0) {
+                    sipFunds.push({ fundName, percent });
+                }
+            });
 
             document.getElementById('swpInputs').classList.toggle('hidden', !swpEnabled);
             document.getElementById('swpSection').classList.toggle('hidden', !swpEnabled);
@@ -564,7 +715,8 @@
             document.getElementById('introDuration').innerText = accumulationYears + '-year';
             const introMethod = document.getElementById('introMethod');
             if (introMethod) {
-                if (lumpsum > 0 && monthlySip > 0) introMethod.innerText = 'Lumpsum + SIP';
+                if (stepUpConfig.enabled && stepUpConfig.hasValue && monthlySip > 0) introMethod.innerText = 'Lumpsum + Step-Up SIP';
+                else if (lumpsum > 0 && monthlySip > 0) introMethod.innerText = 'Lumpsum + SIP';
                 else if (monthlySip > 0) introMethod.innerText = 'SIP';
                 else introMethod.innerText = 'Lumpsum';
             }
@@ -593,10 +745,12 @@
             const investedData = [];
             const gainData = [];
             let tableHtml = '';
+            let runningSip = monthlySip;
 
             for (let year = 1; year <= accumulationYears; year++) {
                 const age = currentAge + year - 1;
                 const openingCorpus = corpus;
+                const yearStartSip = runningSip;
                 const yearlyLumpsumItems = additionalLumpsums.filter(item => item.age === age);
                 const yearlyLumpsum = yearlyLumpsumItems.reduce((sum, item) => sum + item.amount, 0);
                 if (yearlyLumpsum > 0) {
@@ -608,10 +762,15 @@
                 let annualSipInvested = 0;
                 if (year <= sipDuration) {
                     for (let month = 1; month <= 12; month++) {
-                        corpus += monthlySip;
-                        annualSipInvested += monthlySip;
-                        totalSipInvested += monthlySip;
-                        totalInvested += monthlySip;
+                        const totalMonthsPassed = ((year - 1) * 12) + month;
+                        if (stepUpConfig.enabled && stepUpConfig.hasValue && totalMonthsPassed > 1 && (totalMonthsPassed - 1) % stepUpConfig.frequency === 0) {
+                            runningSip = applySipStepUp(runningSip, stepUpConfig);
+                        }
+
+                        corpus += runningSip;
+                        annualSipInvested += runningSip;
+                        totalSipInvested += runningSip;
+                        totalInvested += runningSip;
                         corpus *= (1 + monthlyRate);
                     }
                 } else {
@@ -626,6 +785,13 @@
                 const investmentDetails = [];
                 if (annualSipInvested > 0) {
                     investmentDetails.push(`<div class="text-[10px] text-blue-600 font-black uppercase mt-1">SIP: ${formatCurrency(annualSipInvested)}</div>`);
+                    if (stepUpConfig.enabled && stepUpConfig.hasValue) {
+                        const yearEndSip = runningSip;
+                        const monthlyDetail = Math.round(yearStartSip) === Math.round(yearEndSip)
+                            ? `Monthly: ${formatCurrency(yearEndSip)}`
+                            : `Monthly: ${formatCurrency(yearStartSip)} to ${formatCurrency(yearEndSip)}`;
+                        investmentDetails.push(`<div class="text-[10px] text-amber-600 font-black uppercase mt-1">${monthlyDetail}</div>`);
+                    }
                 }
                 yearlyLumpsumItems.forEach(function(item) {
                     investmentDetails.push(`
@@ -651,7 +817,7 @@
             }
 
             const gain = corpus - totalInvested;
-            renderFundList(sifName, lumpsum, monthlySip, sipDuration, additionalLumpsums);
+            renderFundList(sifName, lumpsum, monthlySip, sipDuration, additionalLumpsums, stepUpConfig, sipFunds);
             document.getElementById('projectionTable').innerHTML = tableHtml;
             document.getElementById('pInvestment').innerText = formatCurrency(totalInvested);
             document.getElementById('pCorpus').innerText = formatCurrency(corpus);
@@ -688,6 +854,15 @@
             document.getElementById('totalWealthAgeEnd').innerText = swpEnabled
                 ? retireAge + (Math.max(1, parseInt(document.getElementById('swpDuration').value) || 25)) - 1
                 : currentAge + accumulationYears;
+            const stepUpPreviewNote = document.getElementById('stepUpPreviewNote');
+            const stepUpPreviewText = document.getElementById('stepUpPreviewText');
+            if (stepUpPreviewNote && stepUpPreviewText) {
+                const showStepUpPreview = stepUpConfig.enabled && stepUpConfig.hasValue && monthlySip > 0 && sipDuration > 0;
+                stepUpPreviewNote.classList.toggle('hidden', !showStepUpPreview);
+                stepUpPreviewText.innerText = showStepUpPreview
+                    ? `Starting SIP of ${formatCurrency(monthlySip)} increases by ${stepUpConfig.valueLabel} ${stepUpConfig.frequencyLabel} during the ${sipDuration}-year SIP contribution period.`
+                    : '';
+            }
             renderMixChart(lumpsum, totalSipInvested, totalAdditionalLumpsum);
             renderBuildUpChart(labels, investedData, gainData);
         }
@@ -729,19 +904,13 @@
             return { totalPaidOut, finalCorpus: corpus };
         }
 
-        function renderFundList(sifName, initialLumpsum, monthlySip, sipDuration, additionalLumpsums) {
+        function renderFundList(sifName, initialLumpsum, monthlySip, sipDuration, additionalLumpsums, stepUpConfig = { enabled: false, hasValue: false }, sipFunds = []) {
             const container = document.getElementById('fundListDisplay');
             if (!container) return;
 
             let html = '';
-            if (initialLumpsum > 0 || monthlySip > 0) {
-                const hasSip = monthlySip > 0 && sipDuration > 0;
-                const planAmount = hasSip
-                    ? `${formatCurrency(initialLumpsum)} + ${formatCurrency(monthlySip)}/mo`
-                    : formatCurrency(initialLumpsum);
-                const planDuration = hasSip
-                    ? `<p class="text-[10px] font-bold text-slate-400">${sipDuration} year SIP</p>`
-                    : '<p class="text-[10px] font-bold text-slate-400">Initial lumpsum allocation</p>';
+            const hasSip = monthlySip > 0 && sipDuration > 0;
+            if (initialLumpsum > 0) {
                 html += `
                     <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
                         <div class="flex items-center gap-4">
@@ -757,11 +926,37 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Plan</p>
-                            <p class="text-sm font-black text-teal-700">${planAmount}</p>
-                            ${planDuration}
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Lumpsum</p>
+                            <p class="text-sm font-black text-teal-700">${formatCurrency(initialLumpsum)}</p>
+                            <p class="text-[10px] font-bold text-slate-400">Initial lumpsum allocation</p>
                         </div>
                     </div>`;
+            }
+
+            if (hasSip) {
+                const selectedSipFunds = sipFunds.length ? sipFunds : [{ fundName: sifName, percent: 100 }];
+                selectedSipFunds.forEach(function(item) {
+                    const monthlyAllocation = (monthlySip * item.percent) / 100;
+                    html += `
+                        <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-2xl">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600 font-bold text-xs">
+                                    ${item.percent.toLocaleString('en-IN', { maximumFractionDigits: 2 })}%
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">${escapeHtml(item.fundName)}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded-sm font-black uppercase tracking-widest">${stepUpConfig.enabled && stepUpConfig.hasValue ? 'Step-Up SIP' : 'SIP'}</span>
+                                        <p class="text-[10px] text-slate-700 font-medium uppercase tracking-normal">${sipDuration} year systematic allocation</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Monthly</p>
+                                <p class="text-sm font-black text-blue-700">${formatCurrency(monthlyAllocation)}</p>
+                            </div>
+                        </div>`;
+                });
             }
 
             additionalLumpsums.forEach(function(item) {
@@ -879,6 +1074,7 @@
 
         window.onload = function() {
             updateAmountWords();
+            toggleStepUpMode();
             runLogic();
         };
     </script>
