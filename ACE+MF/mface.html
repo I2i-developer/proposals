@@ -1365,7 +1365,10 @@
                 const swpToggle = document.getElementById('swpToggle')?.checked;
                 const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
                 const earlySwpEnabled = document.getElementById('earlySwpEnabled')?.checked || false;
-                const totalYears = Math.max(aceTerm, mfSipDuration);
+                const compoundingGapYears = swpToggle && !earlySwpEnabled
+                    ? Math.max(0, startAge - projectionStartAge)
+                    : 0;
+                const totalYears = Math.max(aceTerm, mfSipDuration, compoundingGapYears);
                 const termEndAge = projectionStartAge + aceTerm - 1;
                 const projectionEndAge = projectionStartAge + totalYears - 1;
                 const effectiveSwpStartAge = Math.min(Math.max(startAge, projectionStartAge), projectionEndAge);
