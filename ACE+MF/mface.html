@@ -203,6 +203,18 @@
                         </div>
                         <p class="text-[12px] text-slate-400 mt-1 font-medium">Choose a SIP period between 5 and 60 years. It can continue after the ACE policy term.</p>
                     </div>
+                    <div id="redirectAcePremiumWrap" class="hidden p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[13px] font-black text-blue-700 uppercase">Redirect ACE Premium to MF</p>
+                                <p class="text-[12px] text-blue-600">Invest annual premium as MF lumpsum after ACE policy term</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="redirectAcePremiumEnabled" class="sr-only peer" onchange="runLogic()">
+                                <div class="w-11 h-6 bg-slate-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
                     <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
                         <div class="flex items-center justify-between">
                             <div>
@@ -1365,6 +1377,16 @@
                 const swpToggle = document.getElementById('swpToggle')?.checked;
                 const startAge = parseInt(document.getElementById('swpStartAge')?.value) || 60;
                 const earlySwpEnabled = document.getElementById('earlySwpEnabled')?.checked || false;
+                const showRedirectAcePremium = mfSipDuration > aceTerm;
+                const redirectAcePremiumWrap = document.getElementById('redirectAcePremiumWrap');
+                const redirectAcePremiumToggle = document.getElementById('redirectAcePremiumEnabled');
+                if (redirectAcePremiumWrap) {
+                    redirectAcePremiumWrap.classList.toggle('hidden', !showRedirectAcePremium);
+                }
+                if (!showRedirectAcePremium && redirectAcePremiumToggle) {
+                    redirectAcePremiumToggle.checked = false;
+                }
+                const redirectAcePremiumEnabled = showRedirectAcePremium && (redirectAcePremiumToggle?.checked || false);
                 const compoundingGapYears = swpToggle && !earlySwpEnabled
                     ? Math.max(0, startAge - projectionStartAge)
                     : 0;
@@ -1411,6 +1433,7 @@
                 let growthPoints = [];
                 let runningMfSip = mfSip;
                 let totalMfSipInvested = 0;
+                let totalRedirectedAcePremium = 0;
                 let firstYearMfSipAverage = mfSip;
                 const openingCorpusByAge = {};
                 const accumulationByAge = {};
@@ -1420,6 +1443,11 @@
                     let currentAge = projectionStartAge + yr - 1;
                     openingCorpusByAge[currentAge] = currentCorpus;
                     let yrLumpsum = plannedLumpsums[yr] || 0;
+                    const redirectedAcePremium = (redirectAcePremiumEnabled && aceTerm > 0 && yr > aceTerm && yr <= mfSipDuration) ? acePrem : 0;
+                    if (redirectedAcePremium > 0) {
+                        yrLumpsum += redirectedAcePremium;
+                        totalRedirectedAcePremium += redirectedAcePremium;
+                    }
                     // let yrWithdrawal = plannedWithdrawals[yr] || 0;
                     let yrWithdrawal = 0;
                     let withdrawalTags = [];
@@ -1434,7 +1462,7 @@
                     
                     let yrAceIn = (yr <= aceTerm) ? aceInc : 0;
                     if (yr === aceTerm) yrAceIn += aceMat;
-                    aceAdditionsByAge[currentAge] = yrAceIn;
+                    aceAdditionsByAge[currentAge] = yrAceIn + redirectedAcePremium;
 
                     let annualSip = 0;
                     let yearStartSip = runningMfSip;
@@ -1495,6 +1523,9 @@
                         sipDisplay += `<span class="text-emerald-600 text-[12px] ml-1">
                             + ₹${yrLumpsum.toLocaleString('en-IN')} Lumpsum Added
                         </span>`;
+                        if (redirectedAcePremium > 0) {
+                            sipDisplay += `<div class="text-[10px] text-blue-600 font-black uppercase mt-1">ACE Premium redirected to MF</div>`;
+                        }
                     }
 
                     if(document.getElementById('sum_final_age')) {
@@ -1564,7 +1595,7 @@
                 }
 
                 // 6. CALCULATE TOTALS FOR SUMMARY
-                const totalInvested = (acePrem * acePpt) + totalMfSipInvested + totalLumpsums;
+                const totalInvested = (acePrem * acePpt) + totalMfSipInvested + totalLumpsums + totalRedirectedAcePremium;
                 const totalAceBenefit = (aceInc * aceTerm) + aceMat;
 
                 // 7. UPDATE ALL UI ELEMENTS (Safely)
@@ -1670,7 +1701,7 @@
                 updateLabelTax(acePrem);
                 updateFundPills();
                 updateMainChart(labels, growthPoints);
-                updateMixChart(acePrem, firstYearMfSipAverage, totalLumpsums);
+                updateMixChart(acePrem, firstYearMfSipAverage, totalLumpsums + totalRedirectedAcePremium);
 
             } catch (e) { 
                 console.error("Logic Error:", e); 
