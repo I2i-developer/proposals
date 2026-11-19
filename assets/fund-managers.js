@@ -107,6 +107,12 @@
     ];
     Object.assign(profiles, window.FundManagerLibrary?.profiles || {});
     catalogue.push(...(window.FundManagerLibrary?.catalogue || []));
+    Object.entries(window.FundManagerLibrary?.portraits || {}).forEach(([id, portrait]) => {
+        if (profiles[id]) {
+            profiles[id].photo = new URL(`fund-managers/${portrait.file}`, assetRoot).href;
+            profiles[id].photoSource = portrait.source;
+        }
+    });
     const overrides = new Map();
     const custom = new Map();
     let sequence = 0;
@@ -175,18 +181,32 @@
         return [...funds].map(([key, name]) => ({ key, name }));
     }
 
+    function selectManager(entry) {
+        if (!entry) return null;
+        const component = entry.component || 'equity';
+        const candidates = entry.managers.filter(id => profiles[id] && (profiles[id].components || ['equity']).includes(component));
+        // Compare experience only among managers responsible for the relevant component.
+        return candidates.reduce((best, id) => {
+            const experience = parseFloat(profiles[id].experience) || 0;
+            const bestExperience = best ? parseFloat(profiles[best].experience) || 0 : -1;
+            return experience > bestExperience ? id : best;
+        }, null);
+    }
+
     function buildProfiles() {
         const result = new Map();
+        const customByFund = new Map([...custom].map(([id, profile]) => [profile.fundKey, { id, profile }]));
         selectedFunds.forEach(fund => {
+            const manual = customByFund.get(fund.key);
+            if (manual) {
+                result.set(manual.id, { id: manual.id, ...manual.profile, funds: [fund.name] });
+                return;
+            }
             const entry = catalogue.find(item => item.names.some(name => normalize(name) === fund.key));
-            (entry?.managers || []).forEach(id => {
-                if (!result.has(id)) result.set(id, { id, ...profiles[id], ...overrides.get(id), funds: [] });
-                result.get(id).funds.push(fund.name);
-            });
-        });
-        custom.forEach((profile, id) => {
-            const fund = selectedFunds.find(item => item.key === profile.fundKey);
-            if (fund) result.set(id, { id, ...profile, funds: [fund.name] });
+            const id = selectManager(entry);
+            if (!id) return;
+            if (!result.has(id)) result.set(id, { id, ...profiles[id], ...overrides.get(id), funds: [] });
+            result.get(id).funds.push(fund.name);
         });
         return [...result.values()];
     }
@@ -209,7 +229,7 @@
                         <label class="fm-toggle"><input type="checkbox" data-field="include" ${profile.include !== false ? 'checked' : ''}> Include profile</label>
                         ${custom.has(profile.id) ? '<button class="fm-icon-button" type="button" data-action="remove" title="Remove manager" aria-label="Remove manager"><i class="fa fa-trash" aria-hidden="true"></i></button>' : ''}
                     </div>
-                    ${custom.has(profile.id) ? `<label class="fm-field">Proposed Fund<select data-field="fundKey">${selectedFunds.map(fund => `<option value="${escape(fund.key)}" ${fund.key === profile.fundKey ? 'selected' : ''}>${escape(fund.name)}</option>`).join('')}</select></label>` : ''}
+                    ${custom.has(profile.id) ? `<label class="fm-field">Proposed Fund<select data-field="fundKey">${selectedFunds.map(fund => `<option value="${escape(fund.key)}" ${fund.key === profile.fundKey ? 'selected' : ''} ${[...custom].some(([id, manager]) => id !== profile.id && manager.fundKey === fund.key) ? 'disabled' : ''}>${escape(fund.name)}</option>`).join('')}</select></label>` : ''}
                     ${custom.has(profile.id) ? `<label class="fm-field">Load Manager Profile<select data-manager-preset><option value="">Custom Profile</option>${managerOptions()}</select></label>` : ''}
                     ${field('Manager Name', 'name', profile.name, { max: 80 })}
                     ${field('Role / Designation', 'role', profile.role, { max: 100 })}
@@ -233,7 +253,7 @@
         const missingNode = editor.querySelector('.fm-missing');
         missingNode.textContent = missing.length ? `Add manager details for: ${missing.map(item => item.name).join(', ')}` : '';
         missingNode.hidden = !missing.length;
-        editor.querySelector('.fm-add').disabled = !selectedFunds.length;
+        editor.querySelector('.fm-add').disabled = !selectedFunds.some(fund => ![...custom.values()].some(profile => profile.fundKey === fund.key));
     }
 
     function managerOptions() {
@@ -266,6 +286,7 @@
     function renderProfile(profile) {
         const initials = profile.name.replace(/,.*$/, '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('');
         const source = safeUrl(profile.source);
+        const photoSource = profile.photo?.startsWith(assetRoot.href) ? safeUrl(profile.photoSource) : '';
         const date = readableDate(profile.asOf);
         const photo = profile.photo && (/^data:image\/(png|jpeg|webp);base64,/.test(profile.photo) || profile.photo.startsWith(assetRoot.href)) ? profile.photo : '';
         return `<article class="fm-profile">
@@ -281,7 +302,7 @@
                 ${profile.qualifications ? `<div><p class="fm-label">Qualifications</p><p class="fm-detail-copy">${escape(profile.qualifications)}</p></div>` : ''}
             </div>
             ${profile.expertise ? `<p class="fm-expertise">${escape(profile.expertise)}</p>` : ''}
-            ${source || date ? `<p class="fm-source">${source ? `<a href="${escape(source)}" target="_blank" rel="noopener noreferrer">${escape(profile.sourceLabel || 'Profile source')}</a>` : ''}${source && date ? ' / ' : ''}${date ? `Profile as of ${escape(date)}` : ''}</p>` : ''}
+            ${source || date || (photo && photoSource) ? `<p class="fm-source">${source ? `<a href="${escape(source)}" target="_blank" rel="noopener noreferrer">${escape(profile.sourceLabel || 'Profile source')}</a>` : ''}${source && date ? ' / ' : ''}${date ? `Profile as of ${escape(date)}` : ''}${photo && photoSource ? `${source || date ? ' / ' : ''}<a href="${escape(photoSource)}" target="_blank" rel="noopener noreferrer">Official portrait source</a>` : ''}</p>` : ''}
         </article>`;
     }
 
@@ -332,7 +353,7 @@
         editor.className = 'fm-editor no-print';
         pages.className = 'fm-pages';
         editor.innerHTML = `<div class="fm-toolbar"><h3>Fund Manager Profiles</h3><label class="fm-toggle"><input type="checkbox" data-include-page checked aria-label="Include fund manager pages"> Include</label></div>
-            <div data-editor-body><p class="fm-status"></p><p class="fm-missing fm-status fm-warning" hidden></p><div class="fm-editors"></div><button type="button" class="fm-add"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add Fund Manager</button></div>`;
+            <div data-editor-body><p class="fm-status"></p><p class="fm-missing fm-status fm-warning" hidden></p><div class="fm-editors"></div><button type="button" class="fm-add"><i class="fa fa-user-plus" aria-hidden="true"></i> Add Fund Manager</button></div>`;
         const suggestions = document.createElement('datalist');
         suggestions.id = 'fundManagerFundOptions';
         suggestions.innerHTML = [...new Set(catalogue.flatMap(entry => entry.names))].sort().map(name => `<option value="${escape(name)}"></option>`).join('');
@@ -347,17 +368,29 @@
             const details = event.target.closest('[data-profile]');
             const key = event.target.dataset.field;
             if (details && key) {
+                if (key === 'fundKey' && [...custom].some(([id, profile]) => id !== details.dataset.profile && profile.fundKey === event.target.value)) {
+                    event.target.value = custom.get(details.dataset.profile).fundKey;
+                    return;
+                }
                 saveField(details.dataset.profile, key, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
                 if (key === 'name') details.querySelector('summary').textContent = event.target.value || 'New fund manager';
+                if (key === 'fundKey') {
+                    renderEditors();
+                    editor.querySelector(`[data-profile="${details.dataset.profile}"]`).open = true;
+                }
             }
         });
         editor.addEventListener('click', event => {
             if (event.target.closest('.fm-add')) {
-                if (!selectedFunds.length) return;
+                const fund = selectedFunds.find(fund => ![...custom.values()].some(profile => profile.fundKey === fund.key));
+                if (!fund) return;
                 const id = `custom-${++sequence}`;
-                custom.set(id, { name: '', role: '', amc: '', experience: '', bio: '', career: '', qualifications: '', expertise: '', source: '', asOf: '', fundKey: selectedFunds[0].key });
+                const entry = catalogue.find(item => item.names.some(name => normalize(name) === fund.key));
+                const defaultId = selectManager(entry);
+                custom.set(id, { name: '', role: '', amc: '', experience: '', bio: '', career: '', qualifications: '', expertise: '', source: '', asOf: '', ...profiles[defaultId], ...overrides.get(defaultId), fundKey: fund.key, include: true });
                 activeProfiles = buildProfiles();
                 renderEditors();
+                renderPages();
                 const details = editor.querySelector(`[data-profile="${id}"]`);
                 details.open = true;
                 details.querySelector('[data-field="name"]').focus();

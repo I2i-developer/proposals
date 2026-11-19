@@ -53,6 +53,7 @@
         }),
         mayank: profile('HSBC Mutual Fund', sources.hsbc, '2026-05-31', {
             name: 'Mayank Chaturvedi', role: 'Fund Manager, Overseas Investments', experience: '5',
+            components: ['overseas-equity'],
             career: 'HSBC Asset Management India', expertise: 'Overseas securities, international investment exposure',
             bio: 'Mayank is the designated manager for overseas securities in HSBC schemes, where applicable. His responsibility is the foreign-investment component, distinct from the domestic equity portfolio.'
         }),
@@ -123,6 +124,7 @@
         }),
         abakkusAbhishek: profile('Abakkus Mutual Fund', sources.abakkus, '2026-10-17', {
             name: 'Abhishek Krishnaswami Srinivas', role: 'Fund Manager & Dealer, Fixed Income', experience: '12+',
+            components: ['fixed-income'],
             qualifications: 'PGDM, Finance\nB.Com, University of Mumbai',
             career: 'Insurance-sector investment management\nAbakkus Mutual Fund', expertise: 'Fixed-income investing, debt portfolio management',
             bio: 'Abhishek manages the fixed-income component of Abakkus schemes. His experience spans investment and portfolio management in debt markets.'
@@ -179,6 +181,21 @@
             expertise: 'Equity research, small-cap and diversified portfolios',
             bio: 'Asit has experience in both securities research and fund management. His earlier roles included SBI Funds and Lotus India AMC before his work at JM Financial.'
         }),
+        carnelianDeepak: profile('Carnelian Mutual Fund', 'https://carnelianmf.com/team/deepak-malik', '2026-11-19', {
+            name: 'Deepak Malik, CFA', role: 'Chief Investment Officer & Fund Manager', experience: '25+',
+            components: ['equity', 'fixed-income'],
+            qualifications: 'CFA Charterholder\nMBA, Kurukshetra University\nInternational Business Program, IIM Calcutta',
+            career: 'Axis Mutual Fund, Equity Research\nEdelweiss Securities, Institutional Research\nFaering Capital, Private Equity\nCarnelian Asset Management / Carnelian Mutual Fund',
+            expertise: 'Fundamental research, portfolio construction, investment risk management',
+            bio: 'Deepak brings more than 25 years of experience, predominantly in investment management. His career spans equity research at Axis Mutual Fund and Edelweiss, private equity at Faering Capital, and investment responsibilities at Carnelian.'
+        }),
+        carnelianViraj: profile('Carnelian Mutual Fund', 'https://carnelianmf.com/team/viraj-parekh', '2026-11-19', {
+            name: 'Viraj Parekh', role: 'Fund Manager', components: ['equity', 'fixed-income'],
+            qualifications: 'B.Com\nIPCC, Institute of Chartered Accountants of India',
+            career: 'Carnelian Asset Management & Advisors, Research Analyst, 2021-2026\nCarnelian Investment Managers, since March 2026',
+            expertise: 'Company research, business-model analysis, portfolio monitoring',
+            bio: 'Viraj joined Carnelian Investment Managers in March 2026 after five years in the sponsor\'s equity research team. His responsibilities include investment analysis, portfolio construction and performance monitoring.'
+        }),
         deepak: profile('JM Financial Mutual Fund', sources.jm, '2026-05-31', {
             name: 'Deepak Gupta', role: 'Head of Research & Senior Fund Manager, Equity', experience: '21+',
             qualifications: 'Chartered Accountant\nM.Com, University of Mumbai',
@@ -188,8 +205,10 @@
         })
     };
 
-    function entry(names, managers, source, asOf) { return { names, managers, source, asOf }; }
+    function entry(names, managers, source, asOf, component = 'equity') { return { names, managers, source, asOf, component }; }
     const catalogue = [
+        entry(['Carnelian Small Cap Fund'], ['carnelianDeepak', 'carnelianViraj'], 'https://carnelianmf.com/small-cap-fund-nfo', '2026-11-19'),
+        entry(['Carnelian Liquid Fund'], ['carnelianDeepak', 'carnelianViraj'], 'https://carnelianmf.com/funds/carnelian-liquid', '2026-11-19', 'fixed-income'),
         entry(['Invesco India Midcap Fund'], ['aditya'], sources.invesco, '2026-04-30'),
         entry(['Invesco India Smallcap Fund'], ['taher', 'aditya'], sources.invesco, '2026-04-30'),
         entry(['Invesco India Flexi Cap Fund'], ['taher'], sources.invesco, '2026-04-30'),
@@ -221,5 +240,41 @@
         entry(['JM Large and Mid Cap Fund'], ['asit', 'deepak'], sources.jm, '2026-05-31')
     ];
 
-    window.FundManagerLibrary = { profiles, catalogue };
+    // Official portrait URLs are retained for provenance; proposals use local copies.
+    const portraits = {
+        venugopal: { file: 'venugopal-manghat.jpeg', source: 'https://www.assetmanagement.hsbc.co.in/assets/documents/mutual-funds/en/ddecda17-3e8e-4a03-9da3-ffe02591a58b/equity-capability-and-market-outlook.pdf#page=9', document: 'https://www.assetmanagement.hsbc.co.in/assets/documents/mutual-funds/en/ddecda17-3e8e-4a03-9da3-ffe02591a58b/equity-capability-and-market-outlook.pdf', page: 9, imageObject: 92 },
+        neelotpal: { file: 'neelotpal-sahai.jpeg', source: 'https://www.assetmanagement.hsbc.co.in/assets/documents/mutual-funds/en/ddecda17-3e8e-4a03-9da3-ffe02591a58b/equity-capability-and-market-outlook.pdf#page=9', document: 'https://www.assetmanagement.hsbc.co.in/assets/documents/mutual-funds/en/ddecda17-3e8e-4a03-9da3-ffe02591a58b/equity-capability-and-market-outlook.pdf', page: 9, imageObject: 100 },
+        cheenu: { file: 'cheenu-gupta.jpeg', source: 'https://www.assetmanagement.hsbc.co.in/assets/documents/mutual-funds/en/60501823-9e31-4783-acd2-920d31302066/hsbc-aggressive-hybrid-fund-sep-2023-doc.pdf#page=20', document: 'https://www.assetmanagement.hsbc.co.in/assets/documents/mutual-funds/en/60501823-9e31-4783-acd2-920d31302066/hsbc-aggressive-hybrid-fund-sep-2023-doc.pdf', page: 20, imageObject: 166 },
+        ramesh: { file: 'ramesh-mantri.jpeg', source: 'https://wocamc-prd-prelogin-s3-00.s3.ap-south-1.amazonaws.com/12_WOC_MAAF_PPT_04a1fa0b54.pdf#page=36', document: 'https://wocamc-prd-prelogin-s3-00.s3.ap-south-1.amazonaws.com/12_WOC_MAAF_PPT_04a1fa0b54.pdf', page: 36, imageObject: 248 },
+        gaurav: { file: 'gaurav-mehta.png', source: 'https://www.sbimf.com/about-us#sbimf-our-people', image: 'https://www.sbimf.com/images/default-source/fund-managers/Gaurav-Mehta.png' },
+        taher: { file: 'taher-badshah.png', source: 'https://www.invescomutualfund.com/about-us/our-people', image: 'https://www.invescomutualfund.com/images/default-source/board-of-directors-asset-management-company-photo/taher72edf907eee8616aaa28ff00007d74af.png?sfvrsn=630598c2_1' },
+        hiten: { file: 'hiten-jain.png', source: 'https://www.invescomutualfund.com/about-us/our-people', image: 'https://www.invescomutualfund.com/images/default-source/board-of-directors-asset-management-company-photo/hiten.png?sfvrsn=a80798c2_1' },
+        aditya: { file: 'aditya-khemani.png', source: 'https://www.invescomutualfund.com/about-us/our-people', image: 'https://www.invescomutualfund.com/images/default-source/board-of-directors-asset-management-company-photo/aditya-khemani.png?sfvrsn=f31898c2_1' },
+        saurabh: { file: 'saurabh-kataria.jpg', source: 'https://www.trustmf.com/why-trust-us', image: 'https://trustmf.com/Content/2026/5/SK%20FInal%201_20260518105030.jpg' },
+        aakash: { file: 'aakash-manghani.jpg', source: 'https://www.trustmf.com/why-trust-us', image: 'https://trustmf.com/Content/2025/11/Aakash-Mangh_20251107180700.jpg' },
+        carnelianDeepak: { file: 'carnelian-deepak-malik.jpeg', source: 'https://carnelianmf.com/team/deepak-malik', image: 'https://carnelianmf.com/_files/media/01a0c7ec-70f3-7059-a143-544f8e604e61/Deepak.jpeg' },
+        carnelianViraj: { file: 'carnelian-viraj-parekh.png', source: 'https://carnelianmf.com/team/viraj-parekh', image: 'https://carnelianmf.com/_files/media/01a0c7ec-70f3-7059-a143-544f8e604e61/Viraj-profile.png' },
+        sanjay: { file: 'sanjay-doshi.jpg', source: sources.abakkus, image: 'https://www.abakkusmf.com/uploads/Sanjay_94f1d2af54.jpg' },
+        pratish: { file: 'pratish-krishnan.jpg', source: sources.abakkus, image: 'https://www.abakkusmf.com/uploads/Pratish_002_b286486afa.jpg' },
+        abakkusAbhishek: { file: 'abhishek-krishnaswami-srinivas.jpg', source: sources.abakkus, image: 'https://www.abakkusmf.com/uploads/FM_5_e8cc813c8f.jpg' },
+        rajeev: { file: 'rajeev-thakkar.jpg', source: 'https://amc.ppfas.com/schemes/fund-managers/', image: 'https://amc.ppfas.com/img/management-photos/rajeev-thakkar-card.jpg' },
+        raunak: { file: 'raunak-onkar.jpg', source: 'https://amc.ppfas.com/schemes/fund-managers/', image: 'https://amc.ppfas.com/img/management-photos/raunak-onkar-card.jpg' },
+        rajMehta: { file: 'raj-mehta.jpg', source: 'https://amc.ppfas.com/schemes/fund-managers/', image: 'https://amc.ppfas.com/img/management-photos/raj-mehta-card.jpg' },
+        rukun: { file: 'rukun-tarachandani.jpg', source: 'https://amc.ppfas.com/schemes/fund-managers/', image: 'https://amc.ppfas.com/img/management-photos/rukun-tarachandani-card.jpg' },
+        ankit: { file: 'ankit-agarwal.jpg', source: 'https://www.motilaloswalmf.com/about-us', image: 'https://www.motilaloswalmf.com/media_199388a0809b1c62b91ff6353e3a847c146ee6c52.jpg?width=750&format=jpg&optimize=medium' },
+        varun: { file: 'varun-sharma.jpg', source: 'https://www.motilaloswalmf.com/about-us', image: 'https://www.motilaloswalmf.com/media_119e7e329aba28b7774f33d280b7cce153a584465.jpg?width=750&format=jpg&optimize=medium' },
+        manish: { file: 'manish-gunwani.jpg', source: 'https://bandhanamc.com/about/executive-team/manish-gunwani/', image: 'https://bandhanamc.com/assets/jpegs/about/team/manish-gunwani.jpg' },
+        satish: { file: 'satish-ramanathan.png', source: 'https://www.jmfinancialmf.com/AboutUs/Teams', image: 'https://www.jmfinancialmf.com/CMS/aboutus/MrSatishRamanathan.png' },
+        asit: { file: 'asit-bhandarkar.png', source: 'https://www.jmfinancialmf.com/AboutUs/Teams', image: 'https://www.jmfinancialmf.com/CMS/aboutus/MrAsitBhandarkar.png' },
+        deepak: { file: 'jm-deepak-gupta.jpg', source: 'https://www.jmfinancialmf.com/AboutUs/Teams', image: 'https://www.jmfinancialmf.com/CMS/aboutus/Deepak_Gupta.jpg' },
+        vinit: { file: 'vinit-sambre.jpg', source: 'https://www.dspim.com/our-team#fundManager-tab', image: 'https://www.dspim.com/media/pages/our-team/c1414c9bab-1757771475/vinit-sambre.jpg' },
+        dspAbhishek: { file: 'abhishek-ghosh.webp', source: 'https://www.dspim.com/our-team#fundManager-tab', image: 'https://www.dspim.com/campaigns/images/fund_manager/fm_28.webp' },
+        bhavin: { file: 'bhavin-gandhi.webp', source: 'https://www.dspim.com/our-team#fundManager-tab', image: 'https://www.dspim.com/campaigns/images/fund_manager/fm_40.webp' },
+        mihir: { file: 'mihir-vora.jpeg', source: 'https://www.trustmf.com/', image: 'https://www.trustmf.com/images/aboutusoverview/aboutusoverview_q2.jpeg' },
+        trideep: { file: 'trideep-bhattacharya.jpg', source: 'https://www.edelweissmf.com/know-us/our-team', image: 'https://www.edelweissmf.com/images/EDL/investment/TrideepBhattacharya_2025-240x240.jpg' },
+        ashwani: { file: 'ashwani-agarwalla.jpg', source: 'https://www.edelweissmf.com/know-us/our-team', image: 'https://www.edelweissmf.com/images/EDL/investment/Ashwani-Agarwalla_080623.jpg' },
+        dhruv: { file: 'dhruv-bhatia.jpg', source: 'https://www.edelweissmf.com/know-us/our-team', image: 'https://www.edelweissmf.com/images/EDL/investment/DhruvBhatia_240x240.jpg' }
+    };
+
+    window.FundManagerLibrary = { profiles, catalogue, portraits };
 })();
